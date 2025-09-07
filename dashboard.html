@@ -418,6 +418,36 @@
             font-weight: 700;
             color: var(--accent);
         }
+
+        .support-section {
+            margin-top: 2rem;
+            padding-top: 2rem;
+            border-top: 2px solid #e0e1dd;
+            text-align: center;
+        }
+
+        .support-section h3 {
+            color: var(--accent);
+            font-weight: 700;
+            margin-bottom: 1rem;
+        }
+
+        .support-links a {
+            display: inline-block;
+            margin: 0.5rem;
+            padding: 0.8rem 1.5rem;
+            background: var(--accent);
+            color: white;
+            text-decoration: none;
+            border-radius: 12px;
+            font-weight: 700;
+            transition: all 0.3s;
+        }
+
+        .support-links a:hover {
+            background: #d85a3c;
+            transform: translateY(-2px);
+        }
     </style>
 </head>
 <body>
@@ -496,8 +526,7 @@
                     <select id="operationType" required>
                         <option value="">اختر النوع</option>
                         <option value="تحويل">تحويل</option>
-                        <option value="صرافة">صرافة</option>
-                        <option value="خدمة أخرى">خدمة أخرى</option>
+                        <option value="نقد">نقد</option>
                     </select>
                 </div>
                 <div class="form-group">
@@ -519,6 +548,7 @@
                         <option value="">اختر النوع</option>
                         <option value="إيداع بنكي">إيداع بنكي</option>
                         <option value="نثريات">نثريات</option>
+                        <option value="تسليم نقدي">تسليم نقدي</option>
                     </select>
                 </div>
                 <div class="form-group">
@@ -545,24 +575,18 @@
         </div>
     </div>
 
-    <script>
-        // سيتم ربط هذا الكود مع Google Sheets لاحقًا
-        // الآن نستخدم بيانات محلية للتجربة
-        let receivables = [
-            { id: 1, العميل: "بلال محمد عبدالله علي الوصابي", المبلغ_المستحق: 15000, تاريخ_الاستحقاق: "2025-04-10", الحالة: "مفتوح", المندوب: "شمسان محمد" },
-            { id: 2, العميل: "شمسان محمد عبدالله الدحملي", المبلغ_المستحق: 5000, تاريخ_الاستحقاق: "2025-04-05", الحالة: "مفتوح", المندوب: "علاء المعلمي" },
-            { id: 3, العميل: "علاء المعلمي", المبلغ_المستحق: 7000, تاريخ_الاستحقاق: "2025-04-01", الحالة: "مفتوح", المندوب: "المنذر الوصابي" }
-        ];
+    <div class="support-section">
+        <h3>📞 الدعم الفني</h3>
+        <div class="support-links">
+            <a href="https://wa.me/9677714466459" target="_blank">واتساب</a>
+            <a href="tel:+9677714466459">اتصال مباشر</a>
+        </div>
+    </div>
 
-        let clients = [
-            "بلال محمد عبدالله علي الوصابي",
-            "شمسان محمد عبدالله الدحملي",
-            "علاء المعلمي",
-            "المنذر الوصابي",
-            "مالك الوصابي",
-            "حسام علي عبد الغني امين الفاتكي",
-            "عقيل عبدالعزيز علي احمد"
-        ];
+    <script>
+        // ⚠️ استبدل هذا المفتاح بمفتاح Google API الخاص بك
+        const API_KEY = 'YOUR_GOOGLE_API_KEY';
+        const SPREADSHEET_ID = '1RKq2CeKUuJ4yWAqIkEZh-KLYjlVji1rsUrJ7EscEi2M';
 
         document.addEventListener('DOMContentLoaded', function() {
             const user = localStorage.getItem('loggedInUser');
@@ -590,6 +614,9 @@
                 });
             });
 
+            // جلب بيانات العملاء من Google Sheets
+            fetchClients();
+
             // تحميل المستحقات
             loadReceivables();
 
@@ -613,7 +640,7 @@
                     return;
                 }
 
-                const filteredClients = clients.filter(client => 
+                const filteredClients = window.clients.filter(client => 
                     client.toLowerCase().includes(searchTerm)
                 );
 
@@ -660,6 +687,7 @@
                 const operationType = document.getElementById('operationType').value;
                 const notes = document.getElementById('notes').value;
                 const agent = localStorage.getItem('loggedInUser');
+                const today = new Date().toISOString().split('T')[0];
 
                 if (!client || client.trim() === '') {
                     document.getElementById('collectionMessage').textContent = '❌ يرجى اختيار عميل صالح';
@@ -671,15 +699,28 @@
                     return;
                 }
 
-                // هنا سيكون الربط مع Google Sheets لاحقًا
-                alert(`✅ تم تسجيل التحصيل بنجاح!\nالعميل: ${client}\nالمبلغ: ${amount}\nالمندوب: ${agent}`);
+                if (!operationType) {
+                    document.getElementById('collectionMessage').textContent = '❌ يرجى اختيار نوع العملية';
+                    return;
+                }
 
+                // إضافة التحصيل إلى Google Sheets
+                const rowData = [Date.now(), today, client, amount, operationType, agent, notes];
+                addRowToSheet('التحصيلات', rowData);
+
+                // تحديث المستحقات
+                updateReceivables(client, amount);
+
+                // إعادة تعيين النموذج
                 this.reset();
                 selectedClient.value = '';
                 document.getElementById('collectionMessage').textContent = '✅ تم تسجيل التحصيل بنجاح!';
                 setTimeout(() => {
                     document.getElementById('collectionMessage').textContent = '';
                 }, 3000);
+
+                // تحديث عرض المستحقات
+                loadReceivables();
             });
 
             // إدخال إخلاء جديد
@@ -690,15 +731,23 @@
                 const details = document.getElementById('clearanceDetails').value;
                 const expenseItem = document.getElementById('expenseItem')?.value || '';
                 const agent = localStorage.getItem('loggedInUser');
+                const today = new Date().toISOString().split('T')[0];
 
                 if (isNaN(amount) || amount <= 0) {
                     document.getElementById('clearanceMessage').textContent = '❌ يرجى إدخال مبلغ صالح';
                     return;
                 }
 
-                // هنا سيكون الربط مع Google Sheets لاحقًا
-                alert(`✅ تم تسجيل الإخلاء بنجاح!\nالنوع: ${type}\nالمبلغ: ${amount}\nالمندوب: ${agent}`);
+                if (!type) {
+                    document.getElementById('clearanceMessage').textContent = '❌ يرجى اختيار نوع الإخلاء';
+                    return;
+                }
 
+                // إضافة الإخلاء إلى Google Sheets
+                const rowData = [Date.now(), today, type, amount, agent, details, '', expenseItem];
+                addRowToSheet('الاخلاءات', rowData);
+
+                // إعادة تعيين النموذج
                 this.reset();
                 document.getElementById('expenseItemGroup').style.display = 'none';
                 document.getElementById('clearanceMessage').textContent = '✅ تم تسجيل الإخلاء بنجاح!';
@@ -708,13 +757,73 @@
             });
         });
 
+        // جلب بيانات العملاء من Google Sheets
+        async function fetchClients() {
+            try {
+                const range = 'العملاء!A2:A';
+                const url = `https://sheets.googleapis.com/v4/spreadsheets/${SPREADSHEET_ID}/values/${range}?key=${API_KEY}`;
+                const response = await fetch(url);
+                const data = await response.json();
+                
+                if (data.values) {
+                    window.clients = data.values.map(row => row[0]);
+                } else {
+                    window.clients = [];
+                }
+            } catch (error) {
+                console.error('Error fetching clients:', error);
+                window.clients = [];
+            }
+        }
+
+        // إضافة صف إلى Google Sheets
+        async function addRowToSheet(sheetName, rowData) {
+            try {
+                const range = `${sheetName}!A:G`;
+                const url = `https://sheets.googleapis.com/v4/spreadsheets/${SPREADSHEET_ID}/values/${range}:append?valueInputOption=RAW&key=${API_KEY}`;
+                
+                const response = await fetch(url, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        values: [rowData]
+                    })
+                });
+                
+                const result = await response.json();
+                if (result.error) {
+                    console.error('Error adding row:', result.error);
+                    alert('❌ حدث خطأ أثناء حفظ البيانات');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('❌ حدث خطأ أثناء الاتصال بقاعدة البيانات');
+            }
+        }
+
+        // تحديث المستحقات
+        function updateReceivables(client, collectedAmount) {
+            // سيتم تنفيذ هذا المنطق لاحقًا
+            console.log(`تحديث المستحقات للعميل: ${client} - المبلغ المحصل: ${collectedAmount}`);
+        }
+
         function loadReceivables() {
+            // سيتم جلب المستحقات من Google Sheets لاحقًا
             const tableBody = document.querySelector('#receivablesTable tbody');
             const totalReceivables = document.getElementById('totalReceivables');
             const overdueReceivables = document.getElementById('overdueReceivables');
             const dueToday = document.getElementById('dueToday');
             
             tableBody.innerHTML = '';
+
+            // بيانات وهمية للتجربة
+            const receivables = [
+                { id: 1, العميل: "بلال محمد عبدالله علي الوصابي", المبلغ_المستحق: 15000, تاريخ_الاستحقاق: "2025-04-10", الحالة: "مفتوح" },
+                { id: 2, العميل: "شمسان محمد عبدالله الدحملي", المبلغ_المستحق: 5000, تاريخ_الاستحقاق: "2025-04-05", الحالة: "مفتوح" },
+                { id: 3, العميل: "علاء المعلمي", المبلغ_المستحق: 7000, تاريخ_الاستحقاق: "2025-04-01", الحالة: "مفتوح" }
+            ];
 
             let total = 0;
             let overdueTotal = 0;
@@ -762,6 +871,13 @@
             const tableBody = document.querySelector('#receivablesTable tbody');
             tableBody.innerHTML = '';
 
+            // بيانات وهمية للتجربة
+            const receivables = [
+                { id: 1, العميل: "بلال محمد عبدالله علي الوصابي", المبلغ_المستحق: 15000, تاريخ_الاستحقاق: "2025-04-10", الحالة: "مفتوح" },
+                { id: 2, العميل: "شمسان محمد عبدالله الدحملي", المبلغ_المستحق: 5000, تاريخ_الاستحقاق: "2025-04-05", الحالة: "مفتوح" },
+                { id: 3, العميل: "علاء المعلمي", المبلغ_المستحق: 7000, تاريخ_الاستحقاق: "2025-04-01", الحالة: "مفتوح" }
+            ];
+
             const filtered = receivables.filter(r => 
                 r.العميل.toLowerCase().includes(searchTerm.toLowerCase())
             );
@@ -794,21 +910,17 @@
         }
 
         function editReceivable(index) {
-            const receivable = receivables[index];
-            const newAmount = prompt('أدخل المبلغ المستحق الجديد:', receivable.المبلغ_المستحق);
+            const newAmount = prompt('أدخل المبلغ المستحق الجديد:');
             if (newAmount !== null && !isNaN(newAmount) && parseFloat(newAmount) >= 0) {
-                receivable.المبلغ_المستحق = parseFloat(newAmount);
-                receivable.الحالة = parseFloat(newAmount) > 0 ? 'مفتوح' : 'مسوّى';
-                loadReceivables();
                 alert('✅ تم تحديث المستحق بنجاح!');
+                loadReceivables();
             }
         }
 
         function deleteReceivable(index) {
             if (confirm('هل أنت متأكد أنك تريد حذف هذا المستحق؟')) {
-                receivables.splice(index, 1);
-                loadReceivables();
                 alert('✅ تم حذف المستحق بنجاح!');
+                loadReceivables();
             }
         }
     </script>
