@@ -186,6 +186,35 @@
             border-bottom: 2px solid var(--accent);
         }
 
+        .support-section {
+            margin-top: 2rem;
+            padding-top: 2rem;
+            border-top: 2px solid #e0e1dd;
+        }
+
+        .support-section h3 {
+            color: var(--accent);
+            font-weight: 700;
+            margin-bottom: 1rem;
+        }
+
+        .support-links a {
+            display: inline-block;
+            margin: 0.5rem;
+            padding: 0.8rem 1.5rem;
+            background: var(--accent);
+            color: white;
+            text-decoration: none;
+            border-radius: 12px;
+            font-weight: 700;
+            transition: all 0.3s;
+        }
+
+        .support-links a:hover {
+            background: #d85a3c;
+            transform: translateY(-2px);
+        }
+
         /* تحسينات للجوال */
         @media (max-width: 480px) {
             .login-container {
@@ -250,57 +279,66 @@
             <div id="loginError" class="error"></div>
         </form>
 
-        <div class="footer-links">
-            <a href="#" id="forgotPasswordLink">نسيت كلمة المرور؟</a>
-            <a href="#" onclick="alert('للتواصل مع الدعم الفني: +967 XXX XXX XXX'); return false;">الدعم الفني</a>
+        <div class="support-section">
+            <h3>📞 الدعم الفني</h3>
+            <div class="support-links">
+                <a href="https://wa.me/9677714466459" target="_blank">واتساب</a>
+                <a href="tel:+9677714466459">اتصال مباشر</a>
+            </div>
         </div>
     </div>
 
     <script>
+        // ⚠️ استبدل هذا المفتاح بمفتاح Google API الخاص بك
+        const API_KEY = 'YOUR_GOOGLE_API_KEY';
+        const SPREADSHEET_ID = '1RKq2CeKUuJ4yWAqIkEZh-KLYjlVji1rsUrJ7EscEi2M';
+
         document.addEventListener('DOMContentLoaded', function() {
             const loginForm = document.getElementById('loginForm');
             const usernameInput = document.getElementById('username');
             const passwordInput = document.getElementById('password');
             const errorDiv = document.getElementById('loginError');
-            const forgotPasswordLink = document.getElementById('forgotPasswordLink');
 
-            // هنا سيكون الربط مع Google Sheets لاحقًا
-            // الآن نستخدم بيانات محلية للتجربة
-            const mockUsers = [
-                { username: 'admin', password: 'admin123', role: 'admin' },
-                { username: 'شمسان محمد', password: '123456', role: 'agent' },
-                { username: 'علاء المعلمي', password: '123456', role: 'agent' },
-                { username: 'المنذر الوصابي', password: '123456', role: 'agent' },
-                { username: 'مالك الوصابي', password: '123456', role: 'agent' }
-            ];
-
-            forgotPasswordLink.addEventListener('click', function(e) {
-                e.preventDefault();
-                const username = prompt('أدخل اسم المستخدم لتغيير كلمة المرور:');
-                if (username) {
-                    const user = mockUsers.find(u => u.username === username);
-                    if (user) {
-                        const newPassword = prompt('أدخل كلمة المرور الجديدة (6 أحرف على الأقل):');
-                        if (newPassword && newPassword.length >= 6) {
-                            user.password = newPassword;
-                            alert('✅ تم تغيير كلمة المرور بنجاح!');
-                        } else {
-                            alert('❌ كلمة المرور يجب أن تكون 6 أحرف على الأقل');
-                        }
-                    } else {
-                        alert('❌ المستخدم غير موجود');
+            // جلب بيانات المندوبين من Google Sheets
+            async function fetchAgents() {
+                try {
+                    const range = 'المندوبين!A2:E';
+                    const url = `https://sheets.googleapis.com/v4/spreadsheets/${SPREADSHEET_ID}/values/${range}?key=${API_KEY}`;
+                    const response = await fetch(url);
+                    const data = await response.json();
+                    
+                    if (data.values) {
+                        return data.values.map(row => ({
+                            username: row[0],
+                            password: row[4], // عمود كلمة المرور
+                            role: 'agent'
+                        }));
                     }
+                    return [];
+                } catch (error) {
+                    console.error('Error fetching agents:', error);
+                    return [];
                 }
-            });
+            }
 
-            loginForm.addEventListener('submit', function(e) {
+            // تسجيل الدخول
+            loginForm.addEventListener('submit', async function(e) {
                 e.preventDefault();
                 
                 const username = usernameInput.value.trim();
                 const password = passwordInput.value;
                 errorDiv.textContent = '';
 
-                const user = mockUsers.find(u => u.username === username && u.password === password);
+                // جلب بيانات المندوبين
+                const agents = await fetchAgents();
+                
+                // إضافة مدير يدويًا
+                const allUsers = [
+                    { username: 'admin', password: 'admin123', role: 'admin' },
+                    ...agents
+                ];
+
+                const user = allUsers.find(u => u.username === username && u.password === password);
                 
                 if (user) {
                     localStorage.setItem('loggedInUser', username);
@@ -328,8 +366,10 @@
                 }
             });
 
+            // التركيز التلقائي على حقل المستخدم
             usernameInput.focus();
 
+            // السماح بالدخول بالضغط على Enter
             passwordInput.addEventListener('keypress', function(e) {
                 if (e.key === 'Enter') {
                     loginForm.dispatchEvent(new Event('submit'));
