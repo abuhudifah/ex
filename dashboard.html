@@ -512,7 +512,7 @@
                     <div class="dropdown" id="clientDropdown">
                         <input type="text" id="clientSearch" placeholder="ابدأ بالكتابة للبحث عن عميل..." autocomplete="off" required>
                         <div class="dropdown-menu" id="clientList">
-                            <!-- سيتم ملؤها تلقائيًا من Google Sheets -->
+                            <!-- سيتم ملؤها تلقائيًا من localStorage -->
                         </div>
                     </div>
                     <input type="hidden" id="selectedClient">
@@ -549,6 +549,22 @@
                         <option value="إيداع بنكي">إيداع بنكي</option>
                         <option value="نثريات">نثريات</option>
                         <option value="تسليم نقدي">تسليم نقدي</option>
+                        <option value="تحويل رصيد">تحويل رصيد</option>
+                    </select>
+                </div>
+                <div class="form-group" id="bankAccountGroup" style="display:none;">
+                    <label for="bankAccount">اسم الحساب البنكي</label>
+                    <select id="bankAccount">
+                        <option value="">اختر الحساب</option>
+                        <!-- سيتم ملؤها تلقائيًا من Google Sheets -->
+                    </select>
+                    <button type="button" id="addBankAccountBtn" style="margin-top: 0.5rem;">+ إضافة حساب جديد</button>
+                </div>
+                <div class="form-group" id="agentTransferGroup" style="display:none;">
+                    <label for="transferAgent">المندوب المحول إليه</label>
+                    <select id="transferAgent">
+                        <option value="">اختر المندوب</option>
+                        <!-- سيتم ملؤها تلقائيًا من Google Sheets -->
                     </select>
                 </div>
                 <div class="form-group">
@@ -578,15 +594,18 @@
     <div class="support-section">
         <h3>📞 الدعم الفني</h3>
         <div class="support-links">
-            <a href="https://wa.me/9677714466459" target="_blank">واتساب</a>
-            <a href="tel:+9677714466459">اتصال مباشر</a>
+            <a href="https://wa.me/967714466459" target="_blank">واتساب</a>
+            <a href="tel:+967714466459">اتصال مباشر</a>
         </div>
     </div>
 
     <script>
         // ⚠️ استبدل هذا المفتاح بمفتاح Google API الخاص بك
-        const API_KEY = 'YOUR_GOOGLE_API_KEY';
-        const SPREADSHEET_ID = '1RKq2CeKUuJ4yWAqIkEZh-KLYjlVji1rsUrJ7EscEi2M';
+        const API_KEY = 'YOUR_API_KEY';
+        const SPREADSHEET_ID = '1lILr9yv_9Mef_T506kN8kK20G2-zQNCQ0OsTeYm54PM';
+
+        // بيانات العملاء من localStorage
+        let clients = JSON.parse(localStorage.getItem('clients')) || [];
 
         document.addEventListener('DOMContentLoaded', function() {
             const user = localStorage.getItem('loggedInUser');
@@ -614,8 +633,11 @@
                 });
             });
 
-            // جلب بيانات العملاء من Google Sheets
-            fetchClients();
+            // جلب بيانات الحسابات البنكية
+            fetchBankAccounts();
+
+            // جلب بيانات المندوبين
+            fetchAgents();
 
             // تحميل المستحقات
             loadReceivables();
@@ -640,7 +662,7 @@
                     return;
                 }
 
-                const filteredClients = window.clients.filter(client => 
+                const filteredClients = clients.filter(client => 
                     client.toLowerCase().includes(searchTerm)
                 );
 
@@ -669,18 +691,35 @@
                 }
             });
 
-            // إظهار/إخفاء حقل النثريات
+            // إظهار/إخفاء حقول حسب نوع الإخلاء
             document.getElementById('clearanceType').addEventListener('change', function() {
+                const bankAccountGroup = document.getElementById('bankAccountGroup');
+                const agentTransferGroup = document.getElementById('agentTransferGroup');
                 const expenseItemGroup = document.getElementById('expenseItemGroup');
-                if (this.value === 'نثريات') {
+                
+                bankAccountGroup.style.display = 'none';
+                agentTransferGroup.style.display = 'none';
+                expenseItemGroup.style.display = 'none';
+                
+                if (this.value === 'إيداع بنكي') {
+                    bankAccountGroup.style.display = 'block';
+                } else if (this.value === 'نثريات') {
                     expenseItemGroup.style.display = 'block';
-                } else {
-                    expenseItemGroup.style.display = 'none';
+                } else if (this.value === 'تحويل رصيد') {
+                    agentTransferGroup.style.display = 'block';
+                }
+            });
+
+            // إضافة حساب بنكي جديد
+            document.getElementById('addBankAccountBtn').addEventListener('click', function() {
+                const newAccountName = prompt('أدخل اسم الحساب البنكي الجديد:');
+                if (newAccountName) {
+                    addBankAccount(newAccountName);
                 }
             });
 
             // إدخال تحصيل جديد
-            document.getElementById('collectionForm').addEventListener('submit', function(e) {
+            document.getElementById('collectionForm').addEventListener('submit', async function(e) {
                 e.preventDefault();
                 const client = selectedClient.value || clientSearch.value;
                 const amount = parseFloat(document.getElementById('collectedAmount').value);
@@ -704,12 +743,29 @@
                     return;
                 }
 
+                // حفظ العميل في localStorage إذا كان جديدًا
+                if (!clients.includes(client)) {
+                    clients.push(client);
+                    localStorage.setItem('clients', JSON.stringify(clients));
+                    
+                    // إضافة العميل إلى قائمة الاقتراحات
+                    const div = document.createElement('div');
+                    div.className = 'client-item';
+                    div.textContent = client;
+                    div.addEventListener('click', function() {
+                        clientSearch.value = client;
+                        selectedClient.value = client;
+                        clientDropdown.classList.remove('active');
+                    });
+                    clientList.appendChild(div);
+                }
+
                 // إضافة التحصيل إلى Google Sheets
                 const rowData = [Date.now(), today, client, amount, operationType, agent, notes];
-                addRowToSheet('التحصيلات', rowData);
+                await addRowToSheet('المستحقات_اليومية', rowData);
 
-                // تحديث المستحقات
-                updateReceivables(client, amount);
+                // تحديث عرض المستحقات
+                loadReceivables();
 
                 // إعادة تعيين النموذج
                 this.reset();
@@ -718,18 +774,17 @@
                 setTimeout(() => {
                     document.getElementById('collectionMessage').textContent = '';
                 }, 3000);
-
-                // تحديث عرض المستحقات
-                loadReceivables();
             });
 
             // إدخال إخلاء جديد
-            document.getElementById('clearanceForm').addEventListener('submit', function(e) {
+            document.getElementById('clearanceForm').addEventListener('submit', async function(e) {
                 e.preventDefault();
                 const type = document.getElementById('clearanceType').value;
                 const amount = parseFloat(document.getElementById('clearanceAmount').value);
                 const details = document.getElementById('clearanceDetails').value;
                 const expenseItem = document.getElementById('expenseItem')?.value || '';
+                const bankAccount = document.getElementById('bankAccount')?.value || '';
+                const transferAgent = document.getElementById('transferAgent')?.value || '';
                 const agent = localStorage.getItem('loggedInUser');
                 const today = new Date().toISOString().split('T')[0];
 
@@ -743,12 +798,24 @@
                     return;
                 }
 
+                if (type === 'إيداع بنكي' && !bankAccount) {
+                    document.getElementById('clearanceMessage').textContent = '❌ يرجى اختيار الحساب البنكي';
+                    return;
+                }
+
+                if (type === 'تحويل رصيد' && !transferAgent) {
+                    document.getElementById('clearanceMessage').textContent = '❌ يرجى اختيار المندوب المحول إليه';
+                    return;
+                }
+
                 // إضافة الإخلاء إلى Google Sheets
-                const rowData = [Date.now(), today, type, amount, agent, details, '', expenseItem];
-                addRowToSheet('الاخلاءات', rowData);
+                const rowData = [Date.now(), today, type, amount, agent, details, bankAccount, expenseItem, transferAgent];
+                await addRowToSheet('المستحقات_اليومية', rowData);
 
                 // إعادة تعيين النموذج
                 this.reset();
+                document.getElementById('bankAccountGroup').style.display = 'none';
+                document.getElementById('agentTransferGroup').style.display = 'none';
                 document.getElementById('expenseItemGroup').style.display = 'none';
                 document.getElementById('clearanceMessage').textContent = '✅ تم تسجيل الإخلاء بنجاح!';
                 setTimeout(() => {
@@ -757,29 +824,80 @@
             });
         });
 
-        // جلب بيانات العملاء من Google Sheets
-        async function fetchClients() {
+        // جلب بيانات الحسابات البنكية من Google Sheets
+        async function fetchBankAccounts() {
             try {
-                const range = 'العملاء!A2:A';
+                const range = 'الحسابات_البنكية!A2:C';
                 const url = `https://sheets.googleapis.com/v4/spreadsheets/${SPREADSHEET_ID}/values/${range}?key=${API_KEY}`;
                 const response = await fetch(url);
                 const data = await response.json();
                 
+                const bankAccountSelect = document.getElementById('bankAccount');
+                bankAccountSelect.innerHTML = '<option value="">اختر الحساب</option>';
+                
                 if (data.values) {
-                    window.clients = data.values.map(row => row[0]);
-                } else {
-                    window.clients = [];
+                    data.values.forEach(row => {
+                        const option = document.createElement('option');
+                        option.value = row[0];
+                        option.textContent = `${row[0]} - ${row[2]}`;
+                        bankAccountSelect.appendChild(option);
+                    });
                 }
             } catch (error) {
-                console.error('Error fetching clients:', error);
-                window.clients = [];
+                console.error('Error fetching bank accounts:', error);
+            }
+        }
+
+        // جلب بيانات المندوبين من Google Sheets
+        async function fetchAgents() {
+            try {
+                const range = 'المستخدمين!A2:A';
+                const url = `https://sheets.googleapis.com/v4/spreadsheets/${SPREADSHEET_ID}/values/${range}?key=${API_KEY}`;
+                const response = await fetch(url);
+                const data = await response.json();
+                
+                const transferAgentSelect = document.getElementById('transferAgent');
+                transferAgentSelect.innerHTML = '<option value="">اختر المندوب</option>';
+                
+                if (data.values) {
+                    data.values.forEach(row => {
+                        if (row[0]) {
+                            const option = document.createElement('option');
+                            option.value = row[0];
+                            option.textContent = row[0];
+                            transferAgentSelect.appendChild(option);
+                        }
+                    });
+                }
+            } catch (error) {
+                console.error('Error fetching agents:', error);
+            }
+        }
+
+        // إضافة حساب بنكي جديد إلى Google Sheets
+        async function addBankAccount(accountName) {
+            try {
+                const bankName = prompt('أدخل اسم البنك:');
+                const accountNumber = prompt('أدخل رقم الحساب:');
+                const today = new Date().toISOString().split('T')[0];
+                
+                const rowData = [accountName, accountNumber, bankName, today];
+                await addRowToSheet('الحسابات_البنكية', rowData);
+                
+                // تحديث قائمة الحسابات البنكية
+                fetchBankAccounts();
+                
+                alert('✅ تم إضافة الحساب البنكي بنجاح!');
+            } catch (error) {
+                console.error('Error adding bank account:', error);
+                alert('❌ حدث خطأ أثناء إضافة الحساب البنكي');
             }
         }
 
         // إضافة صف إلى Google Sheets
         async function addRowToSheet(sheetName, rowData) {
             try {
-                const range = `${sheetName}!A:G`;
+                const range = `${sheetName}!A:J`;
                 const url = `https://sheets.googleapis.com/v4/spreadsheets/${SPREADSHEET_ID}/values/${range}:append?valueInputOption=RAW&key=${API_KEY}`;
                 
                 const response = await fetch(url, {
@@ -803,123 +921,89 @@
             }
         }
 
-        // تحديث المستحقات
-        function updateReceivables(client, collectedAmount) {
-            // سيتم تنفيذ هذا المنطق لاحقًا
-            console.log(`تحديث المستحقات للعميل: ${client} - المبلغ المحصل: ${collectedAmount}`);
-        }
-
-        function loadReceivables() {
-            // سيتم جلب المستحقات من Google Sheets لاحقًا
-            const tableBody = document.querySelector('#receivablesTable tbody');
-            const totalReceivables = document.getElementById('totalReceivables');
-            const overdueReceivables = document.getElementById('overdueReceivables');
-            const dueToday = document.getElementById('dueToday');
-            
-            tableBody.innerHTML = '';
-
-            // بيانات وهمية للتجربة
-            const receivables = [
-                { id: 1, العميل: "بلال محمد عبدالله علي الوصابي", المبلغ_المستحق: 15000, تاريخ_الاستحقاق: "2025-04-10", الحالة: "مفتوح" },
-                { id: 2, العميل: "شمسان محمد عبدالله الدحملي", المبلغ_المستحق: 5000, تاريخ_الاستحقاق: "2025-04-05", الحالة: "مفتوح" },
-                { id: 3, العميل: "علاء المعلمي", المبلغ_المستحق: 7000, تاريخ_الاستحقاق: "2025-04-01", الحالة: "مفتوح" }
-            ];
-
-            let total = 0;
-            let overdueTotal = 0;
-            let dueTodayTotal = 0;
-            const today = new Date();
-            today.setHours(0, 0, 0, 0);
-
-            receivables.forEach((receivable, index) => {
-                total += receivable.المبلغ_المستحق;
+        // تحميل المستحقات من Google Sheets
+        async function loadReceivables() {
+            try {
+                const today = new Date().toISOString().split('T')[0];
+                const range = 'المستحقات_اليومية!A:H';
+                const url = `https://sheets.googleapis.com/v4/spreadsheets/${SPREADSHEET_ID}/values/${range}?key=${API_KEY}`;
+                const response = await fetch(url);
+                const data = await response.json();
                 
-                const dueDate = new Date(receivable.تاريخ_الاستحقاق);
-                if (dueDate < today) {
-                    overdueTotal += receivable.المبلغ_المستحق;
-                } else if (dueDate.getTime() === today.getTime()) {
-                    dueTodayTotal += receivable.المبلغ_المستحق;
+                const tableBody = document.querySelector('#receivablesTable tbody');
+                const totalReceivables = document.getElementById('totalReceivables');
+                const overdueReceivables = document.getElementById('overdueReceivables');
+                const dueToday = document.getElementById('dueToday');
+                
+                tableBody.innerHTML = '';
+
+                let total = 0;
+                let overdueTotal = 0;
+                let dueTodayTotal = 0;
+                const todayDate = new Date();
+                todayDate.setHours(0, 0, 0, 0);
+
+                if (data.values && data.values.length > 1) {
+                    data.values.slice(1).forEach((row, index) => {
+                        // افتراض أن العمود B هو تاريخ الاستحقاق، والعمود D هو المبلغ المستحق
+                        const dueDate = new Date(row[1] || today);
+                        const amount = parseFloat(row[3] || 0);
+                        const client = row[2] || 'عميل غير معروف';
+                        const status = 'مفتوح'; // يمكنك تعديل هذا حسب الحاجة
+                        
+                        total += amount;
+                        
+                        if (dueDate < todayDate) {
+                            overdueTotal += amount;
+                        } else if (dueDate.getTime() === todayDate.getTime()) {
+                            dueTodayTotal += amount;
+                        }
+
+                        const rowElement = document.createElement('tr');
+                        
+                        if (dueDate < todayDate) {
+                            rowElement.classList.add('overdue');
+                        } else if (dueDate.getTime() === todayDate.getTime()) {
+                            rowElement.classList.add('due-today');
+                        }
+
+                        rowElement.innerHTML = `
+                            <td>${client}</td>
+                            <td>${amount.toLocaleString()} ريال</td>
+                            <td>${row[1] || today}</td>
+                            <td>${status}</td>
+                            <td class="actions">
+                                <button class="btn-edit" onclick="editReceivable(${index})">تعديل</button>
+                                <button class="btn-delete" onclick="deleteReceivable(${index})">حذف</button>
+                            </td>
+                        `;
+                        tableBody.appendChild(rowElement);
+                    });
                 }
 
-                const row = document.createElement('tr');
-                
-                if (dueDate < today) {
-                    row.classList.add('overdue');
-                } else if (dueDate.getTime() === today.getTime()) {
-                    row.classList.add('due-today');
-                }
-
-                row.innerHTML = `
-                    <td>${receivable.العميل}</td>
-                    <td>${receivable.المبلغ_المستحق.toLocaleString()} ريال</td>
-                    <td>${receivable.تاريخ_الاستحقاق}</td>
-                    <td>${receivable.الحالة}</td>
-                    <td class="actions">
-                        <button class="btn-edit" onclick="editReceivable(${index})">تعديل</button>
-                        <button class="btn-delete" onclick="deleteReceivable(${index})">حذف</button>
-                    </td>
-                `;
-                tableBody.appendChild(row);
-            });
-
-            totalReceivables.textContent = `${total.toLocaleString()} ريال`;
-            overdueReceivables.textContent = `${overdueTotal.toLocaleString()} ريال`;
-            dueToday.textContent = `${dueTodayTotal.toLocaleString()} ريال`;
+                totalReceivables.textContent = `${total.toLocaleString()} ريال`;
+                overdueReceivables.textContent = `${overdueTotal.toLocaleString()} ريال`;
+                dueToday.textContent = `${dueTodayTotal.toLocaleString()} ريال`;
+            } catch (error) {
+                console.error('Error loading receivables:', error);
+            }
         }
 
         function filterReceivables(searchTerm) {
             const tableBody = document.querySelector('#receivablesTable tbody');
             tableBody.innerHTML = '';
 
-            // بيانات وهمية للتجربة
-            const receivables = [
-                { id: 1, العميل: "بلال محمد عبدالله علي الوصابي", المبلغ_المستحق: 15000, تاريخ_الاستحقاق: "2025-04-10", الحالة: "مفتوح" },
-                { id: 2, العميل: "شمسان محمد عبدالله الدحملي", المبلغ_المستحق: 5000, تاريخ_الاستحقاق: "2025-04-05", الحالة: "مفتوح" },
-                { id: 3, العميل: "علاء المعلمي", المبلغ_المستحق: 7000, تاريخ_الاستحقاق: "2025-04-01", الحالة: "مفتوح" }
-            ];
-
-            const filtered = receivables.filter(r => 
-                r.العميل.toLowerCase().includes(searchTerm.toLowerCase())
-            );
-
-            filtered.forEach((receivable, index) => {
-                const row = document.createElement('tr');
-                
-                const dueDate = new Date(receivable.تاريخ_الاستحقاق);
-                const today = new Date();
-                today.setHours(0, 0, 0, 0);
-                
-                if (dueDate < today) {
-                    row.classList.add('overdue');
-                } else if (dueDate.getTime() === today.getTime()) {
-                    row.classList.add('due-today');
-                }
-
-                row.innerHTML = `
-                    <td>${receivable.العميل}</td>
-                    <td>${receivable.المبلغ_المستحق.toLocaleString()} ريال</td>
-                    <td>${receivable.تاريخ_الاستحقاق}</td>
-                    <td>${receivable.الحالة}</td>
-                    <td class="actions">
-                        <button class="btn-edit" onclick="editReceivable(${index})">تعديل</button>
-                        <button class="btn-delete" onclick="deleteReceivable(${index})">حذف</button>
-                    </td>
-                `;
-                tableBody.appendChild(row);
-            });
+            // سيتم تنفيذ هذا لاحقًا
+            console.log('Filter receivables:', searchTerm);
         }
 
         function editReceivable(index) {
-            const newAmount = prompt('أدخل المبلغ المستحق الجديد:');
-            if (newAmount !== null && !isNaN(newAmount) && parseFloat(newAmount) >= 0) {
-                alert('✅ تم تحديث المستحق بنجاح!');
-                loadReceivables();
-            }
+            alert('تعديل المستحق رقم: ' + index);
         }
 
         function deleteReceivable(index) {
             if (confirm('هل أنت متأكد أنك تريد حذف هذا المستحق؟')) {
-                alert('✅ تم حذف المستحق بنجاح!');
+                alert('تم حذف المستحق رقم: ' + index);
                 loadReceivables();
             }
         }
