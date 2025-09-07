@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>لوحة الإدارة - أبو حذيفة</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div class="navbar">
+        <div class="logo">
+            <img src="images/logo.png" alt="شعار أبو حذيفة">
+        </div>
+        <h2>لوحة الإدارة</h2>
+        <button id="logoutBtn">تسجيل خروج</button>
+    </div>
+
+    <div class="container">
+        <h3>التقرير اليومي</h3>
+        <div class="report-cards">
+            <div class="card">
+                <h4>إجمالي التحصيل اليومي</h4>
+                <p id="totalCollection">0 ريال</p>
+            </div>
+            <div class="card">
+                <h4>إجمالي الإيداعات</h4>
+                <p id="totalDeposits">0 ريال</p>
+            </div>
+            <div class="card">
+                <h4>إجمالي النثريات</h4>
+                <p id="totalExpenses">0 ريال</p>
+            </div>
+            <div class="card">
+                <h4>الرصيد المتبقي</h4>
+                <p id="remainingBalance">0 ريال</p>
+            </div>
+        </div>
+
+        <button id="exportPDF" class="btn-primary">تصدير كـ PDF</button>
+
+        <h4 style="margin-top: 2rem;">تفصيل حسب المندوب</h4>
+        <table id="agentsReport">
+            <thead>
+                <tr>
+                    <th>اسم المندوب</th>
+                    <th>إجمالي التحصيل</th>
+                    <th>إجمالي الإيداعات</th>
+                    <th>إجمالي النثريات</th>
+                    <th>الرصيد المتبقي</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- سيتم ملؤها تلقائيًا -->
+            </tbody>
+        </table>
+    </div>
+
+    <script src="js/data.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html>
