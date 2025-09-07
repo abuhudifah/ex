@@ -3,29 +3,174 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>تسجيل الدخول - أبو حذيفة</title>
+    <title>تسجيل الدخول - نظام أبو حذيفة</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="css/style.css">
+    <style>
+        /* تضمين الخط والأسلوب مباشرة كنسخة احتياطية */
+        body {
+            font-family: 'Tajawal', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(135deg, #0d1b2a, #1b263b);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: #e0e1dd;
+        }
+        .login-container {
+            background: white;
+            padding: 2.5rem;
+            border-radius: 16px;
+            box-shadow: 0 15px 40px rgba(0,0,0,0.3);
+            width: 90%;
+            max-width: 420px;
+            text-align: center;
+            animation: fadeIn 0.8s ease-in-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .logo img {
+            width: 140px;
+            margin-bottom: 1.8rem;
+            filter: drop-shadow(0 4px 8px rgba(0,0,0,0.2));
+        }
+        .login-container h2 {
+            color: #0d1b2a;
+            margin-bottom: 2rem;
+            font-weight: 700;
+            font-size: 1.5rem;
+        }
+        .form-group {
+            margin-bottom: 1.8rem;
+            text-align: right;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 0.6rem;
+            font-weight: 600;
+            color: #0d1b2a;
+            font-size: 1.1rem;
+        }
+        .form-group input {
+            width: 100%;
+            padding: 1rem;
+            border: 2px solid #e0e1dd;
+            border-radius: 12px;
+            font-size: 1.1rem;
+            transition: all 0.3s ease;
+            font-family: inherit;
+        }
+        .form-group input:focus {
+            outline: none;
+            border-color: #3d5a80;
+            box-shadow: 0 0 0 3px rgba(61, 90, 128, 0.2);
+        }
+        button {
+            background: linear-gradient(to right, #0d1b2a, #1b263b);
+            color: white;
+            padding: 1rem 2rem;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            font-size: 1.1rem;
+            font-weight: 600;
+            width: 100%;
+            transition: all 0.3s ease;
+            margin-top: 0.5rem;
+        }
+        button:hover {
+            background: linear-gradient(to right, #1b263b, #0d1b2a);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(13, 27, 42, 0.4);
+        }
+        .error {
+            color: #e63946;
+            margin-top: 1.2rem;
+            font-weight: 600;
+            font-size: 1.05rem;
+            min-height: 1.5rem;
+        }
+        /* تحسين التصميم للجوال */
+        @media (max-width: 480px) {
+            .login-container {
+                margin: 1rem;
+                padding: 2rem 1.5rem;
+            }
+            .logo img {
+                width: 120px;
+            }
+            .login-container h2 {
+                font-size: 1.3rem;
+            }
+            .form-group input {
+                font-size: 1rem;
+                padding: 0.8rem;
+            }
+            button {
+                font-size: 1rem;
+                padding: 0.9rem;
+            }
+        }
+    </style>
 </head>
-<body class="login-page">
+<body>
     <div class="login-container">
         <div class="logo">
-            <img src="images/logo.png" alt="شعار أبو حذيفة">
+            <img src="images/logo.png" alt="شعار أبو حذيفة للصرافة والتحويلات">
         </div>
         <h2>نظام التحصيل والإخلاءات</h2>
         <form id="loginForm">
             <div class="form-group">
                 <label for="username">اسم المستخدم</label>
-                <input type="text" id="username" required>
+                <input type="text" id="username" name="username" required autocomplete="username" placeholder="أدخل اسم المستخدم">
             </div>
             <div class="form-group">
                 <label for="password">كلمة المرور</label>
-                <input type="password" id="password" required>
+                <input type="password" id="password" name="password" required autocomplete="current-password" placeholder="أدخل كلمة المرور">
             </div>
             <button type="submit">تسجيل الدخول</button>
             <div id="loginError" class="error"></div>
         </form>
     </div>
 
-    <script src="js/app.js"></script>
+    <script>
+        document.getElementById('loginForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const username = document.getElementById('username').value.trim();
+            const password = document.getElementById('password').value;
+            const errorDiv = document.getElementById('loginError');
+            errorDiv.textContent = '';
+
+            // بيانات الدخول المسموح بها
+            const validUsers = {
+                'admin': 'admin123',
+                'شمسان محمد': '123456',
+                'علاء المعلمي': '123456',
+                'المنذر الوصابي': '123456',
+                'مالك الوصابي': '123456'
+            };
+
+            if (validUsers[username] && validUsers[username] === password) {
+                localStorage.setItem('loggedInUser', username);
+                if (username === 'admin') {
+                    window.location.href = 'admin.html';
+                } else {
+                    window.location.href = 'dashboard.html';
+                }
+            } else {
+                errorDiv.textContent = '❌ اسم المستخدم أو كلمة المرور غير صحيحة';
+            }
+        });
+
+        // تحسين تجربة المستخدم: التركيز التلقائي على حقل المستخدم
+        document.getElementById('username').focus();
+    </script>
 </body>
 </html>
