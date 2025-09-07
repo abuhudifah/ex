@@ -511,4 +511,306 @@
 
         <!-- تبويب إدخال إخلاء -->
         <div id="clearance" class="tab-content">
-            <h2 style="text-align: right; color: var(--dark-blue); margin-bottom
+            <h2 style="text-align: right; color: var(--dark-blue); margin-bottom: 1.5rem;">إدخال إخلاء جديد</h2>
+            <form id="clearanceForm">
+                <div class="form-group">
+                    <label for="clearanceType">نوع الإخلاء</label>
+                    <select id="clearanceType" required>
+                        <option value="">اختر النوع</option>
+                        <option value="إيداع بنكي">إيداع بنكي</option>
+                        <option value="نثريات">نثريات</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="clearanceAmount">المبلغ</label>
+                    <input type="number" id="clearanceAmount" required min="1" placeholder="أدخل المبلغ">
+                </div>
+                <div class="form-group" id="expenseItemGroup" style="display:none;">
+                    <label for="expenseItem">بند النثريات</label>
+                    <select id="expenseItem">
+                        <option value="وقود">وقود</option>
+                        <option value="مواصلات">مواصلات</option>
+                        <option value="عمولة">عمولة</option>
+                        <option value="إعاشة">إعاشة</option>
+                        <option value="أخرى">أخرى</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="clearanceDetails">تفاصيل</label>
+                    <textarea id="clearanceDetails" rows="3" placeholder="أدخل التفاصيل"></textarea>
+                </div>
+                <button type="submit" class="btn-primary">تسجيل الإخلاء</button>
+                <div id="clearanceMessage" class="success"></div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // سيتم ربط هذا الكود مع Google Sheets لاحقًا
+        // الآن نستخدم بيانات محلية للتجربة
+        let receivables = [
+            { id: 1, العميل: "بلال محمد عبدالله علي الوصابي", المبلغ_المستحق: 15000, تاريخ_الاستحقاق: "2025-04-10", الحالة: "مفتوح", المندوب: "شمسان محمد" },
+            { id: 2, العميل: "شمسان محمد عبدالله الدحملي", المبلغ_المستحق: 5000, تاريخ_الاستحقاق: "2025-04-05", الحالة: "مفتوح", المندوب: "علاء المعلمي" },
+            { id: 3, العميل: "علاء المعلمي", المبلغ_المستحق: 7000, تاريخ_الاستحقاق: "2025-04-01", الحالة: "مفتوح", المندوب: "المنذر الوصابي" }
+        ];
+
+        let clients = [
+            "بلال محمد عبدالله علي الوصابي",
+            "شمسان محمد عبدالله الدحملي",
+            "علاء المعلمي",
+            "المنذر الوصابي",
+            "مالك الوصابي",
+            "حسام علي عبد الغني امين الفاتكي",
+            "عقيل عبدالعزيز علي احمد"
+        ];
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const user = localStorage.getItem('loggedInUser');
+            if (!user) {
+                window.location.href = 'index.html';
+                return;
+            }
+            document.getElementById('userNameDisplay').textContent = `👤 ${user}`;
+
+            document.getElementById('logoutBtn').addEventListener('click', function() {
+                localStorage.removeItem('loggedInUser');
+                window.location.href = 'index.html';
+            });
+
+            // تبديل التبويبات
+            const tabBtns = document.querySelectorAll('.tab-btn');
+            const tabContents = document.querySelectorAll('.tab-content');
+
+            tabBtns.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    tabBtns.forEach(b => b.classList.remove('active'));
+                    tabContents.forEach(c => c.classList.remove('active'));
+                    btn.classList.add('active');
+                    document.getElementById(btn.dataset.tab).classList.add('active');
+                });
+            });
+
+            // تحميل المستحقات
+            loadReceivables();
+
+            // البحث في المستحقات
+            document.getElementById('searchReceivable').addEventListener('input', function() {
+                filterReceivables(this.value);
+            });
+
+            // إعداد البحث الذكي عن العميل
+            const clientSearch = document.getElementById('clientSearch');
+            const clientList = document.getElementById('clientList');
+            const clientDropdown = document.getElementById('clientDropdown');
+            const selectedClient = document.getElementById('selectedClient');
+
+            clientSearch.addEventListener('input', function() {
+                const searchTerm = this.value.toLowerCase();
+                clientList.innerHTML = '';
+                
+                if (searchTerm.length === 0) {
+                    clientDropdown.classList.remove('active');
+                    return;
+                }
+
+                const filteredClients = clients.filter(client => 
+                    client.toLowerCase().includes(searchTerm)
+                );
+
+                if (filteredClients.length > 0) {
+                    clientDropdown.classList.add('active');
+                    filteredClients.forEach(client => {
+                        const div = document.createElement('div');
+                        div.className = 'client-item';
+                        div.textContent = client;
+                        div.addEventListener('click', function() {
+                            clientSearch.value = client;
+                            selectedClient.value = client;
+                            clientDropdown.classList.remove('active');
+                        });
+                        clientList.appendChild(div);
+                    });
+                } else {
+                    clientDropdown.classList.remove('active');
+                }
+            });
+
+            // إغلاق القائمة عند النقر خارجها
+            document.addEventListener('click', function(e) {
+                if (!clientDropdown.contains(e.target)) {
+                    clientDropdown.classList.remove('active');
+                }
+            });
+
+            // إظهار/إخفاء حقل النثريات
+            document.getElementById('clearanceType').addEventListener('change', function() {
+                const expenseItemGroup = document.getElementById('expenseItemGroup');
+                if (this.value === 'نثريات') {
+                    expenseItemGroup.style.display = 'block';
+                } else {
+                    expenseItemGroup.style.display = 'none';
+                }
+            });
+
+            // إدخال تحصيل جديد
+            document.getElementById('collectionForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+                const client = selectedClient.value || clientSearch.value;
+                const amount = parseFloat(document.getElementById('collectedAmount').value);
+                const operationType = document.getElementById('operationType').value;
+                const notes = document.getElementById('notes').value;
+                const agent = localStorage.getItem('loggedInUser');
+
+                if (!client || client.trim() === '') {
+                    document.getElementById('collectionMessage').textContent = '❌ يرجى اختيار عميل صالح';
+                    return;
+                }
+
+                if (isNaN(amount) || amount <= 0) {
+                    document.getElementById('collectionMessage').textContent = '❌ يرجى إدخال مبلغ صالح';
+                    return;
+                }
+
+                // هنا سيكون الربط مع Google Sheets لاحقًا
+                alert(`✅ تم تسجيل التحصيل بنجاح!\nالعميل: ${client}\nالمبلغ: ${amount}\nالمندوب: ${agent}`);
+
+                this.reset();
+                selectedClient.value = '';
+                document.getElementById('collectionMessage').textContent = '✅ تم تسجيل التحصيل بنجاح!';
+                setTimeout(() => {
+                    document.getElementById('collectionMessage').textContent = '';
+                }, 3000);
+            });
+
+            // إدخال إخلاء جديد
+            document.getElementById('clearanceForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+                const type = document.getElementById('clearanceType').value;
+                const amount = parseFloat(document.getElementById('clearanceAmount').value);
+                const details = document.getElementById('clearanceDetails').value;
+                const expenseItem = document.getElementById('expenseItem')?.value || '';
+                const agent = localStorage.getItem('loggedInUser');
+
+                if (isNaN(amount) || amount <= 0) {
+                    document.getElementById('clearanceMessage').textContent = '❌ يرجى إدخال مبلغ صالح';
+                    return;
+                }
+
+                // هنا سيكون الربط مع Google Sheets لاحقًا
+                alert(`✅ تم تسجيل الإخلاء بنجاح!\nالنوع: ${type}\nالمبلغ: ${amount}\nالمندوب: ${agent}`);
+
+                this.reset();
+                document.getElementById('expenseItemGroup').style.display = 'none';
+                document.getElementById('clearanceMessage').textContent = '✅ تم تسجيل الإخلاء بنجاح!';
+                setTimeout(() => {
+                    document.getElementById('clearanceMessage').textContent = '';
+                }, 3000);
+            });
+        });
+
+        function loadReceivables() {
+            const tableBody = document.querySelector('#receivablesTable tbody');
+            const totalReceivables = document.getElementById('totalReceivables');
+            const overdueReceivables = document.getElementById('overdueReceivables');
+            const dueToday = document.getElementById('dueToday');
+            
+            tableBody.innerHTML = '';
+
+            let total = 0;
+            let overdueTotal = 0;
+            let dueTodayTotal = 0;
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+
+            receivables.forEach((receivable, index) => {
+                total += receivable.المبلغ_المستحق;
+                
+                const dueDate = new Date(receivable.تاريخ_الاستحقاق);
+                if (dueDate < today) {
+                    overdueTotal += receivable.المبلغ_المستحق;
+                } else if (dueDate.getTime() === today.getTime()) {
+                    dueTodayTotal += receivable.المبلغ_المستحق;
+                }
+
+                const row = document.createElement('tr');
+                
+                if (dueDate < today) {
+                    row.classList.add('overdue');
+                } else if (dueDate.getTime() === today.getTime()) {
+                    row.classList.add('due-today');
+                }
+
+                row.innerHTML = `
+                    <td>${receivable.العميل}</td>
+                    <td>${receivable.المبلغ_المستحق.toLocaleString()} ريال</td>
+                    <td>${receivable.تاريخ_الاستحقاق}</td>
+                    <td>${receivable.الحالة}</td>
+                    <td class="actions">
+                        <button class="btn-edit" onclick="editReceivable(${index})">تعديل</button>
+                        <button class="btn-delete" onclick="deleteReceivable(${index})">حذف</button>
+                    </td>
+                `;
+                tableBody.appendChild(row);
+            });
+
+            totalReceivables.textContent = `${total.toLocaleString()} ريال`;
+            overdueReceivables.textContent = `${overdueTotal.toLocaleString()} ريال`;
+            dueToday.textContent = `${dueTodayTotal.toLocaleString()} ريال`;
+        }
+
+        function filterReceivables(searchTerm) {
+            const tableBody = document.querySelector('#receivablesTable tbody');
+            tableBody.innerHTML = '';
+
+            const filtered = receivables.filter(r => 
+                r.العميل.toLowerCase().includes(searchTerm.toLowerCase())
+            );
+
+            filtered.forEach((receivable, index) => {
+                const row = document.createElement('tr');
+                
+                const dueDate = new Date(receivable.تاريخ_الاستحقاق);
+                const today = new Date();
+                today.setHours(0, 0, 0, 0);
+                
+                if (dueDate < today) {
+                    row.classList.add('overdue');
+                } else if (dueDate.getTime() === today.getTime()) {
+                    row.classList.add('due-today');
+                }
+
+                row.innerHTML = `
+                    <td>${receivable.العميل}</td>
+                    <td>${receivable.المبلغ_المستحق.toLocaleString()} ريال</td>
+                    <td>${receivable.تاريخ_الاستحقاق}</td>
+                    <td>${receivable.الحالة}</td>
+                    <td class="actions">
+                        <button class="btn-edit" onclick="editReceivable(${index})">تعديل</button>
+                        <button class="btn-delete" onclick="deleteReceivable(${index})">حذف</button>
+                    </td>
+                `;
+                tableBody.appendChild(row);
+            });
+        }
+
+        function editReceivable(index) {
+            const receivable = receivables[index];
+            const newAmount = prompt('أدخل المبلغ المستحق الجديد:', receivable.المبلغ_المستحق);
+            if (newAmount !== null && !isNaN(newAmount) && parseFloat(newAmount) >= 0) {
+                receivable.المبلغ_المستحق = parseFloat(newAmount);
+                receivable.الحالة = parseFloat(newAmount) > 0 ? 'مفتوح' : 'مسوّى';
+                loadReceivables();
+                alert('✅ تم تحديث المستحق بنجاح!');
+            }
+        }
+
+        function deleteReceivable(index) {
+            if (confirm('هل أنت متأكد أنك تريد حذف هذا المستحق؟')) {
+                receivables.splice(index, 1);
+                loadReceivables();
+                alert('✅ تم حذف المستحق بنجاح!');
+            }
+        }
+    </script>
+</body>
+</html>
