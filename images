@@ -1,9 +1,0 @@
-images/
-├── logo.png                 ← شعار أبو حذيفة (من الرابط الذي أرسلته)
-├── icon-clients.png         ← أيقونة العملاء
-├── icon-collection.png      ← أيقونة التحصيل
-├── icon-deposit.png         ← أيقونة الإيداع البنكي
-├── icon-expenses.png        ← أيقونة النثريات
-├── icon-report.png          ← أيقونة التقرير اليومي
-├── icon-user.png            ← أيقونة المستخدم/المندوب
-└── icon-admin.png           ← أيقونة المدير
