@@ -356,6 +356,11 @@
             font-weight: 700;
         }
 
+        .pending-sync {
+            background-color: #fff3cd !important;
+            color: #856404 !important;
+        }
+
         @keyframes blink {
             50% { opacity: 0.7; }
         }
@@ -393,6 +398,15 @@
                 font-size: 1.1rem;
                 padding: 0.8rem 1.5rem;
             }
+
+            .card p {
+                font-size: 1.5rem;
+            }
+
+            .tab-btn {
+                padding: 0.75rem 1.25rem;
+                font-size: 1rem;
+            }
         }
 
         .success {
@@ -416,6 +430,19 @@
             font-weight: bold;
             text-align: center;
             font-size: 1.1rem;
+        }
+
+        #offlineBanner {
+            display: none;
+            background: #e63946;
+            color: white;
+            text-align: center;
+            padding: 0.5rem;
+            position: fixed;
+            top: 0;
+            width: 100%;
+            z-index: 9999;
+            font-weight: bold;
         }
 
         .card {
@@ -471,9 +498,22 @@
             background: #d85a3c;
             transform: translateY(-2px);
         }
+
+        .sync-btn {
+            background: #2a9d8f;
+            margin: 1rem 0;
+        }
+
+        .sync-btn:hover {
+            background: #228b7e;
+        }
     </style>
 </head>
 <body>
+    <div id="offlineBanner">
+        ⚠️ تعمل دون اتصال — سيتم المزامنة تلقائيًا عند الاتصال
+    </div>
+
     <div class="navbar">
         <div class="logo">
             <img src="https://i.ibb.co/LDSLfqXy/abohuthaifa-logo.png" alt="شعار أبو حذيفة">
@@ -496,6 +536,7 @@
         <div id="receivables" class="tab-content active">
             <h2 style="text-align: right; color: var(--dark-blue); margin-bottom: 1.5rem;"><i class="fas fa-list"></i> قائمة المستحقات</h2>
             <input type="text" id="searchReceivable" class="search-box" placeholder="ابحث عن عميل...">
+            <button id="syncNowBtn" class="btn-primary sync-btn"><i class="fas fa-sync"></i> مزامنة الآن</button>
             <div id="summaryCards" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1.5rem; margin: 2rem 0;">
                 <div class="card">
                     <h3><i class="fas fa-calculator"></i> إجمالي المستحقات</h3>
@@ -522,7 +563,7 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <!-- سيتم ملؤها تلقائيًا من Google Sheets -->
+                    <!-- سيتم ملؤها تلقائيًا من localStorage -->
                 </tbody>
             </table>
         </div>
@@ -634,6 +675,17 @@
             return Date.now().toString(36) + Math.random().toString(36).substr(2, 5);
         }
 
+        // تهيئة localStorage عند أول استخدام
+        if (!localStorage.getItem('dailyCollections')) {
+            localStorage.setItem('dailyCollections', JSON.stringify([]));
+        }
+        if (!localStorage.getItem('dailyClearances')) {
+            localStorage.setItem('dailyClearances', JSON.stringify([]));
+        }
+        if (!localStorage.getItem('dailyReceivables')) {
+            localStorage.setItem('dailyReceivables', JSON.stringify([]));
+        }
+
         // بيانات العملاء من localStorage
         let clients = JSON.parse(localStorage.getItem('clients')) || [];
 
@@ -670,8 +722,8 @@
             // جلب بيانات المندوبين
             fetchAgents();
 
-            // تحميل المستحقات
-            loadReceivables();
+            // تحميل المستحقات من localStorage
+            loadLocalReceivables();
 
             // البحث في المستحقات
             document.getElementById('searchReceivable').addEventListener('input', function() {
@@ -749,6 +801,25 @@
                 }
             });
 
+            // زر المزامنة اليدوية
+            document.getElementById('syncNowBtn').addEventListener('click', async function() {
+                const btn = this;
+                const originalText = btn.innerHTML;
+                btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> جاري المزامنة...';
+                btn.disabled = true;
+
+                try {
+                    await syncDataWithServer();
+                    loadLocalReceivables();
+                    alert('✅ تمت المزامنة بنجاح!');
+                } catch (error) {
+                    alert('❌ فشل المزامنة: ' + error.message);
+                } finally {
+                    btn.innerHTML = originalText;
+                    btn.disabled = false;
+                }
+            });
+
             // إدخال تحصيل جديد
             document.getElementById('collectionForm').addEventListener('submit', async function(e) {
                 e.preventDefault();
@@ -786,7 +857,7 @@
                         localStorage.setItem('clients', JSON.stringify(clients));
                     }
 
-                    // إضافة التحصيل إلى Google Sheets
+                    // إنشاء سجل التحصيل
                     const rowData = {
                         id: generateUniqueId(),
                         date: today,
@@ -794,17 +865,25 @@
                         amount: amount,
                         operationType: operationType,
                         agent: agent,
-                        notes: notes
+                        notes: notes,
+                        synced: false // لم تتم مزامنته بعد
                     };
-                    await addRowToSheet('المستحقات_اليومية', rowData);
 
-                    // تحديث عرض المستحقات
-                    loadReceivables();
+                    // الحفظ محليًا فورًا
+                    let collections = JSON.parse(localStorage.getItem('dailyCollections') || '[]');
+                    collections.push(rowData);
+                    localStorage.setItem('dailyCollections', JSON.stringify(collections));
+
+                    // تحديث العرض
+                    loadLocalReceivables();
+
+                    // محاولة المزامنة في الخلفية
+                    syncDataWithServer().catch(console.error);
 
                     // إعادة تعيين النموذج
                     this.reset();
                     selectedClient.value = '';
-                    document.getElementById('collectionMessage').textContent = '✅ تم تسجيل التحصيل بنجاح!';
+                    document.getElementById('collectionMessage').textContent = '✅ تم الحفظ محليًا! سيتم المزامنة تلقائيًا.';
                     setTimeout(() => {
                         document.getElementById('collectionMessage').textContent = '';
                     }, 3000);
@@ -854,7 +933,7 @@
                 document.getElementById('clearanceMessage').textContent = '';
 
                 try {
-                    // إضافة الإخلاء إلى Google Sheets
+                    // إنشاء سجل الإخلاء
                     const rowData = {
                         id: generateUniqueId(),
                         date: today,
@@ -864,16 +943,24 @@
                         details: details,
                         bankAccount: bankAccount,
                         expenseItem: expenseItem,
-                        transferAgent: transferAgent
+                        transferAgent: transferAgent,
+                        synced: false // لم تتم مزامنته بعد
                     };
-                    await addRowToSheet('المستحقات_اليومية', rowData);
+
+                    // الحفظ محليًا فورًا
+                    let clearances = JSON.parse(localStorage.getItem('dailyClearances') || '[]');
+                    clearances.push(rowData);
+                    localStorage.setItem('dailyClearances', JSON.stringify(clearances));
+
+                    // محاولة المزامنة في الخلفية
+                    syncDataWithServer().catch(console.error);
 
                     // إعادة تعيين النموذج
                     this.reset();
                     document.getElementById('bankAccountGroup').style.display = 'none';
                     document.getElementById('agentTransferGroup').style.display = 'none';
                     document.getElementById('expenseItemGroup').style.display = 'none';
-                    document.getElementById('clearanceMessage').textContent = '✅ تم تسجيل الإخلاء بنجاح!';
+                    document.getElementById('clearanceMessage').textContent = '✅ تم الحفظ محليًا! سيتم المزامنة تلقائيًا.';
                     setTimeout(() => {
                         document.getElementById('clearanceMessage').textContent = '';
                     }, 3000);
@@ -884,6 +971,27 @@
                     loadingDiv.style.display = 'none';
                 }
             });
+
+            // كشف حالة الاتصال
+            window.addEventListener('online', () => {
+                document.getElementById('offlineBanner').style.display = 'none';
+                syncDataWithServer().catch(console.error);
+            });
+
+            window.addEventListener('offline', () => {
+                document.getElementById('offlineBanner').style.display = 'block';
+            });
+
+            if (!navigator.onLine) {
+                document.getElementById('offlineBanner').style.display = 'block';
+            }
+
+            // مزامنة دورية كل 5 دقائق
+            setInterval(() => {
+                if (navigator.onLine) {
+                    syncDataWithServer().catch(console.error);
+                }
+            }, 5 * 60 * 1000);
         });
 
         // جلب بيانات الحسابات البنكية من Google Sheets
@@ -978,87 +1086,107 @@
                 });
                 const result = await response.json();
                 if (result.error) {
-                    console.error('Error adding row:', result.error);
-                    alert('❌ حدث خطأ أثناء حفظ البيانات');
+                    throw new Error(result.error);
                 }
             } catch (error) {
-                console.error('Error:', error);
-                alert('❌ حدث خطأ أثناء الاتصال بقاعدة البيانات');
+                throw error;
             }
         }
 
-        // تحميل المستحقات من Google Sheets
-        async function loadReceivables() {
-            const loadingDiv = document.getElementById('loading');
-            loadingDiv.style.display = 'block';
+        // مزامنة البيانات مع السيرفر
+        async function syncDataWithServer() {
+            // مزامنة التحصيلات
+            let collections = JSON.parse(localStorage.getItem('dailyCollections') || '[]');
+            let unsyncedCollections = collections.filter(item => !item.synced);
 
-            try {
-                const url = `${SCRIPT_URL}?sheet=المستحقات_اليومية&action=get`;
-                const response = await fetch(url);
-                const data = await response.json();
-                
-                const tableBody = document.querySelector('#receivablesTable tbody');
-                const totalReceivables = document.getElementById('totalReceivables');
-                const overdueReceivables = document.getElementById('overdueReceivables');
-                const dueToday = document.getElementById('dueToday');
-                
-                tableBody.innerHTML = '';
+            for (let item of unsyncedCollections) {
+                try {
+                    await addRowToSheet('المستحقات_اليومية', item);
+                    item.synced = true;
+                } catch (error) {
+                    console.warn('فشل مزامنة التحصيل:', item, error);
+                    // نستمر مع العناصر الأخرى
+                }
+            }
 
-                if (data.error) {
-                    console.error('Error:', data.error);
-                    return;
+            // مزامنة الإخلاءات
+            let clearances = JSON.parse(localStorage.getItem('dailyClearances') || '[]');
+            let unsyncedClearances = clearances.filter(item => !item.synced);
+
+            for (let item of unsyncedClearances) {
+                try {
+                    await addRowToSheet('المستحقات_اليومية', item);
+                    item.synced = true;
+                } catch (error) {
+                    console.warn('فشل مزامنة الإخلاء:', item, error);
+                }
+            }
+
+            // تحديث localStorage
+            localStorage.setItem('dailyCollections', JSON.stringify(collections));
+            localStorage.setItem('dailyClearances', JSON.stringify(clearances));
+
+            // تحديث العرض
+            loadLocalReceivables();
+        }
+
+        // تحميل المستحقات من localStorage
+        function loadLocalReceivables() {
+            const collections = JSON.parse(localStorage.getItem('dailyCollections') || '[]');
+            const tableBody = document.querySelector('#receivablesTable tbody');
+            const totalReceivables = document.getElementById('totalReceivables');
+            const overdueReceivables = document.getElementById('overdueReceivables');
+            const dueToday = document.getElementById('dueToday');
+            
+            tableBody.innerHTML = '';
+
+            let total = 0;
+            let overdueTotal = 0;
+            let dueTodayTotal = 0;
+            const todayDate = new Date();
+            todayDate.setHours(0, 0, 0, 0);
+
+            collections.forEach((row, index) => {
+                const dueDate = new Date(row['date'] || todayDate);
+                const amount = parseFloat(row['amount'] || 0);
+                const client = row['client'] || 'عميل غير معروف';
+                
+                total += amount;
+                
+                if (dueDate < todayDate) {
+                    overdueTotal += amount;
+                } else if (dueDate.getTime() === todayDate.getTime()) {
+                    dueTodayTotal += amount;
                 }
 
-                let total = 0;
-                let overdueTotal = 0;
-                let dueTodayTotal = 0;
-                const todayDate = new Date();
-                todayDate.setHours(0, 0, 0, 0);
+                const rowElement = document.createElement('tr');
+                
+                if (dueDate < todayDate) {
+                    rowElement.classList.add('overdue');
+                } else if (dueDate.getTime() === todayDate.getTime()) {
+                    rowElement.classList.add('due-today');
+                }
 
-                data.forEach((row, index) => {
-                    // افتراض أن العمود date هو تاريخ الاستحقاق، و amount هو المبلغ المستحق
-                    const dueDate = new Date(row['date'] || todayDate);
-                    const amount = parseFloat(row['amount'] || 0);
-                    const client = row['client'] || 'عميل غير معروف';
-                    const status = 'مفتوح'; // يمكنك تعديل هذا حسب الحاجة
-                    
-                    total += amount;
-                    
-                    if (dueDate < todayDate) {
-                        overdueTotal += amount;
-                    } else if (dueDate.getTime() === todayDate.getTime()) {
-                        dueTodayTotal += amount;
-                    }
+                if (!row.synced) {
+                    rowElement.classList.add('pending-sync');
+                }
 
-                    const rowElement = document.createElement('tr');
-                    
-                    if (dueDate < todayDate) {
-                        rowElement.classList.add('overdue');
-                    } else if (dueDate.getTime() === todayDate.getTime()) {
-                        rowElement.classList.add('due-today');
-                    }
+                rowElement.innerHTML = `
+                    <td>${client}</td>
+                    <td>${amount.toLocaleString()} ريال</td>
+                    <td>${row['date'] || todayDate.toISOString().split('T')[0]}</td>
+                    <td>${row.synced ? 'مزامن' : 'قيد الانتظار'}</td>
+                    <td class="actions">
+                        <button class="btn-edit" onclick="editReceivable(${index})"><i class="fas fa-edit"></i> تعديل</button>
+                        <button class="btn-delete" onclick="deleteReceivable(${index})"><i class="fas fa-trash"></i> حذف</button>
+                    </td>
+                `;
+                tableBody.appendChild(rowElement);
+            });
 
-                    rowElement.innerHTML = `
-                        <td>${client}</td>
-                        <td>${amount.toLocaleString()} ريال</td>
-                        <td>${row['date'] || todayDate.toISOString().split('T')[0]}</td>
-                        <td>${status}</td>
-                        <td class="actions">
-                            <button class="btn-edit" onclick="editReceivable(${index})"><i class="fas fa-edit"></i> تعديل</button>
-                            <button class="btn-delete" onclick="deleteReceivable(${index})"><i class="fas fa-trash"></i> حذف</button>
-                        </td>
-                    `;
-                    tableBody.appendChild(rowElement);
-                });
-
-                totalReceivables.textContent = `${total.toLocaleString()} ريال`;
-                overdueReceivables.textContent = `${overdueTotal.toLocaleString()} ريال`;
-                dueToday.textContent = `${dueTodayTotal.toLocaleString()} ريال`;
-            } catch (error) {
-                console.error('Error loading receivables:', error);
-            } finally {
-                loadingDiv.style.display = 'none';
-            }
+            totalReceivables.textContent = `${total.toLocaleString()} ريال`;
+            overdueReceivables.textContent = `${overdueTotal.toLocaleString()} ريال`;
+            dueToday.textContent = `${dueTodayTotal.toLocaleString()} ريال`;
         }
 
         function filterReceivables(searchTerm) {
@@ -1081,8 +1209,10 @@
 
         function deleteReceivable(index) {
             if (confirm('هل أنت متأكد أنك تريد حذف هذا المستحق؟')) {
-                alert('تم حذف المستحق رقم: ' + index);
-                loadReceivables();
+                let collections = JSON.parse(localStorage.getItem('dailyCollections') || '[]');
+                collections.splice(index, 1);
+                localStorage.setItem('dailyCollections', JSON.stringify(collections));
+                loadLocalReceivables();
             }
         }
     </script>
