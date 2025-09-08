@@ -600,9 +600,8 @@
     </div>
 
     <script>
-        // ⚠️ استبدل هذا المفتاح بمفتاح Google API الخاص بك
-        const API_KEY = 'YOUR_API_KEY';
-        const SPREADSHEET_ID = '1lILr9yv_9Mef_T506kN8kK20G2-zQNCQ0OsTeYm54PM';
+        // ⚠️ رابط Google Apps Script
+        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwg9n2T6wg7ZtWM_UR8TY6Kno46V9gy4juCct28r6n9Zqzoc0muHsORHXvFQnfxnOLLAg/exec';
 
         // بيانات العملاء من localStorage
         let clients = JSON.parse(localStorage.getItem('clients')) || [];
@@ -761,7 +760,15 @@
                 }
 
                 // إضافة التحصيل إلى Google Sheets
-                const rowData = [Date.now(), today, client, amount, operationType, agent, notes];
+                const rowData = {
+                    id: Date.now(),
+                    date: today,
+                    client: client,
+                    amount: amount,
+                    operationType: operationType,
+                    agent: agent,
+                    notes: notes
+                };
                 await addRowToSheet('المستحقات_اليومية', rowData);
 
                 // تحديث عرض المستحقات
@@ -809,7 +816,17 @@
                 }
 
                 // إضافة الإخلاء إلى Google Sheets
-                const rowData = [Date.now(), today, type, amount, agent, details, bankAccount, expenseItem, transferAgent];
+                const rowData = {
+                    id: Date.now(),
+                    date: today,
+                    type: type,
+                    amount: amount,
+                    agent: agent,
+                    details: details,
+                    bankAccount: bankAccount,
+                    expenseItem: expenseItem,
+                    transferAgent: transferAgent
+                };
                 await addRowToSheet('المستحقات_اليومية', rowData);
 
                 // إعادة تعيين النموذج
@@ -827,22 +844,24 @@
         // جلب بيانات الحسابات البنكية من Google Sheets
         async function fetchBankAccounts() {
             try {
-                const range = 'الحسابات_البنكية!A2:C';
-                const url = `https://sheets.googleapis.com/v4/spreadsheets/${SPREADSHEET_ID}/values/${range}?key=${API_KEY}`;
+                const url = `${SCRIPT_URL}?sheet=الحسابات_البنكية&action=get`;
                 const response = await fetch(url);
                 const data = await response.json();
                 
                 const bankAccountSelect = document.getElementById('bankAccount');
                 bankAccountSelect.innerHTML = '<option value="">اختر الحساب</option>';
                 
-                if (data.values) {
-                    data.values.forEach(row => {
-                        const option = document.createElement('option');
-                        option.value = row[0];
-                        option.textContent = `${row[0]} - ${row[2]}`;
-                        bankAccountSelect.appendChild(option);
-                    });
+                if (data.error) {
+                    console.error('Error:', data.error);
+                    return;
                 }
+                
+                data.forEach(row => {
+                    const option = document.createElement('option');
+                    option.value = row['اسم_الحساب'];
+                    option.textContent = `${row['اسم_الحساب']} - ${row['البنك']}`;
+                    bankAccountSelect.appendChild(option);
+                });
             } catch (error) {
                 console.error('Error fetching bank accounts:', error);
             }
@@ -851,24 +870,26 @@
         // جلب بيانات المندوبين من Google Sheets
         async function fetchAgents() {
             try {
-                const range = 'المستخدمين!A2:A';
-                const url = `https://sheets.googleapis.com/v4/spreadsheets/${SPREADSHEET_ID}/values/${range}?key=${API_KEY}`;
+                const url = `${SCRIPT_URL}?sheet=المستخدمين&action=get`;
                 const response = await fetch(url);
                 const data = await response.json();
                 
                 const transferAgentSelect = document.getElementById('transferAgent');
                 transferAgentSelect.innerHTML = '<option value="">اختر المندوب</option>';
                 
-                if (data.values) {
-                    data.values.forEach(row => {
-                        if (row[0]) {
-                            const option = document.createElement('option');
-                            option.value = row[0];
-                            option.textContent = row[0];
-                            transferAgentSelect.appendChild(option);
-                        }
-                    });
+                if (data.error) {
+                    console.error('Error:', data.error);
+                    return;
                 }
+                
+                data.forEach(row => {
+                    if (row['الصلاحية'] === 'مندوب') {
+                        const option = document.createElement('option');
+                        option.value = row['اسم_المستخدم'];
+                        option.textContent = row['اسم_المستخدم'];
+                        transferAgentSelect.appendChild(option);
+                    }
+                });
             } catch (error) {
                 console.error('Error fetching agents:', error);
             }
@@ -881,7 +902,12 @@
                 const accountNumber = prompt('أدخل رقم الحساب:');
                 const today = new Date().toISOString().split('T')[0];
                 
-                const rowData = [accountName, accountNumber, bankName, today];
+                const rowData = {
+                    اسم_الحساب: accountName,
+                    رقم_الحساب: accountNumber,
+                    البنك: bankName,
+                    تاريخ_آخر_استخدام: today
+                };
                 await addRowToSheet('الحسابات_البنكية', rowData);
                 
                 // تحديث قائمة الحسابات البنكية
@@ -897,19 +923,14 @@
         // إضافة صف إلى Google Sheets
         async function addRowToSheet(sheetName, rowData) {
             try {
-                const range = `${sheetName}!A:J`;
-                const url = `https://sheets.googleapis.com/v4/spreadsheets/${SPREADSHEET_ID}/values/${range}:append?valueInputOption=RAW&key=${API_KEY}`;
-                
+                const url = `${SCRIPT_URL}?sheet=${sheetName}&action=add`;
                 const response = await fetch(url, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
                     },
-                    body: JSON.stringify({
-                        values: [rowData]
-                    })
+                    body: JSON.stringify(rowData)
                 });
-                
                 const result = await response.json();
                 if (result.error) {
                     console.error('Error adding row:', result.error);
@@ -924,9 +945,7 @@
         // تحميل المستحقات من Google Sheets
         async function loadReceivables() {
             try {
-                const today = new Date().toISOString().split('T')[0];
-                const range = 'المستحقات_اليومية!A:H';
-                const url = `https://sheets.googleapis.com/v4/spreadsheets/${SPREADSHEET_ID}/values/${range}?key=${API_KEY}`;
+                const url = `${SCRIPT_URL}?sheet=المستحقات_اليومية&action=get`;
                 const response = await fetch(url);
                 const data = await response.json();
                 
@@ -937,49 +956,52 @@
                 
                 tableBody.innerHTML = '';
 
+                if (data.error) {
+                    console.error('Error:', data.error);
+                    return;
+                }
+
                 let total = 0;
                 let overdueTotal = 0;
                 let dueTodayTotal = 0;
                 const todayDate = new Date();
                 todayDate.setHours(0, 0, 0, 0);
 
-                if (data.values && data.values.length > 1) {
-                    data.values.slice(1).forEach((row, index) => {
-                        // افتراض أن العمود B هو تاريخ الاستحقاق، والعمود D هو المبلغ المستحق
-                        const dueDate = new Date(row[1] || today);
-                        const amount = parseFloat(row[3] || 0);
-                        const client = row[2] || 'عميل غير معروف';
-                        const status = 'مفتوح'; // يمكنك تعديل هذا حسب الحاجة
-                        
-                        total += amount;
-                        
-                        if (dueDate < todayDate) {
-                            overdueTotal += amount;
-                        } else if (dueDate.getTime() === todayDate.getTime()) {
-                            dueTodayTotal += amount;
-                        }
+                data.forEach((row, index) => {
+                    // افتراض أن العمود date هو تاريخ الاستحقاق، و amount هو المبلغ المستحق
+                    const dueDate = new Date(row['date'] || todayDate);
+                    const amount = parseFloat(row['amount'] || 0);
+                    const client = row['client'] || 'عميل غير معروف';
+                    const status = 'مفتوح'; // يمكنك تعديل هذا حسب الحاجة
+                    
+                    total += amount;
+                    
+                    if (dueDate < todayDate) {
+                        overdueTotal += amount;
+                    } else if (dueDate.getTime() === todayDate.getTime()) {
+                        dueTodayTotal += amount;
+                    }
 
-                        const rowElement = document.createElement('tr');
-                        
-                        if (dueDate < todayDate) {
-                            rowElement.classList.add('overdue');
-                        } else if (dueDate.getTime() === todayDate.getTime()) {
-                            rowElement.classList.add('due-today');
-                        }
+                    const rowElement = document.createElement('tr');
+                    
+                    if (dueDate < todayDate) {
+                        rowElement.classList.add('overdue');
+                    } else if (dueDate.getTime() === todayDate.getTime()) {
+                        rowElement.classList.add('due-today');
+                    }
 
-                        rowElement.innerHTML = `
-                            <td>${client}</td>
-                            <td>${amount.toLocaleString()} ريال</td>
-                            <td>${row[1] || today}</td>
-                            <td>${status}</td>
-                            <td class="actions">
-                                <button class="btn-edit" onclick="editReceivable(${index})">تعديل</button>
-                                <button class="btn-delete" onclick="deleteReceivable(${index})">حذف</button>
-                            </td>
-                        `;
-                        tableBody.appendChild(rowElement);
-                    });
-                }
+                    rowElement.innerHTML = `
+                        <td>${client}</td>
+                        <td>${amount.toLocaleString()} ريال</td>
+                        <td>${row['date'] || todayDate.toISOString().split('T')[0]}</td>
+                        <td>${status}</td>
+                        <td class="actions">
+                            <button class="btn-edit" onclick="editReceivable(${index})">تعديل</button>
+                            <button class="btn-delete" onclick="deleteReceivable(${index})">حذف</button>
+                        </td>
+                    `;
+                    tableBody.appendChild(rowElement);
+                });
 
                 totalReceivables.textContent = `${total.toLocaleString()} ريال`;
                 overdueReceivables.textContent = `${overdueTotal.toLocaleString()} ريال`;
@@ -991,10 +1013,16 @@
 
         function filterReceivables(searchTerm) {
             const tableBody = document.querySelector('#receivablesTable tbody');
-            tableBody.innerHTML = '';
-
-            // سيتم تنفيذ هذا لاحقًا
-            console.log('Filter receivables:', searchTerm);
+            const rows = tableBody.querySelectorAll('tr');
+            
+            rows.forEach(row => {
+                const clientCell = row.cells[0];
+                if (clientCell.textContent.toLowerCase().includes(searchTerm.toLowerCase())) {
+                    row.style.display = '';
+                } else {
+                    row.style.display = 'none';
+                }
+            });
         }
 
         function editReceivable(index) {
