@@ -549,4 +549,598 @@
             <button id="exportPDF" class="btn-primary"><i class="fas fa-file-pdf"></i> تصدير كـ PDF</button>
 
             <h3 style="text-align: right; color: var(--dark-blue); margin: 2rem 0 1rem 0;"><i class="fas fa-list"></i> تفصيل العمليات اليومية</h3>
-            <table id="daily
+            <table id="dailyOperationsTable">
+                <thead>
+                    <tr>
+                        <th>النوع</th>
+                        <th>العميل/المندوب</th>
+                        <th>المبلغ</th>
+                        <th>المندوب</th>
+                        <th>التاريخ</th>
+                        <th>التفاصيل</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- سيتم ملؤها تلقائيًا من Google Sheets -->
+                </tbody>
+            </table>
+        </div>
+
+        <!-- تبويب إدارة المستحقات -->
+        <div id="manageReceivables" class="tab-content">
+            <h2 class="section-title"><i class="fas fa-list"></i> إدارة المستحقات</h2>
+            <button id="addReceivableBtn" class="btn-primary"><i class="fas fa-plus"></i> إضافة مستحق جديد</button>
+            <input type="text" id="searchReceivableAdmin" class="search-box" placeholder="ابحث عن عميل...">
+            <div id="loading">⏳ جاري تحميل المستحقات...</div>
+            <table id="adminReceivablesTable">
+                <thead>
+                    <tr>
+                        <th>اسم العميل</th>
+                        <th>المبلغ المستحق</th>
+                        <th>تاريخ الاستحقاق</th>
+                        <th>الحالة</th>
+                        <th>الإجراءات</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- سيتم ملؤها تلقائيًا من Google Sheets -->
+                </tbody>
+            </table>
+        </div>
+
+        <!-- تبويب الحسابات البنكية -->
+        <div id="bankAccounts" class="tab-content">
+            <h2 class="section-title"><i class="fas fa-university"></i> الحسابات البنكية</h2>
+            <button id="addBankAccountBtn" class="btn-primary"><i class="fas fa-plus"></i> إضافة حساب بنكي جديد</button>
+            <div id="loading">⏳ جاري تحميل الحسابات...</div>
+            <table id="bankAccountsTable">
+                <thead>
+                    <tr>
+                        <th>اسم الحساب</th>
+                        <th>رقم الحساب</th>
+                        <th>البنك</th>
+                        <th>تاريخ آخر استخدام</th>
+                        <th>الإجراءات</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- سيتم ملؤها تلقائيًا من Google Sheets -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="support-section">
+        <h3><i class="fas fa-headset"></i> الدعم الفني</h3>
+        <div class="support-links">
+            <a href="https://wa.me/967714466459" target="_blank"><i class="fab fa-whatsapp"></i> واتساب</a>
+            <a href="tel:+967714466459"><i class="fas fa-phone"></i> اتصال مباشر</a>
+        </div>
+    </div>
+
+    <!-- Modal إضافة مستحق جديد -->
+    <div id="addReceivableModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2 style="text-align: right; color: var(--dark-blue);"><i class="fas fa-plus"></i> إضافة مستحق جديد</h2>
+            <form id="addReceivableForm">
+                <div class="form-group">
+                    <label for="newClient"><i class="fas fa-user"></i> اسم العميل</label>
+                    <input type="text" id="newClient" required placeholder="أدخل اسم العميل">
+                </div>
+                <div class="form-group">
+                    <label for="newAmount"><i class="fas fa-money-bill"></i> المبلغ المستحق</label>
+                    <input type="number" id="newAmount" required min="1" placeholder="أدخل المبلغ المستحق">
+                </div>
+                <div class="form-group">
+                    <label for="newDueDate"><i class="fas fa-calendar"></i> تاريخ الاستحقاق</label>
+                    <input type="date" id="newDueDate" required>
+                </div>
+                <div class="form-group">
+                    <label for="newStatus"><i class="fas fa-tag"></i> الحالة</label>
+                    <select id="newStatus" required>
+                        <option value="مفتوح">مفتوح</option>
+                        <option value="مسوّى">مسوّى</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="newNotes"><i class="fas fa-sticky-note"></i> ملاحظات</label>
+                    <textarea id="newNotes" rows="3" placeholder="أدخل أي ملاحظات إضافية"></textarea>
+                </div>
+                <button type="submit" class="btn-primary"><i class="fas fa-save"></i> إضافة المستحق</button>
+                <div id="loading">⏳ جاري الحفظ...</div>
+                <div id="addReceivableMessage" class="success"></div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal إضافة حساب بنكي جديد -->
+    <div id="addBankAccountModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2 style="text-align: right; color: var(--dark-blue);"><i class="fas fa-university"></i> إضافة حساب بنكي جديد</h2>
+            <form id="addBankAccountForm">
+                <div class="form-group">
+                    <label for="accountName"><i class="fas fa-user"></i> اسم الحساب</label>
+                    <input type="text" id="accountName" required placeholder="أدخل اسم الحساب">
+                </div>
+                <div class="form-group">
+                    <label for="accountNumber"><i class="fas fa-hashtag"></i> رقم الحساب</label>
+                    <input type="text" id="accountNumber" required placeholder="أدخل رقم الحساب">
+                </div>
+                <div class="form-group">
+                    <label for="bankName"><i class="fas fa-building"></i> اسم البنك</label>
+                    <input type="text" id="bankName" required placeholder="أدخل اسم البنك">
+                </div>
+                <button type="submit" class="btn-primary"><i class="fas fa-save"></i> إضافة الحساب البنكي</button>
+                <div id="loading">⏳ جاري الحفظ...</div>
+                <div id="addBankAccountMessage" class="success"></div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // ⚠️ رابط Google Apps Script
+        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwg9n2T6wg7ZtWM_UR8TY6Kno46V9gy4juCct28r6n9Zqzoc0muHsORHXvFQnfxnOLLAg/exec';
+
+        // دالة توليد ID فريد
+        function generateUniqueId() {
+            return Date.now().toString(36) + Math.random().toString(36).substr(2, 5);
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const user = localStorage.getItem('loggedInUser');
+            const userRole = localStorage.getItem('userRole');
+            if (!user || userRole !== 'مدير') {
+                alert('❌ ليس لديك صلاحية الوصول إلى هذه الصفحة');
+                window.location.href = 'index.html';
+                return;
+            }
+
+            document.getElementById('userNameDisplay').textContent = `👑 ${user}`;
+
+            document.getElementById('logoutBtn').addEventListener('click', function() {
+                localStorage.removeItem('loggedInUser');
+                window.location.href = 'index.html';
+            });
+
+            // تبديل التبويبات
+            const tabBtns = document.querySelectorAll('.tab-btn');
+            const tabContents = document.querySelectorAll('.tab-content');
+
+            tabBtns.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    tabBtns.forEach(b => b.classList.remove('active'));
+                    tabContents.forEach(c => c.classList.remove('active'));
+                    btn.classList.add('active');
+                    document.getElementById(btn.dataset.tab).classList.add('active');
+                });
+            });
+
+            // تحميل التقرير اليومي
+            loadDailyReport();
+
+            // تحميل المستحقات
+            loadAdminReceivables();
+
+            // تحميل الحسابات البنكية
+            loadBankAccounts();
+
+            // زر تحديث التقرير
+            document.getElementById('refreshReportBtn').addEventListener('click', function() {
+                loadDailyReport();
+            });
+
+            // فتح Modal إضافة مستحق جديد
+            document.getElementById('addReceivableBtn').addEventListener('click', function() {
+                document.getElementById('addReceivableModal').style.display = 'block';
+            });
+
+            // فتح Modal إضافة حساب بنكي جديد
+            document.getElementById('addBankAccountBtn').addEventListener('click', function() {
+                document.getElementById('addBankAccountModal').style.display = 'block';
+            });
+
+            // إغلاق Modal
+            document.querySelectorAll('.close').forEach(closeBtn => {
+                closeBtn.addEventListener('click', function() {
+                    this.closest('.modal').style.display = 'none';
+                });
+            });
+
+            window.addEventListener('click', function(event) {
+                if (event.target.classList.contains('modal')) {
+                    event.target.style.display = 'none';
+                }
+            });
+
+            // إضافة مستحق جديد
+            document.getElementById('addReceivableForm').addEventListener('submit', async function(e) {
+                e.preventDefault();
+                const client = document.getElementById('newClient').value.trim();
+                const amount = parseFloat(document.getElementById('newAmount').value);
+                const dueDate = document.getElementById('newDueDate').value;
+                const status = document.getElementById('newStatus').value;
+                const notes = document.getElementById('newNotes').value;
+                const agent = localStorage.getItem('loggedInUser');
+                const today = new Date().toISOString().split('T')[0];
+
+                if (!client || client === '') {
+                    document.getElementById('addReceivableMessage').textContent = '❌ يرجى إدخال اسم عميل صالح';
+                    return;
+                }
+
+                if (isNaN(amount) || amount <= 0) {
+                    document.getElementById('addReceivableMessage').textContent = '❌ يرجى إدخال مبلغ صالح';
+                    return;
+                }
+
+                if (!dueDate) {
+                    document.getElementById('addReceivableMessage').textContent = '❌ يرجى اختيار تاريخ استحقاق';
+                    return;
+                }
+
+                // إظهار حالة التحميل
+                const loadingDiv = document.getElementById('loading');
+                loadingDiv.style.display = 'block';
+                document.getElementById('addReceivableMessage').textContent = '';
+
+                try {
+                    // إضافة المستحق إلى Google Sheets
+                    const rowData = {
+                        id: generateUniqueId(),
+                        date: today,
+                        client: client,
+                        amount: amount,
+                        dueDate: dueDate,
+                        status: status,
+                        agent: agent,
+                        notes: notes
+                    };
+                    await addRowToSheet('المستحقات_اليومية', rowData);
+
+                    // إعادة تعيين النموذج
+                    this.reset();
+                    document.getElementById('addReceivableMessage').textContent = '✅ تم إضافة المستحق بنجاح!';
+                    setTimeout(() => {
+                        document.getElementById('addReceivableModal').style.display = 'none';
+                        document.getElementById('addReceivableMessage').textContent = '';
+                    }, 2000);
+
+                    // تحديث عرض المستحقات
+                    loadAdminReceivables();
+                    loadDailyReport();
+                } catch (error) {
+                    console.error('Error:', error);
+                    document.getElementById('addReceivableMessage').textContent = `❌ حدث خطأ: ${error.message}`;
+                } finally {
+                    loadingDiv.style.display = 'none';
+                }
+            });
+
+            // إضافة حساب بنكي جديد
+            document.getElementById('addBankAccountForm').addEventListener('submit', async function(e) {
+                e.preventDefault();
+                const accountName = document.getElementById('accountName').value.trim();
+                const accountNumber = document.getElementById('accountNumber').value.trim();
+                const bankName = document.getElementById('bankName').value.trim();
+                const today = new Date().toISOString().split('T')[0];
+
+                if (!accountName || !accountNumber || !bankName) {
+                    document.getElementById('addBankAccountMessage').textContent = '❌ يرجى إدخال جميع بيانات الحساب البنكي';
+                    return;
+                }
+
+                // إظهار حالة التحميل
+                const loadingDiv = document.getElementById('loading');
+                loadingDiv.style.display = 'block';
+                document.getElementById('addBankAccountMessage').textContent = '';
+
+                try {
+                    // إضافة الحساب البنكي إلى Google Sheets
+                    const rowData = {
+                        اسم_الحساب: accountName,
+                        رقم_الحساب: accountNumber,
+                        البنك: bankName,
+                        تاريخ_آخر_استخدام: today
+                    };
+                    await addRowToSheet('الحسابات_البنكية', rowData);
+
+                    // إعادة تعيين النموذج
+                    this.reset();
+                    document.getElementById('addBankAccountMessage').textContent = '✅ تم إضافة الحساب البنكي بنجاح!';
+                    setTimeout(() => {
+                        document.getElementById('addBankAccountModal').style.display = 'none';
+                        document.getElementById('addBankAccountMessage').textContent = '';
+                    }, 2000);
+
+                    // تحديث عرض الحسابات البنكية
+                    loadBankAccounts();
+                } catch (error) {
+                    console.error('Error:', error);
+                    document.getElementById('addBankAccountMessage').textContent = `❌ حدث خطأ: ${error.message}`;
+                } finally {
+                    loadingDiv.style.display = 'none';
+                }
+            });
+
+            // تصدير التقرير كـ PDF
+            document.getElementById('exportPDF').addEventListener('click', function() {
+                exportReportToPDF();
+            });
+
+            // البحث في المستحقات
+            document.getElementById('searchReceivableAdmin').addEventListener('input', function() {
+                filterAdminReceivables(this.value);
+            });
+        });
+
+        // تحميل التقرير اليومي
+        async function loadDailyReport() {
+            const loadingDiv = document.getElementById('loading');
+            loadingDiv.style.display = 'block';
+
+            try {
+                const url = `${SCRIPT_URL}?sheet=المستحقات_اليومية&action=get`;
+                const response = await fetch(url);
+                const data = await response.json();
+                
+                if (data.error) {
+                    console.error('Error:', data.error);
+                    return;
+                }
+
+                const today = new Date().toISOString().split('T')[0];
+                const todayOperations = data.filter(row => row['date'] === today);
+
+                // حساب الإجماليات
+                const totalCollection = todayOperations
+                    .filter(row => row['operationType'] === 'تحويل' || row['operationType'] === 'نقد')
+                    .reduce((sum, row) => sum + parseFloat(row['amount'] || 0), 0);
+                    
+                const totalDeposits = todayOperations
+                    .filter(row => row['type'] === 'إيداع بنكي')
+                    .reduce((sum, row) => sum + parseFloat(row['amount'] || 0), 0);
+                    
+                const totalExpenses = todayOperations
+                    .filter(row => row['type'] === 'نثريات')
+                    .reduce((sum, row) => sum + parseFloat(row['amount'] || 0), 0);
+                    
+                const totalCashDelivery = todayOperations
+                    .filter(row => row['type'] === 'تسليم نقدي')
+                    .reduce((sum, row) => sum + parseFloat(row['amount'] || 0), 0);
+                    
+                const totalTransfer = todayOperations
+                    .filter(row => row['type'] === 'تحويل رصيد')
+                    .reduce((sum, row) => sum + parseFloat(row['amount'] || 0), 0);
+                    
+                const remainingBalance = totalCollection - (totalDeposits + totalExpenses + totalCashDelivery + totalTransfer);
+
+                // عرض التقرير
+                document.getElementById('totalCollection').textContent = `${totalCollection.toLocaleString()} ريال`;
+                document.getElementById('totalDeposits').textContent = `${totalDeposits.toLocaleString()} ريال`;
+                document.getElementById('totalExpenses').textContent = `${totalExpenses.toLocaleString()} ريال`;
+                document.getElementById('totalCashDelivery').textContent = `${totalCashDelivery.toLocaleString()} ريال`;
+                document.getElementById('totalTransfer').textContent = `${totalTransfer.toLocaleString()} ريال`;
+                document.getElementById('remainingBalance').textContent = `${remainingBalance.toLocaleString()} ريال`;
+
+                // تفصيل العمليات اليومية
+                const tableBody = document.querySelector('#dailyOperationsTable tbody');
+                tableBody.innerHTML = '';
+
+                todayOperations.forEach(row => {
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `
+                        <td>${row['type'] || row['operationType'] || 'غير محدد'}</td>
+                        <td>${row['type'] === 'تحويل رصيد' ? row['transferAgent'] : row['client']}</td>
+                        <td>${parseFloat(row['amount'] || 0).toLocaleString()} ريال</td>
+                        <td>${row['agent'] || 'غير محدد'}</td>
+                        <td>${row['date'] || today}</td>
+                        <td>${row['details'] || row['notes'] || ''}</td>
+                    `;
+                    tableBody.appendChild(tr);
+                });
+            } catch (error) {
+                console.error('Error loading daily report:', error);
+            } finally {
+                loadingDiv.style.display = 'none';
+            }
+        }
+
+        // تحميل المستحقات في لوحة الإدارة
+        async function loadAdminReceivables() {
+            const loadingDiv = document.getElementById('loading');
+            loadingDiv.style.display = 'block';
+
+            try {
+                const url = `${SCRIPT_URL}?sheet=المستحقات_اليومية&action=get`;
+                const response = await fetch(url);
+                const data = await response.json();
+                
+                if (data.error) {
+                    console.error('Error:', data.error);
+                    return;
+                }
+
+                const tableBody = document.querySelector('#adminReceivablesTable tbody');
+                tableBody.innerHTML = '';
+
+                data.forEach((row, index) => {
+                    const client = row['client'] || 'عميل غير معروف';
+                    const amount = parseFloat(row['amount'] || 0);
+                    const dueDate = row['dueDate'] || new Date().toISOString().split('T')[0];
+                    const status = row['status'] || 'مفتوح';
+                    
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `
+                        <td>${client}</td>
+                        <td>${amount.toLocaleString()} ريال</td>
+                        <td>${dueDate}</td>
+                        <td>${status}</td>
+                        <td class="actions">
+                            <button class="btn-edit" onclick="editReceivableAdmin(${index})"><i class="fas fa-edit"></i> تعديل</button>
+                            <button class="btn-delete" onclick="deleteReceivableAdmin(${index})"><i class="fas fa-trash"></i> حذف</button>
+                        </td>
+                    `;
+                    tableBody.appendChild(tr);
+                });
+            } catch (error) {
+                console.error('Error loading admin receivables:', error);
+            } finally {
+                loadingDiv.style.display = 'none';
+            }
+        }
+
+        // تحميل الحسابات البنكية
+        async function loadBankAccounts() {
+            const loadingDiv = document.getElementById('loading');
+            loadingDiv.style.display = 'block';
+
+            try {
+                const url = `${SCRIPT_URL}?sheet=الحسابات_البنكية&action=get`;
+                const response = await fetch(url);
+                const data = await response.json();
+                
+                if (data.error) {
+                    console.error('Error:', data.error);
+                    return;
+                }
+
+                const tableBody = document.querySelector('#bankAccountsTable tbody');
+                tableBody.innerHTML = '';
+
+                data.forEach((row, index) => {
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `
+                        <td>${row['اسم_الحساب'] || ''}</td>
+                        <td>${row['رقم_الحساب'] || ''}</td>
+                        <td>${row['البنك'] || ''}</td>
+                        <td>${row['تاريخ_آخر_استخدام'] || ''}</td>
+                        <td class="actions">
+                            <button class="btn-edit" onclick="editBankAccount(${index})"><i class="fas fa-edit"></i> تعديل</button>
+                            <button class="btn-delete" onclick="deleteBankAccount(${index})"><i class="fas fa-trash"></i> حذف</button>
+                        </td>
+                    `;
+                    tableBody.appendChild(tr);
+                });
+            } catch (error) {
+                console.error('Error loading bank accounts:', error);
+            } finally {
+                loadingDiv.style.display = 'none';
+            }
+        }
+
+        // إضافة صف إلى Google Sheets
+        async function addRowToSheet(sheetName, rowData) {
+            try {
+                const url = `${SCRIPT_URL}?sheet=${sheetName}&action=add`;
+                const response = await fetch(url, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(rowData)
+                });
+                const result = await response.json();
+                if (result.error) {
+                    throw new Error(result.error);
+                }
+            } catch (error) {
+                throw error;
+            }
+        }
+
+        function filterAdminReceivables(searchTerm) {
+            const tableBody = document.querySelector('#adminReceivablesTable tbody');
+            const rows = tableBody.querySelectorAll('tr');
+            
+            rows.forEach(row => {
+                const clientCell = row.cells[0];
+                if (clientCell.textContent.toLowerCase().includes(searchTerm.toLowerCase())) {
+                    row.style.display = '';
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+        }
+
+        function editReceivableAdmin(index) {
+            alert('تعديل المستحق رقم: ' + index);
+        }
+
+        function deleteReceivableAdmin(index) {
+            if (confirm('هل أنت متأكد أنك تريد حذف هذا المستحق؟')) {
+                alert('تم حذف المستحق رقم: ' + index);
+                loadAdminReceivables();
+                loadDailyReport();
+            }
+        }
+
+        function editBankAccount(index) {
+            alert('تعديل الحساب البنكي رقم: ' + index);
+        }
+
+        function deleteBankAccount(index) {
+            if (confirm('هل أنت متأكد أنك تريد حذف هذا الحساب البنكي؟')) {
+                alert('تم حذف الحساب البنكي رقم: ' + index);
+                loadBankAccounts();
+            }
+        }
+
+        function exportReportToPDF() {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+            
+            doc.setFont("helvetica", "bold");
+            doc.setFontSize(22);
+            doc.text("تقرير يومي - نظام أبو حذيفة", 105, 25, { align: "center" });
+            
+            doc.setFontSize(14);
+            doc.text(`تاريخ التقرير: ${new Date().toLocaleDateString('ar-EG')}`, 25, 40);
+            
+            let yPos = 60;
+            doc.setFont("helvetica", "bold");
+            doc.text("الملخص المالي", 25, yPos);
+            yPos += 15;
+            doc.setFont("helvetica", "normal");
+            doc.text(`إجمالي التحصيل: ${document.getElementById('totalCollection').textContent}`, 30, yPos);
+            yPos += 10;
+            doc.text(`إجمالي الإيداعات: ${document.getElementById('totalDeposits').textContent}`, 30, yPos);
+            yPos += 10;
+            doc.text(`إجمالي النثريات: ${document.getElementById('totalExpenses').textContent}`, 30, yPos);
+            yPos += 10;
+            doc.text(`إجمالي التسليم النقدي: ${document.getElementById('totalCashDelivery').textContent}`, 30, yPos);
+            yPos += 10;
+            doc.text(`إجمالي تحويلات الرصيد: ${document.getElementById('totalTransfer').textContent}`, 30, yPos);
+            yPos += 10;
+            doc.text(`الرصيد المتبقي: ${document.getElementById('remainingBalance').textContent}`, 30, yPos);
+
+            yPos += 20;
+            doc.setFont("helvetica", "bold");
+            doc.text("تفصيل العمليات", 25, yPos);
+            yPos += 15;
+
+            const tableBody = document.querySelector('#dailyOperationsTable tbody');
+            const rows = tableBody.querySelectorAll('tr');
+            
+            rows.forEach(row => {
+                const cells = row.querySelectorAll('td');
+                let text = '';
+                cells.forEach((cell, index) => {
+                    if (index > 0) text += ' | ';
+                    text += cell.textContent;
+                });
+                doc.text(text, 20, yPos);
+                yPos += 12;
+                if (yPos > 270) {
+                    doc.addPage();
+                    yPos = 30;
+                }
+            });
+
+            doc.save(`تقرير_يومي_أبو_حذيفة_${new Date().toISOString().split('T')[0]}.pdf`);
+            alert('✅ تم تصدير التقرير كـ PDF بنجاح!');
+        }
+    </script>
+</body>
+</html>
