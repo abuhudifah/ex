@@ -504,6 +504,7 @@
                     <p id="dueToday">0 ريال</p>
                 </div>
             </div>
+            <div id="loading">⏳ جاري تحميل البيانات...</div>
             <table id="receivablesTable">
                 <thead>
                     <tr>
@@ -515,7 +516,7 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <!-- سيتم ملؤها تلقائيًا من localStorage -->
+                    <!-- سيتم ملؤها تلقائيًا من Google Sheets -->
                 </tbody>
             </table>
         </div>
@@ -529,7 +530,7 @@
                     <div class="dropdown" id="clientDropdown">
                         <input type="text" id="clientSearch" placeholder="ابدأ بالكتابة للبحث عن عميل..." autocomplete="off" required>
                         <div class="dropdown-menu" id="clientList">
-                            <!-- سيتم ملؤها تلقائيًا من localStorage -->
+                            <!-- سيتم ملؤها تلقائيًا من Google Sheets -->
                         </div>
                     </div>
                     <input type="hidden" id="selectedClient">
@@ -551,6 +552,7 @@
                     <textarea id="notes" rows="3" placeholder="أدخل أي ملاحظات إضافية"></textarea>
                 </div>
                 <button type="submit" class="btn-primary"><i class="fas fa-save"></i> تسجيل التحصيل</button>
+                <div id="loading">⏳ جاري الحفظ...</div>
                 <div id="collectionMessage" class="success"></div>
             </form>
         </div>
@@ -573,16 +575,15 @@
                     <label for="bankAccount"><i class="fas fa-university"></i> اسم الحساب البنكي</label>
                     <select id="bankAccount">
                         <option value="">اختر الحساب</option>
-                        <option value="البنك الأهلي">البنك الأهلي</option>
-                        <option value="البنك التجاري">البنك التجاري</option>
+                        <!-- سيتم ملؤها تلقائيًا من Google Sheets -->
                     </select>
+                    <button type="button" id="addBankAccountBtn" style="margin-top: 0.5rem;"><i class="fas fa-plus"></i> إضافة حساب جديد</button>
                 </div>
                 <div class="form-group" id="agentTransferGroup" style="display:none;">
                     <label for="transferAgent"><i class="fas fa-user-friends"></i> المندوب المحول إليه</label>
                     <select id="transferAgent">
                         <option value="">اختر المندوب</option>
-                        <option value="علي">علي</option>
-                        <option value="أحمد">أحمد</option>
+                        <!-- سيتم ملؤها تلقائيًا من Google Sheets -->
                     </select>
                 </div>
                 <div class="form-group">
@@ -604,6 +605,7 @@
                     <textarea id="clearanceDetails" rows="3" placeholder="أدخل التفاصيل"></textarea>
                 </div>
                 <button type="submit" class="btn-primary"><i class="fas fa-save"></i> تسجيل الإخلاء</button>
+                <div id="loading">⏳ جاري الحفظ...</div>
                 <div id="clearanceMessage" class="success"></div>
             </form>
         </div>
@@ -618,19 +620,11 @@
     </div>
 
     <script>
-        // دالة توليد ID فريد
+        // ⚠️ الرابط الجديد والصحيح
+        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxKVg7raRsBotFSL7BY9z0d9ZbYngkYrkxNJaFAoCacDPLzLzEzuRq2iusYxHSLHCeeHQ/exec';
+
         function generateUniqueId() {
             return Date.now().toString(36) + Math.random().toString(36).substr(2, 5);
-        }
-
-        // دالة حفظ البيانات في localStorage
-        function saveData(data) {
-            localStorage.setItem('dailyData', JSON.stringify(data));
-        }
-
-        // دالة جلب البيانات من localStorage
-        function loadData() {
-            return JSON.parse(localStorage.getItem('dailyData') || '[]');
         }
 
         document.addEventListener('DOMContentLoaded', function() {
@@ -660,6 +654,12 @@
                 });
             });
 
+            // جلب بيانات الحسابات البنكية
+            fetchBankAccounts();
+
+            // جلب بيانات المندوبين
+            fetchAgents();
+
             // تحميل المستحقات
             loadReceivables();
 
@@ -674,7 +674,7 @@
             const clientDropdown = document.getElementById('clientDropdown');
             const selectedClient = document.getElementById('selectedClient');
 
-            clientSearch.addEventListener('input', function() {
+            clientSearch.addEventListener('input', async function() {
                 const searchTerm = this.value.toLowerCase();
                 clientList.innerHTML = '';
                 
@@ -683,27 +683,30 @@
                     return;
                 }
 
-                const data = loadData();
-                const clients = [...new Set(data.map(item => item.client).filter(Boolean))];
-                const filteredClients = clients.filter(client => 
-                    client.toLowerCase().includes(searchTerm)
-                );
+                try {
+                    const clients = await fetchClients();
+                    const filteredClients = clients.filter(client => 
+                        client.toLowerCase().includes(searchTerm)
+                    );
 
-                if (filteredClients.length > 0) {
-                    clientDropdown.classList.add('active');
-                    filteredClients.forEach(client => {
-                        const div = document.createElement('div');
-                        div.className = 'client-item';
-                        div.textContent = client;
-                        div.addEventListener('click', function() {
-                            clientSearch.value = client;
-                            selectedClient.value = client;
-                            clientDropdown.classList.remove('active');
+                    if (filteredClients.length > 0) {
+                        clientDropdown.classList.add('active');
+                        filteredClients.forEach(client => {
+                            const div = document.createElement('div');
+                            div.className = 'client-item';
+                            div.textContent = client;
+                            div.addEventListener('click', function() {
+                                clientSearch.value = client;
+                                selectedClient.value = client;
+                                clientDropdown.classList.remove('active');
+                            });
+                            clientList.appendChild(div);
                         });
-                        clientList.appendChild(div);
-                    });
-                } else {
-                    clientDropdown.classList.remove('active');
+                    } else {
+                        clientDropdown.classList.remove('active');
+                    }
+                } catch (error) {
+                    console.error('Error fetching clients:', error);
                 }
             });
 
@@ -733,8 +736,16 @@
                 }
             });
 
+            // إضافة حساب بنكي جديد
+            document.getElementById('addBankAccountBtn').addEventListener('click', function() {
+                const newAccountName = prompt('أدخل اسم الحساب البنكي الجديد:');
+                if (newAccountName) {
+                    addBankAccount(newAccountName);
+                }
+            });
+
             // إدخال تحصيل جديد
-            document.getElementById('collectionForm').addEventListener('submit', function(e) {
+            document.getElementById('collectionForm').addEventListener('submit', async function(e) {
                 e.preventDefault();
                 const client = selectedClient.value || clientSearch.value;
                 const amount = parseFloat(document.getElementById('collectedAmount').value);
@@ -758,32 +769,41 @@
                     return;
                 }
 
-                const data = loadData();
-                const newRecord = {
-                    id: generateUniqueId(),
-                    type: 'collection',
-                    date: today,
-                    client: client,
-                    amount: amount,
-                    operationType: operationType,
-                    agent: agent,
-                    notes: notes
-                };
+                const loadingDiv = document.getElementById('loading');
+                loadingDiv.style.display = 'block';
+                document.getElementById('collectionMessage').textContent = '';
 
-                data.push(newRecord);
-                saveData(data);
-                loadReceivables();
+                try {
+                    const rowData = {
+                        id: generateUniqueId(),
+                        date: today,
+                        client: client,
+                        amount: amount,
+                        operationType: operationType,
+                        agent: agent,
+                        notes: notes,
+                        type: 'تحصيل'
+                    };
 
-                this.reset();
-                selectedClient.value = '';
-                document.getElementById('collectionMessage').textContent = '✅ تم تسجيل التحصيل بنجاح!';
-                setTimeout(() => {
-                    document.getElementById('collectionMessage').textContent = '';
-                }, 2000);
+                    await addRowToSheet('المستحقات_اليومية', rowData);
+                    loadReceivables(); // تحديث فوري
+
+                    this.reset();
+                    selectedClient.value = '';
+                    document.getElementById('collectionMessage').textContent = '✅ تم تسجيل التحصيل بنجاح!';
+                    setTimeout(() => {
+                        document.getElementById('collectionMessage').textContent = '';
+                    }, 2000);
+                } catch (error) {
+                    console.error('Error:', error);
+                    document.getElementById('collectionMessage').textContent = `❌ حدث خطأ: ${error.message}`;
+                } finally {
+                    loadingDiv.style.display = 'none';
+                }
             });
 
             // إدخال إخلاء جديد
-            document.getElementById('clearanceForm').addEventListener('submit', function(e) {
+            document.getElementById('clearanceForm').addEventListener('submit', async function(e) {
                 e.preventDefault();
                 const type = document.getElementById('clearanceType').value;
                 const amount = parseFloat(document.getElementById('clearanceAmount').value);
@@ -804,132 +824,274 @@
                     return;
                 }
 
-                const data = loadData();
-                const newRecord = {
-                    id: generateUniqueId(),
-                    type: 'clearance',
-                    subtype: type,
-                    date: today,
-                    amount: amount,
-                    agent: agent,
-                    details: details,
-                    bankAccount: bankAccount,
-                    expenseItem: expenseItem,
-                    transferAgent: transferAgent
-                };
+                if (type === 'إيداع بنكي' && !bankAccount) {
+                    document.getElementById('clearanceMessage').textContent = '❌ يرجى اختيار الحساب البنكي';
+                    return;
+                }
 
-                data.push(newRecord);
-                saveData(data);
-                loadReceivables();
+                if (type === 'تحويل رصيد' && !transferAgent) {
+                    document.getElementById('clearanceMessage').textContent = '❌ يرجى اختيار المندوب المحول إليه';
+                    return;
+                }
 
-                this.reset();
-                document.getElementById('bankAccountGroup').style.display = 'none';
-                document.getElementById('agentTransferGroup').style.display = 'none';
-                document.getElementById('expenseItemGroup').style.display = 'none';
-                document.getElementById('clearanceMessage').textContent = '✅ تم تسجيل الإخلاء بنجاح!';
-                setTimeout(() => {
-                    document.getElementById('clearanceMessage').textContent = '';
-                }, 2000);
+                const loadingDiv = document.getElementById('loading');
+                loadingDiv.style.display = 'block';
+                document.getElementById('clearanceMessage').textContent = '';
+
+                try {
+                    const rowData = {
+                        id: generateUniqueId(),
+                        date: today,
+                        type: type,
+                        amount: amount,
+                        agent: agent,
+                        details: details,
+                        bankAccount: bankAccount,
+                        expenseItem: expenseItem,
+                        transferAgent: transferAgent
+                    };
+
+                    await addRowToSheet('المستحقات_اليومية', rowData);
+                    loadReceivables(); // تحديث فوري
+
+                    this.reset();
+                    document.getElementById('bankAccountGroup').style.display = 'none';
+                    document.getElementById('agentTransferGroup').style.display = 'none';
+                    document.getElementById('expenseItemGroup').style.display = 'none';
+                    document.getElementById('clearanceMessage').textContent = '✅ تم تسجيل الإخلاء بنجاح!';
+                    setTimeout(() => {
+                        document.getElementById('clearanceMessage').textContent = '';
+                    }, 2000);
+                } catch (error) {
+                    console.error('Error:', error);
+                    document.getElementById('clearanceMessage').textContent = `❌ حدث خطأ: ${error.message}`;
+                } finally {
+                    loadingDiv.style.display = 'none';
+                }
             });
-
-            // إضافة مستحق جديد (للتوافق مع لوحة الإدارة)
-            window.addReceivable = function(client, amount) {
-                const data = loadData();
-                const today = new Date().toISOString().split('T')[0];
-                const newRecord = {
-                    id: generateUniqueId(),
-                    type: 'receivable',
-                    date: today,
-                    client: client,
-                    amount: amount,
-                    dueDate: today,
-                    status: 'مفتوح',
-                    agent: localStorage.getItem('loggedInUser')
-                };
-                data.push(newRecord);
-                saveData(data);
-                loadReceivables();
-            };
         });
 
-        function loadReceivables() {
-            const data = loadData();
-            const tableBody = document.querySelector('#receivablesTable tbody');
-            const totalReceivables = document.getElementById('totalReceivables');
-            const overdueReceivables = document.getElementById('overdueReceivables');
-            const dueToday = document.getElementById('dueToday');
-            
-            tableBody.innerHTML = '';
-
-            let total = 0;
-            let overdueTotal = 0;
-            let dueTodayTotal = 0;
-            const todayDate = new Date();
-            todayDate.setHours(0, 0, 0, 0);
-
-            const receivables = data.filter(item => item.type === 'receivable');
-
-            receivables.forEach((item, index) => {
-                const dueDate = new Date(item.dueDate || todayDate);
-                const amount = parseFloat(item.amount || 0);
-                const client = item.client || 'عميل غير معروف';
-                const status = item.status || 'مفتوح';
+        async function fetchBankAccounts() {
+            try {
+                const url = `${SCRIPT_URL}?sheet=الحسابات_البنكية&action=get`;
+                const response = await fetch(url);
+                const data = await response.json();
                 
-                total += amount;
+                const bankAccountSelect = document.getElementById('bankAccount');
+                bankAccountSelect.innerHTML = '<option value="">اختر الحساب</option>';
                 
-                if (dueDate < todayDate) {
-                    overdueTotal += amount;
-                } else if (dueDate.getTime() === todayDate.getTime()) {
-                    dueTodayTotal += amount;
+                if (data.error) {
+                    console.error('Error:', data.error);
+                    return;
                 }
-
-                const rowElement = document.createElement('tr');
                 
-                if (dueDate < todayDate) {
-                    rowElement.classList.add('overdue');
-                } else if (dueDate.getTime() === todayDate.getTime()) {
-                    rowElement.classList.add('due-today');
-                }
-
-                rowElement.innerHTML = `
-                    <td>${client}</td>
-                    <td>${amount.toLocaleString()} ريال</td>
-                    <td>${item.dueDate || todayDate.toISOString().split('T')[0]}</td>
-                    <td>${status}</td>
-                    <td class="actions">
-                        <button class="btn-edit" onclick="editReceivable('${item.id}')"><i class="fas fa-edit"></i> تعديل</button>
-                        <button class="btn-delete" onclick="deleteReceivable('${item.id}')"><i class="fas fa-trash"></i> حذف</button>
-                    </td>
-                `;
-                tableBody.appendChild(rowElement);
-            });
-
-            totalReceivables.textContent = `${total.toLocaleString()} ريال`;
-            overdueReceivables.textContent = `${overdueTotal.toLocaleString()} ريال`;
-            dueToday.textContent = `${dueTodayTotal.toLocaleString()} ريال`;
+                data.forEach(row => {
+                    const option = document.createElement('option');
+                    option.value = row['اسم_الحساب'];
+                    option.textContent = `${row['اسم_الحساب']} - ${row['البنك']}`;
+                    bankAccountSelect.appendChild(option);
+                });
+            } catch (error) {
+                console.error('Error fetching bank accounts:', error);
+            }
         }
 
-        function editReceivable(id) {
+        async function fetchAgents() {
+            try {
+                const url = `${SCRIPT_URL}?sheet=المستخدمين&action=get`;
+                const response = await fetch(url);
+                const data = await response.json();
+                
+                const transferAgentSelect = document.getElementById('transferAgent');
+                transferAgentSelect.innerHTML = '<option value="">اختر المندوب</option>';
+                
+                if (data.error) {
+                    console.error('Error:', data.error);
+                    return;
+                }
+                
+                data.forEach(row => {
+                    if (row['الصلاحية'] === 'مندوب') {
+                        const option = document.createElement('option');
+                        option.value = row['اسم_المستخدم'];
+                        option.textContent = row['اسم_المستخدم'];
+                        transferAgentSelect.appendChild(option);
+                    }
+                });
+            } catch (error) {
+                console.error('Error fetching agents:', error);
+            }
+        }
+
+        async function fetchClients() {
+            try {
+                const url = `${SCRIPT_URL}?sheet=المستحقات_اليومية&action=get`;
+                const response = await fetch(url);
+                const data = await response.json();
+                
+                if (data.error) {
+                    console.error('Error:', data.error);
+                    return [];
+                }
+
+                const clients = [...new Set(data.map(row => row['client']).filter(Boolean))];
+                return clients;
+            } catch (error) {
+                console.error('Error fetching clients:', error);
+                return [];
+            }
+        }
+
+        async function addBankAccount(accountName) {
+            try {
+                const bankName = prompt('أدخل اسم البنك:');
+                const accountNumber = prompt('أدخل رقم الحساب:');
+                const today = new Date().toISOString().split('T')[0];
+                
+                const rowData = {
+                    اسم_الحساب: accountName,
+                    رقم_الحساب: accountNumber,
+                    البنك: bankName,
+                    تاريخ_آخر_استخدام: today
+                };
+                await addRowToSheet('الحسابات_البنكية', rowData);
+                fetchBankAccounts();
+                alert('✅ تم إضافة الحساب البنكي بنجاح!');
+            } catch (error) {
+                console.error('Error adding bank account:', error);
+                alert('❌ حدث خطأ أثناء إضافة الحساب البنكي');
+            }
+        }
+
+        async function addRowToSheet(sheetName, rowData) {
+            try {
+                const url = `${SCRIPT_URL}?sheet=${sheetName}&action=add`;
+                const response = await fetch(url, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(rowData)
+                });
+                const result = await response.json();
+                if (result.error) {
+                    throw new Error(result.error);
+                }
+            } catch (error) {
+                throw error;
+            }
+        }
+
+        async function loadReceivables() {
+            const loadingDiv = document.getElementById('loading');
+            loadingDiv.style.display = 'block';
+
+            try {
+                const url = `${SCRIPT_URL}?sheet=المستحقات_اليومية&action=get`;
+                const response = await fetch(url);
+                const data = await response.json();
+                
+                const tableBody = document.querySelector('#receivablesTable tbody');
+                const totalReceivables = document.getElementById('totalReceivables');
+                const overdueReceivables = document.getElementById('overdueReceivables');
+                const dueToday = document.getElementById('dueToday');
+                
+                tableBody.innerHTML = '';
+
+                if (data.error) {
+                    console.error('Error:', data.error);
+                    return;
+                }
+
+                let total = 0;
+                let overdueTotal = 0;
+                let dueTodayTotal = 0;
+                const todayDate = new Date();
+                todayDate.setHours(0, 0, 0, 0);
+
+                const receivables = data.filter(row => row['dueDate'] && !row['type']); // فقط المستحقات الأصلية
+
+                receivables.forEach((row, index) => {
+                    const dueDate = new Date(row['dueDate'] || todayDate);
+                    const amount = parseFloat(row['amount'] || 0);
+                    const client = row['client'] || 'عميل غير معروف';
+                    const status = row['status'] || 'مفتوح';
+                    
+                    total += amount;
+                    
+                    if (dueDate < todayDate) {
+                        overdueTotal += amount;
+                    } else if (dueDate.getTime() === todayDate.getTime()) {
+                        dueTodayTotal += amount;
+                    }
+
+                    const rowElement = document.createElement('tr');
+                    
+                    if (dueDate < todayDate) {
+                        rowElement.classList.add('overdue');
+                    } else if (dueDate.getTime() === todayDate.getTime()) {
+                        rowElement.classList.add('due-today');
+                    }
+
+                    rowElement.innerHTML = `
+                        <td>${client}</td>
+                        <td>${amount.toLocaleString()} ريال</td>
+                        <td>${row['dueDate'] || todayDate.toISOString().split('T')[0]}</td>
+                        <td>${status}</td>
+                        <td class="actions">
+                            <button class="btn-edit" onclick="editReceivable('${row.id}')"><i class="fas fa-edit"></i> تعديل</button>
+                            <button class="btn-delete" onclick="deleteReceivable('${row.id}')"><i class="fas fa-trash"></i> حذف</button>
+                        </td>
+                    `;
+                    tableBody.appendChild(rowElement);
+                });
+
+                totalReceivables.textContent = `${total.toLocaleString()} ريال`;
+                overdueReceivables.textContent = `${overdueTotal.toLocaleString()} ريال`;
+                dueToday.textContent = `${dueTodayTotal.toLocaleString()} ريال`;
+            } catch (error) {
+                console.error('Error loading receivables:', error);
+            } finally {
+                loadingDiv.style.display = 'none';
+            }
+        }
+
+        async function editReceivable(id) {
             const newAmount = prompt('أدخل المبلغ الجديد:');
             if (newAmount && !isNaN(newAmount)) {
-                const data = loadData();
-                const index = data.findIndex(item => item.id === id);
-                if (index !== -1) {
-                    data[index].amount = parseFloat(newAmount);
-                    saveData(data);
-                    loadReceivables();
-                    alert('✅ تم تعديل المستحق بنجاح!');
+                try {
+                    const url = `${SCRIPT_URL}?sheet=المستحقات_اليومية&action=update&id=${id}&amount=${newAmount}`;
+                    const response = await fetch(url, { method: 'POST' });
+                    const result = await response.json();
+                    if (result.success) {
+                        loadReceivables();
+                        alert('✅ تم تعديل المستحق بنجاح!');
+                    } else {
+                        alert('❌ فشل في تعديل المستحق');
+                    }
+                } catch (error) {
+                    console.error('Error:', error);
+                    alert('❌ حدث خطأ أثناء التعديل');
                 }
             }
         }
 
-        function deleteReceivable(id) {
+        async function deleteReceivable(id) {
             if (confirm('هل أنت متأكد أنك تريد حذف هذا المستحق؟')) {
-                let data = loadData();
-                data = data.filter(item => item.id !== id);
-                saveData(data);
-                loadReceivables();
-                alert('✅ تم حذف المستحق بنجاح!');
+                try {
+                    const url = `${SCRIPT_URL}?sheet=المستحقات_اليومية&action=delete&id=${id}`;
+                    const response = await fetch(url, { method: 'POST' });
+                    const result = await response.json();
+                    if (result.success) {
+                        loadReceivables();
+                        alert('✅ تم حذف المستحق بنجاح!');
+                    } else {
+                        alert('❌ فشل في حذف المستحق');
+                    }
+                } catch (error) {
+                    console.error('Error:', error);
+                    alert('❌ حدث خطأ أثناء الحذف');
+                }
             }
         }
 
