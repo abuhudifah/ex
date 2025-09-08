@@ -375,6 +375,15 @@
                 margin: 15% auto;
                 padding: 2rem;
             }
+
+            .card p {
+                font-size: 1.5rem;
+            }
+
+            .tab-btn {
+                padding: 0.75rem 1.25rem;
+                font-size: 1rem;
+            }
         }
 
         .success {
@@ -417,4 +426,127 @@
             display: flex;
             align-items: center;
             gap: 0.3rem;
-       
+        }
+
+        .btn-edit {
+            background: #ffc107;
+            color: #212529;
+        }
+
+        .btn-edit:hover {
+            background: #e0a800;
+            transform: translateY(-2px);
+        }
+
+        .btn-delete {
+            background: #dc3545;
+            color: white;
+        }
+
+        .btn-delete:hover {
+            background: #c82333;
+            transform: translateY(-2px);
+        }
+
+        .section-title {
+            color: var(--dark-blue);
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin-bottom: 2rem;
+            text-align: right;
+            padding-bottom: 1rem;
+            border-bottom: 3px solid var(--accent);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .support-section {
+            margin-top: 2rem;
+            padding-top: 2rem;
+            border-top: 2px solid #e0e1dd;
+            text-align: center;
+        }
+
+        .support-section h3 {
+            color: var(--accent);
+            font-weight: 700;
+            margin-bottom: 1rem;
+        }
+
+        .support-links a {
+            display: inline-block;
+            margin: 0.5rem;
+            padding: 0.8rem 1.5rem;
+            background: var(--accent);
+            color: white;
+            text-decoration: none;
+            border-radius: 12px;
+            font-weight: 700;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .support-links a:hover {
+            background: #d85a3c;
+            transform: translateY(-2px);
+        }
+    </style>
+</head>
+<body>
+    <div class="navbar">
+        <div class="logo">
+            <img src="https://i.ibb.co/LDSLfqXy/abohuthaifa-logo.png" alt="شعار أبو حذيفة">
+        </div>
+        <h2><i class="fas fa-crown"></i> لوحة الإدارة</h2>
+        <div class="user-info">
+            <span id="userNameDisplay"><i class="fas fa-user-shield"></i> المدير</span>
+            <button class="logout-btn" id="logoutBtn"><i class="fas fa-sign-out-alt"></i> تسجيل خروج</button>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="tabs">
+            <button class="tab-btn active" data-tab="dailyReport"><i class="fas fa-chart-bar"></i> التقرير اليومي</button>
+            <button class="tab-btn" data-tab="manageReceivables"><i class="fas fa-list"></i> إدارة المستحقات</button>
+            <button class="tab-btn" data-tab="bankAccounts"><i class="fas fa-university"></i> الحسابات البنكية</button>
+        </div>
+
+        <!-- تبويب التقرير اليومي -->
+        <div id="dailyReport" class="tab-content active">
+            <h2 class="section-title"><i class="fas fa-chart-bar"></i> التقرير اليومي</h2>
+            <button id="refreshReportBtn" class="btn-primary"><i class="fas fa-sync"></i> تحديث التقرير</button>
+            <div id="loading">⏳ جاري تحميل التقرير...</div>
+            <div class="report-cards">
+                <div class="card">
+                    <h4><i class="fas fa-hand-holding-usd"></i> إجمالي التحصيل اليومي</h4>
+                    <p id="totalCollection">0 ريال</p>
+                </div>
+                <div class="card">
+                    <h4><i class="fas fa-piggy-bank"></i> إجمالي الإيداعات</h4>
+                    <p id="totalDeposits">0 ريال</p>
+                </div>
+                <div class="card">
+                    <h4><i class="fas fa-shopping-cart"></i> إجمالي النثريات</h4>
+                    <p id="totalExpenses">0 ريال</p>
+                </div>
+                <div class="card">
+                    <h4><i class="fas fa-hand-holding"></i> إجمالي التسليم النقدي</h4>
+                    <p id="totalCashDelivery">0 ريال</p>
+                </div>
+                <div class="card">
+                    <h4><i class="fas fa-exchange-alt"></i> إجمالي تحويلات الرصيد</h4>
+                    <p id="totalTransfer">0 ريال</p>
+                </div>
+                <div class="card">
+                    <h4><i class="fas fa-balance-scale"></i> الرصيد المتبقي</h4>
+                    <p id="remainingBalance">0 ريال</p>
+                </div>
+            </div>
+
+            <button id="exportPDF" class="btn-primary"><i class="fas fa-file-pdf"></i> تصدير كـ PDF</button>
+
+            <h3 style="text-align: right; color: var(--dark-blue); margin: 2rem 0 1rem 0;"><i class="fas fa-list"></i> تفصيل العمليات اليومية</h3>
+            <table id="daily
