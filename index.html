@@ -270,9 +270,8 @@
     </div>
 
     <script>
-        // ⚠️ استبدل هذا المفتاح بمفتاح Google API الخاص بك
-        const API_KEY = 'YOUR_API_KEY';
-        const SPREADSHEET_ID = '1lILr9yv_9Mef_T506kN8kK20G2-zQNCQ0OsTeYm54PM';
+        // ⚠️ رابط Google Apps Script
+        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwg9n2T6wg7ZtWM_UR8TY6Kno46V9gy4juCct28r6n9Zqzoc0muHsORHXvFQnfxnOLLAg/exec';
 
         document.addEventListener('DOMContentLoaded', function() {
             const loginForm = document.getElementById('loginForm');
@@ -288,42 +287,42 @@
                 errorDiv.textContent = '';
 
                 try {
-                    // جلب بيانات المستخدمين من Google Sheets
-                    const range = 'المستخدمين!A2:D';
-                    const url = `https://sheets.googleapis.com/v4/spreadsheets/${SPREADSHEET_ID}/values/${range}?key=${API_KEY}`;
+                    // جلب بيانات المستخدمين من Google Sheets عبر Google Apps Script
+                    const url = `${SCRIPT_URL}?sheet=المستخدمين&action=get`;
                     const response = await fetch(url);
                     const data = await response.json();
                     
-                    if (data.values) {
-                        const user = data.values.find(row => row[0] === username && row[1] === password);
+                    if (data.error) {
+                        errorDiv.textContent = '❌ حدث خطأ أثناء جلب بيانات المستخدمين';
+                        return;
+                    }
+                    
+                    const user = data.find(row => row['اسم_المستخدم'] === username && row['كلمة_المرور'] === password);
+                    
+                    if (user) {
+                        localStorage.setItem('loggedInUser', username);
+                        localStorage.setItem('userRole', user['الصلاحية']);
+                        localStorage.setItem('userRegion', user['المنطقة'] || '');
                         
-                        if (user) {
-                            localStorage.setItem('loggedInUser', username);
-                            localStorage.setItem('userRole', user[2]); // الصلاحية
-                            localStorage.setItem('userRegion', user[3] || ''); // المنطقة
-                            
-                            errorDiv.style.color = '#2a9d8f';
-                            errorDiv.textContent = '✅ تم تسجيل الدخول بنجاح! جاري التوجيه...';
-                            
-                            setTimeout(() => {
-                                if (user[2] === 'مدير') {
-                                    window.location.href = 'admin.html';
-                                } else {
-                                    window.location.href = 'dashboard.html';
-                                }
-                            }, 1500);
-                        } else {
-                            errorDiv.textContent = '❌ اسم المستخدم أو كلمة المرور غير صحيحة';
-                            usernameInput.style.borderColor = '#e63946';
-                            passwordInput.style.borderColor = '#e63946';
-                            
-                            setTimeout(() => {
-                                usernameInput.style.borderColor = '#e0e1dd';
-                                passwordInput.style.borderColor = '#e0e1dd';
-                            }, 2000);
-                        }
+                        errorDiv.style.color = '#2a9d8f';
+                        errorDiv.textContent = '✅ تم تسجيل الدخول بنجاح! جاري التوجيه...';
+                        
+                        setTimeout(() => {
+                            if (user['الصلاحية'] === 'مدير') {
+                                window.location.href = 'admin.html';
+                            } else {
+                                window.location.href = 'dashboard.html';
+                            }
+                        }, 1500);
                     } else {
-                        errorDiv.textContent = '❌ لم يتم العثور على بيانات المستخدمين';
+                        errorDiv.textContent = '❌ اسم المستخدم أو كلمة المرور غير صحيحة';
+                        usernameInput.style.borderColor = '#e63946';
+                        passwordInput.style.borderColor = '#e63946';
+                        
+                        setTimeout(() => {
+                            usernameInput.style.borderColor = '#e0e1dd';
+                            passwordInput.style.borderColor = '#e0e1dd';
+                        }, 2000);
                     }
                 } catch (error) {
                     console.error('Error:', error);
