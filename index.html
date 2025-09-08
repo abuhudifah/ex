@@ -299,8 +299,8 @@
     </div>
 
     <script>
-        // ⚠️ رابط Google Apps Script للمستخدمين فقط
-        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxkmBs5bpi_h2INLk1is7xwxeOmWZze1lDW8ShMh1YkiiY6aIpywuw6O3IBwHMMMsFeYQ/exec';
+        // ⚠️ الرابط الجديد والصحيح
+        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxKVg7raRsBotFSL7BY9z0d9ZbYngkYrkxNJaFAoCacDPLzLzEzuRq2iusYxHSLHCeeHQ/exec';
 
         document.addEventListener('DOMContentLoaded', function() {
             const loginForm = document.getElementById('loginForm');
@@ -308,9 +308,6 @@
             const passwordInput = document.getElementById('password');
             const errorDiv = document.getElementById('loginError');
             const loadingDiv = document.getElementById('loading');
-
-            // إزالة أي بيانات قديمة عند فتح صفحة الدخول
-            localStorage.removeItem('dailyData');
 
             const savedUser = localStorage.getItem('loggedInUser');
             if (savedUser) {
@@ -376,11 +373,6 @@
                         localStorage.setItem('loggedInUser', username);
                         localStorage.setItem('userRole', user['الصلاحية']);
                         localStorage.setItem('userRegion', user['المنطقة'] || '');
-                        
-                        // تهيئة قاعدة البيانات المحلية إذا لم تكن موجودة
-                        if (!localStorage.getItem('dailyData')) {
-                            localStorage.setItem('dailyData', JSON.stringify([]));
-                        }
                         
                         errorDiv.style.color = '#2a9d8f';
                         errorDiv.textContent = '✅ تم تسجيل الدخول بنجاح! جاري التوجيه...';
