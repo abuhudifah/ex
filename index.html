@@ -7,6 +7,8 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700&display=swap" rel="stylesheet">
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <style>
         :root {
             --dark-blue: #0d1b2a;
@@ -132,7 +134,7 @@
             top: 50%;
             transform: translateY(-50%);
             cursor: pointer;
-            font-size: 1.2rem;
+            font-size: 1.4rem;
             color: var(--light-blue);
             transition: color 0.3s;
         }
@@ -182,6 +184,15 @@
             75% { transform: translateX(8px); }
         }
 
+        #loading {
+            display: none;
+            margin-top: 1rem;
+            color: var(--light-blue);
+            font-weight: bold;
+            text-align: center;
+            font-size: 1.1rem;
+        }
+
         .support-section {
             margin-top: 2.5rem;
             padding-top: 2rem;
@@ -205,6 +216,9 @@
             border-radius: 12px;
             font-weight: 700;
             transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
         }
 
         .support-links a:hover {
@@ -265,23 +279,24 @@
         <h1>نظام التحصيل والإخلاءات<br>أبو حذيفة</h1>
         <form id="loginForm">
             <div class="form-group">
-                <label for="username">👤 اسم المستخدم</label>
+                <label for="username"><i class="fas fa-user"></i> اسم المستخدم</label>
                 <input type="text" id="username" name="username" required autocomplete="username" placeholder="أدخل اسم المستخدم" autofocus>
             </div>
             <div class="form-group">
-                <label for="password">🔒 كلمة المرور</label>
+                <label for="password"><i class="fas fa-lock"></i> كلمة المرور</label>
                 <input type="password" id="password" name="password" required autocomplete="current-password" placeholder="أدخل كلمة المرور">
-                <span class="toggle-password" onclick="togglePassword()">👁️</span>
+                <span class="toggle-password" onclick="togglePassword()"><i class="fas fa-eye"></i></span>
             </div>
             <button type="submit" class="pulse">تسجيل الدخول</button>
+            <div id="loading">⏳ جاري التحقق...</div>
             <div id="loginError" class="error"></div>
         </form>
 
         <div class="support-section">
-            <h3>📞 الدعم الفني</h3>
+            <h3><i class="fas fa-headset"></i> الدعم الفني</h3>
             <div class="support-links">
-                <a href="https://wa.me/967714466459" target="_blank">واتساب</a>
-                <a href="tel:+967714466459">اتصال مباشر</a>
+                <a href="https://wa.me/967714466459" target="_blank"><i class="fab fa-whatsapp"></i> واتساب</a>
+                <a href="tel:+967714466459"><i class="fas fa-phone"></i> اتصال مباشر</a>
             </div>
         </div>
     </div>
@@ -295,14 +310,30 @@
             const usernameInput = document.getElementById('username');
             const passwordInput = document.getElementById('password');
             const errorDiv = document.getElementById('loginError');
+            const loadingDiv = document.getElementById('loading');
+
+            // التحقق من تسجيل دخول سابق
+            const savedUser = localStorage.getItem('loggedInUser');
+            if (savedUser) {
+                const savedRole = localStorage.getItem('userRole');
+                if (savedRole === 'مدير') {
+                    window.location.href = 'admin.html';
+                } else {
+                    window.location.href = 'dashboard.html';
+                }
+                return;
+            }
 
             // إظهار/إخفاء كلمة المرور
             window.togglePassword = function() {
                 const passwordField = document.getElementById('password');
+                const toggleIcon = document.querySelector('.toggle-password i');
                 if (passwordField.type === 'password') {
                     passwordField.type = 'text';
+                    toggleIcon.classList.replace('fa-eye', 'fa-eye-slash');
                 } else {
                     passwordField.type = 'password';
+                    toggleIcon.classList.replace('fa-eye-slash', 'fa-eye');
                 }
             };
 
@@ -318,6 +349,9 @@
                     return;
                 }
 
+                // إظهار حالة التحميل
+                loadingDiv.style.display = 'block';
+
                 try {
                     // جلب بيانات المستخدمين من Google Sheets عبر Google Apps Script
                     const url = `${SCRIPT_URL}?sheet=المستخدمين&action=get`;
@@ -330,14 +364,18 @@
                     const data = await response.json();
                     
                     if (data.error) {
-                        errorDiv.textContent = '❌ حدث خطأ أثناء جلب بيانات المستخدمين';
-                        return;
+                        throw new Error(data.error);
                     }
                     
-                    // البحث عن المستخدم — مع تجاهل الفراغات الزائدة
+                    // التحقق من أن البيانات مصفوفة
+                    if (!Array.isArray(data)) {
+                        throw new Error('Invalid data format: expected array');
+                    }
+                    
+                    // البحث عن المستخدم — مع تحويل القيم إلى نص وتنظيفها
                     const user = data.find(row => 
-                        row['اسم_المستخدم']?.trim() === username && 
-                        row['كلمة_المرور']?.trim() === password
+                        String(row['اسم_المستخدم'] || '').trim() === username && 
+                        String(row['كلمة_المرور'] || '').trim() === password
                     );
                     
                     if (user) {
@@ -368,6 +406,8 @@
                 } catch (error) {
                     console.error('Error:', error);
                     errorDiv.textContent = `❌ فشل في جلب البيانات: ${error.message}`;
+                } finally {
+                    loadingDiv.style.display = 'none';
                 }
             });
 
