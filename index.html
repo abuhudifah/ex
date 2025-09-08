@@ -7,7 +7,6 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700&display=swap" rel="stylesheet">
-    <!-- Font Awesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <style>
         :root {
@@ -226,7 +225,6 @@
             transform: translateY(-2px);
         }
 
-        /* تحسينات للجوال */
         @media (max-width: 480px) {
             .login-container {
                 margin: 1rem;
@@ -253,7 +251,6 @@
             }
         }
 
-        /* تأثيرات إضافية */
         .pulse {
             animation: pulse 2s infinite;
         }
@@ -302,7 +299,6 @@
     </div>
 
     <script>
-        // ⚠️ رابط Google Apps Script
         const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzx-iE6Iip18Z0FunVX-0bzkCOV75k-Fty0CmrR4uZU03LOtDV30TxaBM4ext9L_9VHUw/exec';
 
         document.addEventListener('DOMContentLoaded', function() {
@@ -312,7 +308,6 @@
             const errorDiv = document.getElementById('loginError');
             const loadingDiv = document.getElementById('loading');
 
-            // التحقق من تسجيل دخول سابق
             const savedUser = localStorage.getItem('loggedInUser');
             if (savedUser) {
                 const savedRole = localStorage.getItem('userRole');
@@ -324,7 +319,6 @@
                 return;
             }
 
-            // إظهار/إخفاء كلمة المرور
             window.togglePassword = function() {
                 const passwordField = document.getElementById('password');
                 const toggleIcon = document.querySelector('.toggle-password i');
@@ -349,11 +343,9 @@
                     return;
                 }
 
-                // إظهار حالة التحميل
                 loadingDiv.style.display = 'block';
 
                 try {
-                    // جلب بيانات المستخدمين من Google Sheets عبر Google Apps Script
                     const url = `${SCRIPT_URL}?sheet=المستخدمين&action=get`;
                     const response = await fetch(url);
                     
@@ -367,12 +359,10 @@
                         throw new Error(data.error);
                     }
                     
-                    // التحقق من أن البيانات مصفوفة
                     if (!Array.isArray(data)) {
                         throw new Error('Invalid data format: expected array');
                     }
                     
-                    // البحث عن المستخدم — مع تحويل القيم إلى نص وتنظيفها
                     const user = data.find(row => 
                         String(row['اسم_المستخدم'] || '').trim() === username && 
                         String(row['كلمة_المرور'] || '').trim() === password
