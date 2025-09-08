@@ -638,9 +638,8 @@
     </div>
 
     <script>
-        // ⚠️ استبدل هذا المفتاح بمفتاح Google API الخاص بك
-        const API_KEY = 'YOUR_API_KEY';
-        const SPREADSHEET_ID = '1lILr9yv_9Mef_T506kN8kK20G2-zQNCQ0OsTeYm54PM';
+        // ⚠️ رابط Google Apps Script
+        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwg9n2T6wg7ZtWM_UR8TY6Kno46V9gy4juCct28r6n9Zqzoc0muHsORHXvFQnfxnOLLAg/exec';
 
         document.addEventListener('DOMContentLoaded', function() {
             const user = localStorage.getItem('loggedInUser');
@@ -728,7 +727,16 @@
                 }
 
                 // إضافة المستحق إلى Google Sheets
-                const rowData = [Date.now(), today, client, amount, '', '', status, agent, notes, dueDate];
+                const rowData = {
+                    id: Date.now(),
+                    date: today,
+                    client: client,
+                    amount: amount,
+                    dueDate: dueDate,
+                    status: status,
+                    agent: agent,
+                    notes: notes
+                };
                 await addRowToSheet('المستحقات_اليومية', rowData);
 
                 // إعادة تعيين النموذج
@@ -758,7 +766,12 @@
                 }
 
                 // إضافة الحساب البنكي إلى Google Sheets
-                const rowData = [accountName, accountNumber, bankName, today];
+                const rowData = {
+                    اسم_الحساب: accountName,
+                    رقم_الحساب: accountNumber,
+                    البنك: bankName,
+                    تاريخ_آخر_استخدام: today
+                };
                 await addRowToSheet('الحسابات_البنكية', rowData);
 
                 // إعادة تعيين النموذج
@@ -787,37 +800,38 @@
         // تحميل التقرير اليومي
         async function loadDailyReport() {
             try {
-                const today = new Date().toISOString().split('T')[0];
-                const range = 'المستحقات_اليومية!A:J';
-                const url = `https://sheets.googleapis.com/v4/spreadsheets/${SPREADSHEET_ID}/values/${range}?key=${API_KEY}`;
+                const url = `${SCRIPT_URL}?sheet=المستحقات_اليومية&action=get`;
                 const response = await fetch(url);
                 const data = await response.json();
                 
-                let todayOperations = [];
-                if (data.values && data.values.length > 1) {
-                    todayOperations = data.values.slice(1).filter(row => row[1] === today);
+                if (data.error) {
+                    console.error('Error:', data.error);
+                    return;
                 }
+
+                const today = new Date().toISOString().split('T')[0];
+                const todayOperations = data.filter(row => row['date'] === today);
 
                 // حساب الإجماليات
                 const totalCollection = todayOperations
-                    .filter(row => row[4] === 'تحويل' || row[4] === 'نقد')
-                    .reduce((sum, row) => sum + parseFloat(row[3] || 0), 0);
+                    .filter(row => row['operationType'] === 'تحويل' || row['operationType'] === 'نقد')
+                    .reduce((sum, row) => sum + parseFloat(row['amount'] || 0), 0);
                     
                 const totalDeposits = todayOperations
-                    .filter(row => row[2] === 'إيداع بنكي')
-                    .reduce((sum, row) => sum + parseFloat(row[3] || 0), 0);
+                    .filter(row => row['type'] === 'إيداع بنكي')
+                    .reduce((sum, row) => sum + parseFloat(row['amount'] || 0), 0);
                     
                 const totalExpenses = todayOperations
-                    .filter(row => row[2] === 'نثريات')
-                    .reduce((sum, row) => sum + parseFloat(row[3] || 0), 0);
+                    .filter(row => row['type'] === 'نثريات')
+                    .reduce((sum, row) => sum + parseFloat(row['amount'] || 0), 0);
                     
                 const totalCashDelivery = todayOperations
-                    .filter(row => row[2] === 'تسليم نقدي')
-                    .reduce((sum, row) => sum + parseFloat(row[3] || 0), 0);
+                    .filter(row => row['type'] === 'تسليم نقدي')
+                    .reduce((sum, row) => sum + parseFloat(row['amount'] || 0), 0);
                     
                 const totalTransfer = todayOperations
-                    .filter(row => row[2] === 'تحويل رصيد')
-                    .reduce((sum, row) => sum + parseFloat(row[3] || 0), 0);
+                    .filter(row => row['type'] === 'تحويل رصيد')
+                    .reduce((sum, row) => sum + parseFloat(row['amount'] || 0), 0);
                     
                 const remainingBalance = totalCollection - (totalDeposits + totalExpenses + totalCashDelivery + totalTransfer);
 
@@ -836,12 +850,12 @@
                 todayOperations.forEach(row => {
                     const tr = document.createElement('tr');
                     tr.innerHTML = `
-                        <td>${row[2] || 'غير محدد'}</td>
-                        <td>${row[2] === 'تحويل رصيد' ? row[8] : row[2]}</td>
-                        <td>${parseFloat(row[3] || 0).toLocaleString()} ريال</td>
-                        <td>${row[5] || 'غير محدد'}</td>
-                        <td>${row[1] || today}</td>
-                        <td>${row[6] || ''}</td>
+                        <td>${row['type'] || row['operationType'] || 'غير محدد'}</td>
+                        <td>${row['type'] === 'تحويل رصيد' ? row['transferAgent'] : row['client']}</td>
+                        <td>${parseFloat(row['amount'] || 0).toLocaleString()} ريال</td>
+                        <td>${row['agent'] || 'غير محدد'}</td>
+                        <td>${row['date'] || today}</td>
+                        <td>${row['details'] || row['notes'] || ''}</td>
                     `;
                     tableBody.appendChild(tr);
                 });
@@ -853,36 +867,37 @@
         // تحميل المستحقات في لوحة الإدارة
         async function loadAdminReceivables() {
             try {
-                const range = 'المستحقات_اليومية!A:J';
-                const url = `https://sheets.googleapis.com/v4/spreadsheets/${SPREADSHEET_ID}/values/${range}?key=${API_KEY}`;
+                const url = `${SCRIPT_URL}?sheet=المستحقات_اليومية&action=get`;
                 const response = await fetch(url);
                 const data = await response.json();
                 
+                if (data.error) {
+                    console.error('Error:', data.error);
+                    return;
+                }
+
                 const tableBody = document.querySelector('#adminReceivablesTable tbody');
                 tableBody.innerHTML = '';
 
-                if (data.values && data.values.length > 1) {
-                    data.values.slice(1).forEach((row, index) => {
-                        // افتراض أن العمود C هو العميل، D هو المبلغ، J هو تاريخ الاستحقاق
-                        const client = row[2] || 'عميل غير معروف';
-                        const amount = parseFloat(row[3] || 0);
-                        const dueDate = row[9] || new Date().toISOString().split('T')[0];
-                        const status = row[6] || 'مفتوح';
-                        
-                        const tr = document.createElement('tr');
-                        tr.innerHTML = `
-                            <td>${client}</td>
-                            <td>${amount.toLocaleString()} ريال</td>
-                            <td>${dueDate}</td>
-                            <td>${status}</td>
-                            <td class="actions">
-                                <button class="btn-edit" onclick="editReceivableAdmin(${index})">تعديل</button>
-                                <button class="btn-delete" onclick="deleteReceivableAdmin(${index})">حذف</button>
-                            </td>
-                        `;
-                        tableBody.appendChild(tr);
-                    });
-                }
+                data.forEach((row, index) => {
+                    const client = row['client'] || 'عميل غير معروف';
+                    const amount = parseFloat(row['amount'] || 0);
+                    const dueDate = row['dueDate'] || new Date().toISOString().split('T')[0];
+                    const status = row['status'] || 'مفتوح';
+                    
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `
+                        <td>${client}</td>
+                        <td>${amount.toLocaleString()} ريال</td>
+                        <td>${dueDate}</td>
+                        <td>${status}</td>
+                        <td class="actions">
+                            <button class="btn-edit" onclick="editReceivableAdmin(${index})">تعديل</button>
+                            <button class="btn-delete" onclick="deleteReceivableAdmin(${index})">حذف</button>
+                        </td>
+                    `;
+                    tableBody.appendChild(tr);
+                });
             } catch (error) {
                 console.error('Error loading admin receivables:', error);
             }
@@ -891,30 +906,32 @@
         // تحميل الحسابات البنكية
         async function loadBankAccounts() {
             try {
-                const range = 'الحسابات_البنكية!A:D';
-                const url = `https://sheets.googleapis.com/v4/spreadsheets/${SPREADSHEET_ID}/values/${range}?key=${API_KEY}`;
+                const url = `${SCRIPT_URL}?sheet=الحسابات_البنكية&action=get`;
                 const response = await fetch(url);
                 const data = await response.json();
                 
+                if (data.error) {
+                    console.error('Error:', data.error);
+                    return;
+                }
+
                 const tableBody = document.querySelector('#bankAccountsTable tbody');
                 tableBody.innerHTML = '';
 
-                if (data.values && data.values.length > 1) {
-                    data.values.slice(1).forEach((row, index) => {
-                        const tr = document.createElement('tr');
-                        tr.innerHTML = `
-                            <td>${row[0] || ''}</td>
-                            <td>${row[1] || ''}</td>
-                            <td>${row[2] || ''}</td>
-                            <td>${row[3] || ''}</td>
-                            <td class="actions">
-                                <button class="btn-edit" onclick="editBankAccount(${index})">تعديل</button>
-                                <button class="btn-delete" onclick="deleteBankAccount(${index})">حذف</button>
-                            </td>
-                        `;
-                        tableBody.appendChild(tr);
-                    });
-                }
+                data.forEach((row, index) => {
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `
+                        <td>${row['اسم_الحساب'] || ''}</td>
+                        <td>${row['رقم_الحساب'] || ''}</td>
+                        <td>${row['البنك'] || ''}</td>
+                        <td>${row['تاريخ_آخر_استخدام'] || ''}</td>
+                        <td class="actions">
+                            <button class="btn-edit" onclick="editBankAccount(${index})">تعديل</button>
+                            <button class="btn-delete" onclick="deleteBankAccount(${index})">حذف</button>
+                        </td>
+                    `;
+                    tableBody.appendChild(tr);
+                });
             } catch (error) {
                 console.error('Error loading bank accounts:', error);
             }
@@ -923,19 +940,14 @@
         // إضافة صف إلى Google Sheets
         async function addRowToSheet(sheetName, rowData) {
             try {
-                const range = `${sheetName}!A:J`;
-                const url = `https://sheets.googleapis.com/v4/spreadsheets/${SPREADSHEET_ID}/values/${range}:append?valueInputOption=RAW&key=${API_KEY}`;
-                
+                const url = `${SCRIPT_URL}?sheet=${sheetName}&action=add`;
                 const response = await fetch(url, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
                     },
-                    body: JSON.stringify({
-                        values: [rowData]
-                    })
+                    body: JSON.stringify(rowData)
                 });
-                
                 const result = await response.json();
                 if (result.error) {
                     console.error('Error adding row:', result.error);
