@@ -95,6 +95,7 @@
         .form-group {
             margin-bottom: 2rem;
             text-align: right;
+            position: relative;
         }
 
         .form-group label {
@@ -123,6 +124,21 @@
             border-color: var(--light-blue);
             background-color: white;
             box-shadow: 0 0 0 5px rgba(61, 90, 128, 0.2);
+        }
+
+        .toggle-password {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            cursor: pointer;
+            font-size: 1.2rem;
+            color: var(--light-blue);
+            transition: color 0.3s;
+        }
+
+        .toggle-password:hover {
+            color: var(--accent);
         }
 
         button {
@@ -255,6 +271,7 @@
             <div class="form-group">
                 <label for="password">🔒 كلمة المرور</label>
                 <input type="password" id="password" name="password" required autocomplete="current-password" placeholder="أدخل كلمة المرور">
+                <span class="toggle-password" onclick="togglePassword()">👁️</span>
             </div>
             <button type="submit" class="pulse">تسجيل الدخول</button>
             <div id="loginError" class="error"></div>
@@ -271,13 +288,23 @@
 
     <script>
         // ⚠️ رابط Google Apps Script
-        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwg9n2T6wg7ZtWM_UR8TY6Kno46V9gy4juCct28r6n9Zqzoc0muHsORHXvFQnfxnOLLAg/exec';
+        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzx-iE6Iip18Z0FunVX-0bzkCOV75k-Fty0CmrR4uZU03LOtDV30TxaBM4ext9L_9VHUw/exec';
 
         document.addEventListener('DOMContentLoaded', function() {
             const loginForm = document.getElementById('loginForm');
             const usernameInput = document.getElementById('username');
             const passwordInput = document.getElementById('password');
             const errorDiv = document.getElementById('loginError');
+
+            // إظهار/إخفاء كلمة المرور
+            window.togglePassword = function() {
+                const passwordField = document.getElementById('password');
+                if (passwordField.type === 'password') {
+                    passwordField.type = 'text';
+                } else {
+                    passwordField.type = 'password';
+                }
+            };
 
             loginForm.addEventListener('submit', async function(e) {
                 e.preventDefault();
@@ -286,10 +313,20 @@
                 const password = passwordInput.value;
                 errorDiv.textContent = '';
 
+                if (!username || !password) {
+                    errorDiv.textContent = '❌ يرجى إدخال اسم المستخدم وكلمة المرور';
+                    return;
+                }
+
                 try {
                     // جلب بيانات المستخدمين من Google Sheets عبر Google Apps Script
                     const url = `${SCRIPT_URL}?sheet=المستخدمين&action=get`;
                     const response = await fetch(url);
+                    
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+                    
                     const data = await response.json();
                     
                     if (data.error) {
@@ -297,7 +334,11 @@
                         return;
                     }
                     
-                    const user = data.find(row => row['اسم_المستخدم'] === username && row['كلمة_المرور'] === password);
+                    // البحث عن المستخدم — مع تجاهل الفراغات الزائدة
+                    const user = data.find(row => 
+                        row['اسم_المستخدم']?.trim() === username && 
+                        row['كلمة_المرور']?.trim() === password
+                    );
                     
                     if (user) {
                         localStorage.setItem('loggedInUser', username);
@@ -326,7 +367,7 @@
                     }
                 } catch (error) {
                     console.error('Error:', error);
-                    errorDiv.textContent = '❌ حدث خطأ أثناء الاتصال بقاعدة البيانات';
+                    errorDiv.textContent = `❌ فشل في جلب البيانات: ${error.message}`;
                 }
             });
 
