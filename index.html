@@ -31,24 +31,26 @@
             background-color: var(--light-bg);
             color: var(--dark-text);
             line-height: 1.6;
+            padding: 10px;
         }
         
         .container {
             width: 100%;
             max-width: 1400px;
             margin: 0 auto;
-            padding: 20px;
+            padding: 10px;
         }
         
         header {
             background-color: var(--primary-color);
             color: var(--light-text);
-            padding: 20px 0;
+            padding: 15px 0;
             border-radius: 8px 8px 0 0;
             display: flex;
             align-items: center;
             justify-content: space-between;
-            margin-bottom: 20px;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
         }
         
         .logo-container {
@@ -57,12 +59,12 @@
         }
         
         .logo {
-            width: 80px;
-            height: 80px;
-            margin-left: 15px;
+            width: 60px;
+            height: 60px;
+            margin-left: 10px;
             background-color: white;
             border-radius: 50%;
-            padding: 5px;
+            padding: 3px;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -79,29 +81,32 @@
         }
         
         .header-text h1 {
-            font-size: 28px;
+            font-size: 20px;
             margin-bottom: 5px;
         }
         
         .header-text p {
-            font-size: 16px;
+            font-size: 14px;
             opacity: 0.9;
         }
         
         .tabs {
             display: flex;
-            margin-bottom: 20px;
+            margin-bottom: 15px;
             background: white;
             border-radius: 8px;
             overflow: hidden;
+            flex-wrap: wrap;
         }
         
         .tab {
-            padding: 15px 25px;
+            padding: 12px 15px;
             cursor: pointer;
             background: #f1f1f1;
             transition: background 0.3s;
             font-weight: 600;
+            flex-grow: 1;
+            text-align: center;
         }
         
         .tab.active {
@@ -119,61 +124,62 @@
         
         .main-content {
             display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 20px;
-            margin-bottom: 30px;
+            grid-template-columns: 1fr;
+            gap: 15px;
+            margin-bottom: 20px;
         }
         
-        @media (max-width: 1200px) {
+        @media (min-width: 992px) {
             .main-content {
-                grid-template-columns: 1fr;
+                grid-template-columns: 1fr 1fr;
             }
         }
         
         .input-section, .preview-section, .accounts-section {
             background: white;
             border-radius: 8px;
-            padding: 20px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            padding: 15px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
         }
         
         .section-title {
-            font-size: 22px;
-            margin-bottom: 20px;
-            padding-bottom: 10px;
+            font-size: 18px;
+            margin-bottom: 15px;
+            padding-bottom: 8px;
             border-bottom: 2px solid var(--secondary-color);
             color: var(--primary-color);
         }
         
         .form-group {
-            margin-bottom: 15px;
+            margin-bottom: 12px;
         }
         
         label {
             display: block;
             margin-bottom: 5px;
             font-weight: 600;
+            font-size: 14px;
         }
         
         input, select, textarea {
             width: 100%;
-            padding: 10px;
+            padding: 8px;
             border: 1px solid var(--border-color);
             border-radius: 4px;
-            font-size: 16px;
+            font-size: 14px;
         }
         
         button {
             background-color: var(--secondary-color);
             color: white;
             border: none;
-            padding: 12px 20px;
+            padding: 10px 15px;
             border-radius: 4px;
             cursor: pointer;
-            font-size: 16px;
+            font-size: 14px;
             font-weight: 600;
             transition: background-color 0.3s;
-            margin-top: 10px;
+            margin-top: 8px;
         }
         
         button:hover {
@@ -190,7 +196,6 @@
         
         .btn-download {
             background-color: var(--accent-blue);
-            margin-left: 10px;
         }
         
         .btn-download:hover {
@@ -199,7 +204,6 @@
         
         .btn-excel {
             background-color: #27ae60;
-            margin-left: 10px;
         }
         
         .btn-excel:hover {
@@ -209,53 +213,59 @@
         .buttons-container {
             display: flex;
             justify-content: center;
-            margin-top: 20px;
+            margin-top: 15px;
             flex-wrap: wrap;
-            gap: 10px;
+            gap: 8px;
+        }
+        
+        .buttons-container button {
+            margin: 5px;
+            flex: 1;
+            min-width: 120px;
         }
         
         .report-preview {
             background: white;
-            padding: 20px;
+            padding: 15px;
             border: 1px solid var(--border-color);
             border-radius: 8px;
-            min-height: 500px;
+            min-height: 400px;
         }
         
         .report-header {
             text-align: center;
-            margin-bottom: 20px;
-            padding-bottom: 15px;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
             border-bottom: 2px solid var(--primary-color);
         }
         
         .report-header h2 {
             color: var(--primary-color);
-            font-size: 24px;
+            font-size: 20px;
         }
         
         .report-summary {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
-            gap: 15px;
-            margin-bottom: 20px;
+            gap: 10px;
+            margin-bottom: 15px;
         }
         
         .summary-item {
             background: var(--light-bg);
-            padding: 15px;
+            padding: 10px;
             border-radius: 6px;
             text-align: center;
         }
         
         .summary-item h3 {
-            font-size: 16px;
-            margin-bottom: 8px;
+            font-size: 14px;
+            margin-bottom: 5px;
             color: var(--primary-color);
         }
         
         .summary-item p {
-            font-size: 20px;
+            font-size: 16px;
             font-weight: bold;
             color: var(--secondary-color);
         }
@@ -263,11 +273,12 @@
         table {
             width: 100%;
             border-collapse: collapse;
-            margin-bottom: 20px;
+            margin-bottom: 15px;
+            font-size: 14px;
         }
         
         th, td {
-            padding: 12px 15px;
+            padding: 8px 10px;
             text-align: right;
             border-bottom: 1px solid var(--border-color);
         }
@@ -275,49 +286,54 @@
         th {
             background-color: var(--primary-color);
             color: var(--light-text);
+            font-size: 14px;
         }
         
         tr:nth-child(even) {
             background-color: #f2f2f2;
         }
         
+        .action-btn {
+            padding: 4px 8px;
+            font-size: 12px;
+            margin: 0 2px;
+        }
+        
         .report-footer {
-            margin-top: 30px;
-            padding-top: 15px;
+            margin-top: 20px;
+            padding-top: 10px;
             border-top: 1px solid var(--border-color);
             text-align: center;
             font-style: italic;
             color: #777;
-        }
-        
-        .hidden {
-            display: none;
+            font-size: 14px;
         }
         
         .notification {
             position: fixed;
-            top: 20px;
-            right: 20px;
-            padding: 15px 20px;
+            top: 15px;
+            right: 15px;
+            padding: 12px 15px;
             background-color: var(--accent-green);
             color: white;
             border-radius: 4px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
             z-index: 1000;
             transition: opacity 0.3s;
+            font-size: 14px;
         }
         
         .accounts-list {
             max-height: 300px;
             overflow-y: auto;
-            margin-top: 20px;
+            margin-top: 15px;
             border: 1px solid var(--border-color);
             border-radius: 4px;
-            padding: 10px;
+            padding: 8px;
         }
         
         .account-item {
-            padding: 10px;
+            padding: 8px;
             border-bottom: 1px solid var(--border-color);
             display: flex;
             justify-content: space-between;
@@ -330,34 +346,68 @@
         
         .account-actions button {
             margin-top: 0;
-            padding: 5px 10px;
-            font-size: 14px;
+            padding: 4px 8px;
+            font-size: 12px;
         }
         
         .data-management {
-            margin-top: 30px;
-            padding-top: 20px;
+            margin-top: 20px;
+            padding-top: 15px;
             border-top: 1px solid var(--border-color);
         }
         
         .data-buttons {
             display: flex;
-            gap: 10px;
-            margin-top: 10px;
+            gap: 8px;
+            margin-top: 8px;
+            flex-wrap: wrap;
+        }
+        
+        .data-buttons button {
+            flex: 1;
+            min-width: 120px;
         }
         
         .saved-reports {
-            margin-top: 20px;
+            margin-top: 15px;
         }
         
         .report-item {
-            padding: 10px;
+            padding: 8px;
             border: 1px solid var(--border-color);
             border-radius: 4px;
-            margin-bottom: 10px;
+            margin-bottom: 8px;
             display: flex;
             justify-content: space-between;
             align-items: center;
+        }
+        
+        .card-payment {
+            background-color: #f8f9fa;
+            padding: 10px;
+            border-radius: 4px;
+            margin-top: 10px;
+            border-left: 4px solid var(--accent-blue);
+        }
+        
+        @media (max-width: 768px) {
+            .header-text h1 {
+                font-size: 18px;
+            }
+            
+            .tab {
+                padding: 10px;
+                font-size: 14px;
+            }
+            
+            .report-summary {
+                grid-template-columns: 1fr;
+            }
+            
+            th, td {
+                padding: 6px;
+                font-size: 12px;
+            }
         }
     </style>
 </head>
@@ -396,7 +446,16 @@
                         <input type="date" id="report-date">
                     </div>
                     
-                    <h3 style="margin: 20px 0 15px; color: var(--primary-color);">بيانات التحصيل</h3>
+                    <h3 style="margin: 15px 0 10px; color: var(--primary-color);">بيانات التحصيل</h3>
+                    
+                    <div class="form-group">
+                        <label for="collection-type">نوع التحصيل:</label>
+                        <select id="collection-type">
+                            <option value="نقدي">نقدي</option>
+                            <option value="تحويل">تحويل</option>
+                            <option value="سحب من البطاقة">سحب من البطاقة</option>
+                        </select>
+                    </div>
                     
                     <div class="form-group">
                         <label for="client-name">اسم العميل:</label>
@@ -408,9 +467,21 @@
                         <input type="number" id="collection-amount" placeholder="أدخل المبلغ المحصل">
                     </div>
                     
+                    <div id="card-payment-section" class="card-payment" style="display: none;">
+                        <div class="form-group">
+                            <label for="card-owner">صاحب البطاقة:</label>
+                            <input type="text" id="card-owner" placeholder="أدخل اسم صاحب البطاقة">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="card-last-digits">آخر 4 أرقام من البطاقة:</label>
+                            <input type="text" id="card-last-digits" placeholder="أدخل آخر 4 أرقام" maxlength="4">
+                        </div>
+                    </div>
+                    
                     <button id="add-collection">إضافة تحصيل</button>
                     
-                    <h3 style="margin: 20px 0 15px; color: var(--primary-color);">بيانات الإيداع</h3>
+                    <h3 style="margin: 20px 0 10px; color: var(--primary-color);">بيانات الإيداع</h3>
                     
                     <div class="form-group">
                         <label for="deposit-name">اسم المستفيد:</label>
@@ -426,14 +497,13 @@
                     
                     <button id="add-deposit">إضافة إيداع</button>
                     
-                    <h3 style="margin: 20px 0 15px; color: var(--primary-color);">المصروفات والنثريات</h3>
+                    <h3 style="margin: 20px 0 10px; color: var(--primary-color);">المصروفات والنثريات</h3>
                     
                     <div class="form-group">
                         <label for="expense-type">نوع المصروف:</label>
                         <select id="expense-type">
                             <option value="مصاريف للبيت">مصاريف للبيت</option>
                             <option value="نثريات">نثريات</option>
-                            <option value="سحب من بطاقة">سحب من بطاقة</option>
                             <option value="أخرى">أخرى</option>
                         </select>
                     </div>
@@ -451,10 +521,10 @@
                     <button id="add-expense">إضافة مصروف</button>
 
                     <div class="data-management">
-                        <h3 style="margin: 20px 0 15px; color: var(--primary-color);">إدارة البيانات</h3>
+                        <h3 style="margin: 20px 0 10px; color: var(--primary-color);">إدارة البيانات</h3>
                         <div class="data-buttons">
                             <button id="save-report">حفظ التقرير</button>
-                            <button id="clear-data">مسح البيانات</button>
+                            <button id="clear-data">مسح الكل</button>
                             <button id="load-last">تحميل آخر بيانات</button>
                         </div>
                     </div>
@@ -494,8 +564,9 @@
                         <table id="collections-table">
                             <thead>
                                 <tr>
-                                    <th>اسم العميل</th>
+                                    <th>العميل/النوع</th>
                                     <th>المبلغ (ريال)</th>
+                                    <th>الإجراءات</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -507,9 +578,9 @@
                         <table id="deposits-table">
                             <thead>
                                 <tr>
-                                    <th>اسم المستفيد</th>
-                                    <th>رقم الحساب</th>
+                                    <th>المستفيد</th>
                                     <th>المبلغ (ريال)</th>
+                                    <th>الإجراءات</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -521,9 +592,9 @@
                         <table id="expenses-table">
                             <thead>
                                 <tr>
-                                    <th>نوع المصروف</th>
+                                    <th>النوع</th>
                                     <th>المبلغ (ريال)</th>
-                                    <th>التفاصيل</th>
+                                    <th>الإجراءات</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -561,7 +632,7 @@
                 
                 <button id="add-account">إضافة حساب</button>
                 
-                <h3 style="margin: 20px 0 15px; color: var(--primary-color);">الحسابات المسجلة</h3>
+                <h3 style="margin: 20px 0 10px; color: var(--primary-color);">الحسابات المسجلة</h3>
                 <div class="accounts-list" id="accounts-list">
                     <!-- سيتم ملؤها بالحسابات -->
                 </div>
@@ -594,8 +665,12 @@
         // عناصر DOM
         const collectorNameInput = document.getElementById('collector-name');
         const reportDateInput = document.getElementById('report-date');
+        const collectionTypeInput = document.getElementById('collection-type');
         const clientNameInput = document.getElementById('client-name');
         const collectionAmountInput = document.getElementById('collection-amount');
+        const cardPaymentSection = document.getElementById('card-payment-section');
+        const cardOwnerInput = document.getElementById('card-owner');
+        const cardLastDigitsInput = document.getElementById('card-last-digits');
         const depositNameInput = document.getElementById('deposit-name');
         const depositAmountInput = document.getElementById('deposit-amount');
         const expenseTypeInput = document.getElementById('expense-type');
@@ -664,6 +739,15 @@
                 });
             });
             
+            // تغيير نوع التحصيل
+            collectionTypeInput.addEventListener('change', function() {
+                if (this.value === 'سحب من البطاقة') {
+                    cardPaymentSection.style.display = 'block';
+                } else {
+                    cardPaymentSection.style.display = 'none';
+                }
+            });
+            
             // تحديث المعاينة عند تغيير اسم المندوب أو التاريخ
             collectorNameInput.addEventListener('input', function() {
                 reportData.collectorName = this.value;
@@ -713,11 +797,13 @@
             if (savedAccounts) {
                 accounts = JSON.parse(savedAccounts);
             } else {
-                // بيانات افتراضية
+                // بيانات افتراضية (الحسابات المطلوبة)
                 accounts = [
-                    { name: 'شركة بكري علي أحمد الشيخي', accountNumber: '25600001040609' },
-                    { name: 'القاسمي', accountNumber: '' },
-                    { name: 'تلال الوفاء - زغلول', accountNumber: '' }
+                    { name: 'دادية - شركة دروب سيول التعاون', accountNumber: '01400031966804' },
+                    { name: 'دادية - شركة ترابط النوادر الأهليه', accountNumber: '50200000522607' },
+                    { name: 'القاسمي - ALHANOUF S. AL ALQUTB', accountNumber: '01400029026609' },
+                    { name: 'المقبولي - شركة بكري علي أحمد الشيخي', accountNumber: '25600001040609' },
+                    { name: 'دادية - تلال الوفاء (زغلول)', accountNumber: '01400032556202' }
                 ];
                 localStorage.setItem('depositAccounts', JSON.stringify(accounts));
             }
@@ -858,6 +944,15 @@
                     expenses: []
                 };
                 
+                // مسح الحقول
+                clientNameInput.value = '';
+                collectionAmountInput.value = '';
+                depositAmountInput.value = '';
+                expenseAmountInput.value = '';
+                expenseDetailsInput.value = '';
+                cardOwnerInput.value = '';
+                cardLastDigitsInput.value = '';
+                
                 updatePreview();
                 showNotification('تم مسح البيانات بنجاح');
             }
@@ -881,21 +976,42 @@
 
         // إضافة تحصيل
         function addCollection() {
+            const type = collectionTypeInput.value;
             const clientName = clientNameInput.value.trim();
             const amount = parseFloat(collectionAmountInput.value);
+            const cardOwner = cardOwnerInput.value.trim();
+            const cardLastDigits = cardLastDigitsInput.value.trim();
             
             if (!clientName || isNaN(amount) || amount <= 0) {
                 showNotification('يرجى إدخال بيانات التحصيل بشكل صحيح', 'error');
                 return;
             }
             
+            if (type === 'سحب من البطاقة' && (!cardOwner || !cardLastDigits)) {
+                showNotification('يرجى إدخال بيانات البطاقة', 'error');
+                return;
+            }
+            
+            let displayName = clientName;
+            if (type === 'سحب من البطاقة') {
+                displayName = `${clientName} (سحب من بطاقة: ${cardOwner} - ${cardLastDigits})`;
+            }
+            
             reportData.collections.push({
+                type,
                 clientName,
-                amount
+                displayName,
+                amount,
+                cardOwner,
+                cardLastDigits
             });
             
             clientNameInput.value = '';
             collectionAmountInput.value = '';
+            cardOwnerInput.value = '';
+            cardLastDigitsInput.value = '';
+            cardPaymentSection.style.display = 'none';
+            collectionTypeInput.value = 'نقدي';
             
             updatePreview();
             saveToLocalStorage();
@@ -958,6 +1074,36 @@
             showNotification('تم إضافة المصروف بنجاح');
         }
 
+        // حذف تحصيل
+        function deleteCollection(index) {
+            if (confirm('هل تريد حذف هذا التحصيل؟')) {
+                reportData.collections.splice(index, 1);
+                updatePreview();
+                saveToLocalStorage();
+                showNotification('تم حذف التحصيل بنجاح');
+            }
+        }
+
+        // حذف إيداع
+        function deleteDeposit(index) {
+            if (confirm('هل تريد حذف هذا الإيداع؟')) {
+                reportData.deposits.splice(index, 1);
+                updatePreview();
+                saveToLocalStorage();
+                showNotification('تم حذف الإيداع بنجاح');
+            }
+        }
+
+        // حذف مصروف
+        function deleteExpense(index) {
+            if (confirm('هل تريد حذف هذا المصروف؟')) {
+                reportData.expenses.splice(index, 1);
+                updatePreview();
+                saveToLocalStorage();
+                showNotification('تم حذف المصروف بنجاح');
+            }
+        }
+
         // إضافة حساب
         function addAccount() {
             const name = newAccountNameInput.value.trim();
@@ -1018,35 +1164,42 @@
             
             // تحديث جدول التحصيلات
             collectionsTableBody.innerHTML = '';
-            reportData.collections.forEach(item => {
+            reportData.collections.forEach((item, index) => {
                 const row = document.createElement('tr');
                 row.innerHTML = `
-                    <td>${item.clientName}</td>
+                    <td>${item.displayName || item.clientName}</td>
                     <td>${item.amount.toLocaleString()}</td>
+                    <td>
+                        <button class="action-btn" onclick="deleteCollection(${index})">حذف</button>
+                    </td>
                 `;
                 collectionsTableBody.appendChild(row);
             });
             
             // تحديث جدول الإيداعات
             depositsTableBody.innerHTML = '';
-            reportData.deposits.forEach(item => {
+            reportData.deposits.forEach((item, index) => {
                 const row = document.createElement('tr');
                 row.innerHTML = `
                     <td>${item.depositName}</td>
-                    <td>${item.accountNumber || 'غير محدد'}</td>
                     <td>${item.amount.toLocaleString()}</td>
+                    <td>
+                        <button class="action-btn" onclick="deleteDeposit(${index})">حذف</button>
+                    </td>
                 `;
                 depositsTableBody.appendChild(row);
             });
             
             // تحديث جدول المصروفات
             expensesTableBody.innerHTML = '';
-            reportData.expenses.forEach(item => {
+            reportData.expenses.forEach((item, index) => {
                 const row = document.createElement('tr');
                 row.innerHTML = `
-                    <td>${item.type}</td>
+                    <td>${item.type}${item.details && item.details !== 'لا يوجد' ? ` (${item.details})` : ''}</td>
                     <td>${item.amount.toLocaleString()}</td>
-                    <td>${item.details}</td>
+                    <td>
+                        <button class="action-btn" onclick="deleteExpense(${index})">حذف</button>
+                    </td>
                 `;
                 expensesTableBody.appendChild(row);
             });
@@ -1115,15 +1268,19 @@
             const wb = XLSX.utils.book_new();
             
             // إضافة ورقة للتحصيلات
-            const collectionsData = [['اسم العميل', 'المبلغ (ريال)']];
+            const collectionsData = [['نوع التحصيل', 'العميل', 'المبلغ (ريال)', 'ملاحظات']];
             reportData.collections.forEach(item => {
-                collectionsData.push([item.clientName, item.amount]);
+                let notes = '';
+                if (item.type === 'سحب من البطاقة') {
+                    notes = `صاحب البطاقة: ${item.cardOwner}, آخر 4 أرقام: ${item.cardLastDigits}`;
+                }
+                collectionsData.push([item.type, item.clientName, item.amount, notes]);
             });
             const wsCollections = XLSX.utils.aoa_to_sheet(collectionsData);
             XLSX.utils.book_append_sheet(wb, wsCollections, 'التحصيلات');
             
             // إضافة ورقة للإيداعات
-            const depositsData = [['اسم المستفيد', 'رقم الحساب', 'المبلغ (ريال)']];
+            const depositsData = [['المستفيد', 'رقم الحساب', 'المبلغ (ريال)']];
             reportData.deposits.forEach(item => {
                 depositsData.push([item.depositName, item.accountNumber || 'غير محدد', item.amount]);
             });
