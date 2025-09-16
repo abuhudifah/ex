@@ -682,7 +682,6 @@
             to { transform: rotate(360deg); }
         }
 
-        /* تحسينات جديدة للرسومات المتحركة */
         .animated-table {
             animation: tableAppear 0.6s ease-out;
         }
@@ -750,6 +749,155 @@
         
         .refresh-btn:hover {
             background-color: #2980b9;
+        }
+
+        /* تحسينات جديدة للحسابات */
+        .account-report {
+            margin-top: 20px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 15px;
+            background-color: var(--light-bg);
+        }
+        
+        .account-summary {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+        
+        .account-summary-item {
+            background: white;
+            padding: 12px;
+            border-radius: 8px;
+            text-align: center;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+        
+        .account-summary-item h4 {
+            font-size: 14px;
+            margin-bottom: 8px;
+            color: var(--primary-color);
+        }
+        
+        .account-summary-item p {
+            font-size: 16px;
+            font-weight: bold;
+            color: var(--secondary-color);
+        }
+        
+        .account-details-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+        
+        .account-details-table th {
+            background-color: var(--accent-blue);
+            color: white;
+        }
+        
+        .account-report-btn {
+            margin-top: 15px;
+            background-color: var(--accent-orange);
+        }
+        
+        .account-report-btn:hover {
+            background-color: #e67e22;
+        }
+        
+        .account-link {
+            color: var(--accent-blue);
+            cursor: pointer;
+            text-decoration: underline;
+        }
+        
+        .account-link:hover {
+            color: #2980b9;
+        }
+        
+        .debtor-table-container {
+            max-height: 400px;
+            overflow-y: auto;
+            margin-top: 15px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 10px;
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 30px;
+            color: #777;
+        }
+        
+        .empty-state i {
+            font-size: 48px;
+            margin-bottom: 15px;
+            color: #ddd;
+        }
+
+        /* تحسينات للاستجابة على جميع الأجهزة */
+        @media (max-width: 576px) {
+            .container {
+                padding: 5px;
+            }
+            
+            header {
+                padding: 10px 0;
+                flex-direction: column;
+                text-align: center;
+            }
+            
+            .logo {
+                margin: 0 auto 10px;
+            }
+            
+            .tabs {
+                flex-direction: column;
+            }
+            
+            .tab {
+                width: 100%;
+            }
+            
+            .input-section, .preview-section, .accounts-section, .debtors-section {
+                padding: 15px;
+            }
+            
+            .buttons-container button {
+                min-width: 100%;
+            }
+            
+            .account-item {
+                flex-direction: column;
+                text-align: center;
+            }
+            
+            .account-actions {
+                margin-top: 10px;
+            }
+            
+            .report-item {
+                flex-direction: column;
+                text-align: center;
+            }
+            
+            .report-item div:last-child {
+                margin-top: 10px;
+            }
+        }
+
+        /* تحسينات للأجهزة اللوحية */
+        @media (min-width: 577px) and (max-width: 991px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+            
+            .report-summary {
+                grid-template-columns: repeat(2, 1fr);
+            }
         }
     </style>
 </head>
@@ -1023,6 +1171,14 @@
                 <div class="accounts-list" id="accounts-list">
                     <!-- سيتم ملؤها بالحسابات -->
                 </div>
+
+                <!-- تقارير الحسابات التفصيلية -->
+                <div id="account-reports-container" style="margin-top: 30px;">
+                    <h3 style="margin: 25px 0 15px; color: var(--primary-color);">تقارير الحسابات</h3>
+                    <div id="account-reports">
+                        <!-- سيتم ملؤها بتقارير الحسابات -->
+                    </div>
+                </div>
             </div>
         </div>
 
@@ -1049,8 +1205,67 @@
                     <button id="sync-now" class="btn-generate">مزامنة الآن</button>
                 </div>
                 
-                <div class="sheet-embed-container">
-                    <iframe id="google-sheets-embed" src="https://docs.google.com/spreadsheets/d/1P7HtV_T7w-rL-dveiBjCr82T42UKOQ8Xd140HCKQGy8/edit?usp=sharing"></iframe>
+                <div class="debtors-tabs">
+                    <div class="debtor-tab active" data-debtor-tab="khamis">خميس مشيط</div>
+                    <div class="debtor-tab" data-debtor-tab="dharan">ظهران الجنوب</div>
+                    <div class="debtor-tab" data-debtor-tab="other">مناطق أخرى</div>
+                </div>
+                
+                <div class="debtor-content active" id="khamis-content">
+                    <div class="debtor-table-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>اسم العميل</th>
+                                    <th>المبلغ المتبقي</th>
+                                    <th>آخر تاريخ دفع</th>
+                                    <th>الحالة</th>
+                                    <th>ملاحظات</th>
+                                </tr>
+                            </thead>
+                            <tbody id="khamis-table-body">
+                                <!-- سيتم ملؤها بالبيانات -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                
+                <div class="debtor-content" id="dharan-content">
+                    <div class="debtor-table-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>اسم العميل</th>
+                                    <th>المبلغ المتبقي</th>
+                                    <th>آخر تاريخ دفع</th>
+                                    <th>الحالة</th>
+                                    <th>ملاحظات</th>
+                                </tr>
+                            </thead>
+                            <tbody id="dharan-table-body">
+                                <!-- سيتم ملؤها بالبيانات -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                
+                <div class="debtor-content" id="other-content">
+                    <div class="debtor-table-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>اسم العميل</th>
+                                    <th>المبلغ المتبقي</th>
+                                    <th>آخر تاريخ دفع</th>
+                                    <th>الحالة</th>
+                                    <th>ملاحظات</th>
+                                </tr>
+                            </thead>
+                            <tbody id="other-table-body">
+                                <!-- سيتم ملؤها بالبيانات -->
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
         </div>
@@ -1102,7 +1317,7 @@
         const searchReportsInput = document.getElementById('search-reports');
         const syncNowBtn = document.getElementById('sync-now');
         const syncStatusElem = document.getElementById('sync-status');
-        const googleSheetsEmbed = document.getElementById('google-sheets-embed');
+        const accountReportsContainer = document.getElementById('account-reports');
         
         // أزرار المشاركة
         const shareCollectionBtn = document.getElementById('share-collection');
@@ -1124,9 +1339,9 @@
         const savedReportsList = document.getElementById('saved-reports-list');
         
         // جداول العملاء المديونين
-        const khamisTableBody = document.querySelector('#khamis-table tbody');
-        const dharanTableBody = document.querySelector('#dharan-table tbody');
-        const otherTableBody = document.querySelector('#other-table tbody');
+        const khamisTableBody = document.getElementById('khamis-table-body');
+        const dharanTableBody = document.getElementById('dharan-table-body');
+        const otherTableBody = document.getElementById('other-table-body');
         
         // الأزرار
         const addCollectionBtn = document.getElementById('add-collection');
@@ -1167,6 +1382,7 @@
             updateAccountsList();
             updateSavedReportsList();
             updatePreview();
+            updateDebtorsTables();
             
             // إضافة مستمعي الأحداث
             setupEventListeners();
@@ -1186,11 +1402,19 @@
 
         // إعداد مستمعي الأحداث
         function setupEventListeners() {
-            // التبويبات
+            // التبويبات الرئيسية
             tabs.forEach(tab => {
                 tab.addEventListener('click', () => {
                     const tabId = tab.getAttribute('data-tab');
                     activateTab(tabId);
+                });
+            });
+            
+            // تبويبات العملاء المديونين
+            debtorTabs.forEach(tab => {
+                tab.addEventListener('click', () => {
+                    const debtorTabId = tab.getAttribute('data-debtor-tab');
+                    activateDebtorTab(debtorTabId);
                 });
             });
             
@@ -1300,13 +1524,13 @@
             if (savedAccounts) {
                 accounts = JSON.parse(savedAccounts);
             } else {
-                // بيانات افتراضية (الحسابات المطلوبة)
+                // بيانات افتراضية (الحسابات المطلوبة) مع السقوفات المحددة
                 accounts = [
-                    { name: 'دادية - شركة دروب سيول التعاون', accountNumber: '01400031966804', limit: 50000 },
-                    { name: 'دادية - شركة ترابط النوادر الأهليه', accountNumber: '50200000522607', limit: 75000 },
-                    { name: 'القاسمي - ALHANOUF S. AL ALQUTB', accountNumber: '01400029026609', limit: 30000 },
-                    { name: 'المقبولي - شركة بكري علي أحمد الشيخي', accountNumber: '25600001040609', limit: 60000 },
-                    { name: 'دادية - تلال الوفاء (زغلول)', accountNumber: '01400032556202', limit: 45000 }
+                    { name: 'دادية - شركة دروب سيول التعاون', accountNumber: '01400031966804', limit: 1000000 },
+                    { name: 'دادية - شركة ترابط النوادر الأهليه', accountNumber: '50200000522607', limit: 100000 },
+                    { name: 'القاسمي - ALHANOUF S. AL ALQUTB', accountNumber: '01400029026609', limit: 100000 },
+                    { name: 'المقبولي - شركة بكري علي أحمد الشيخي', accountNumber: '25600001040609', limit: 100000 },
+                    { name: 'دادية - تلال الوفاء (زغلول)', accountNumber: '01400032556202', limit: 100000 }
                 ];
                 localStorage.setItem('depositAccounts', JSON.stringify(accounts));
             }
@@ -1333,6 +1557,57 @@
             }
         }
 
+        // تفعيل تبويب
+        function activateTab(tabId) {
+            tabs.forEach(tab => {
+                if (tab.getAttribute('data-tab') === tabId) {
+                    tab.classList.add('active');
+                } else {
+                    tab.classList.remove('active');
+                }
+            });
+            
+            tabContents.forEach(content => {
+                if (content.id === `${tabId}-tab`) {
+                    content.classList.add('active');
+                    
+                    // عند تفعيل تبويب التقارير، قم بتحديث القائمة
+                    if (tabId === 'reports') {
+                        updateSavedReportsList();
+                    }
+                    // عند تفعيل تبويب الحسابات، قم بتحديث القائمة
+                    else if (tabId === 'accounts') {
+                        updateAccountsList();
+                    }
+                    // عند تفعيل تبويب العملاء المديونين، قم بتحديث الجداول
+                    else if (tabId === 'debtors') {
+                        updateDebtorsTables();
+                    }
+                } else {
+                    content.classList.remove('active');
+                }
+            });
+        }
+
+        // تفعيل تبويب العملاء المديونين
+        function activateDebtorTab(tabId) {
+            debtorTabs.forEach(tab => {
+                if (tab.getAttribute('data-debtor-tab') === tabId) {
+                    tab.classList.add('active');
+                } else {
+                    tab.classList.remove('active');
+                }
+            });
+            
+            debtorContents.forEach(content => {
+                if (content.id === `${tabId}-content`) {
+                    content.classList.add('active');
+                } else {
+                    content.classList.remove('active');
+                }
+            });
+        }
+
         // تحديث قائمة الحسابات في dropdown
         function updateAccountsDropdown() {
             depositNameInput.innerHTML = '<option value="">اختر حساب الإيداع</option>';
@@ -1348,6 +1623,17 @@
         // تحديث قائمة الحسابات المعروضة
         function updateAccountsList() {
             accountsList.innerHTML = '';
+            
+            if (accounts.length === 0) {
+                accountsList.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-university"></i>
+                        <p>لا توجد حسابات مسجلة</p>
+                    </div>
+                `;
+                return;
+            }
+            
             accounts.forEach((account, index) => {
                 const accountItem = document.createElement('div');
                 accountItem.className = 'account-item fade-in';
@@ -1357,7 +1643,7 @@
                 
                 accountItem.innerHTML = `
                     <div>
-                        <strong>${account.name}</strong>
+                        <strong><span class="account-link" onclick="showAccountReport('${account.name}', ${index})">${account.name}</span></strong>
                         ${account.accountNumber ? `<br><small>رقم الحساب: ${account.accountNumber}</small>` : ''}
                         ${account.limit ? `<div class="account-limit">
                             <small>السقف: ${account.limit.toLocaleString()} ريال</small>
@@ -1367,9 +1653,74 @@
                     <div class="account-actions">
                         <button onclick="editAccount(${index})">تعديل</button>
                         <button onclick="deleteAccount(${index})">حذف</button>
+                        <button onclick="shareAccountReport('${account.name}')" class="btn-share">مشاركة</button>
                     </div>
                 `;
                 accountsList.appendChild(accountItem);
+            });
+            
+            // تحديث تقارير الحسابات
+            updateAccountReports();
+        }
+
+        // مشاركة تقرير الحساب نصياً
+        function shareAccountReport(accountName) {
+            const account = accounts.find(acc => acc.name === accountName);
+            if (!account) return;
+            
+            const totalDeposits = getAccountTotal(accountName);
+            const remaining = account.limit ? account.limit - totalDeposits : 0;
+            const percentage = account.limit ? (totalDeposits / account.limit) * 100 : 0;
+            
+            const message = `📊 تقرير حساب: ${accountName}
+            
+💸 إجمالي الإيداعات اليوم: ${totalDeposits.toLocaleString()} ريال
+📈 السقف اليومي: ${account.limit ? account.limit.toLocaleString() + ' ريال' : 'غير محدد'}
+📉 المتبقي: ${remaining.toLocaleString()} ريال
+📊 النسبة المئوية: ${percentage.toFixed(2)}%
+
+تم إنشاء التقرير بواسطة نظام التقارير الإلكتروني لشركة أبو حذيفة`;
+            
+            window.open(`https://wa.me/?text=${encodeURIComponent(message)}`, '_blank');
+            showNotification('تم فتح واتساب لمشاركة تقرير الحساب');
+        }
+
+        // تحديث تقارير الحسابات
+        function updateAccountReports() {
+            accountReportsContainer.innerHTML = '';
+            
+            accounts.forEach((account, index) => {
+                const accountReport = document.createElement('div');
+                accountReport.className = 'account-report fade-in';
+                
+                const totalDeposits = getAccountTotal(account.name);
+                const remaining = account.limit ? account.limit - totalDeposits : 0;
+                const percentage = account.limit ? (totalDeposits / account.limit) * 100 : 0;
+                
+                accountReport.innerHTML = `
+                    <h3>تقرير حساب: ${account.name}</h3>
+                    <div class="account-summary">
+                        <div class="account-summary-item">
+                            <h4>إجمالي الإيداعات اليوم</h4>
+                            <p>${totalDeposits.toLocaleString()} ريال</p>
+                        </div>
+                        <div class="account-summary-item">
+                            <h4>السقف اليومي</h4>
+                            <p>${account.limit ? account.limit.toLocaleString() + ' ريال' : 'غير محدد'}</p>
+                        </div>
+                        <div class="account-summary-item">
+                            <h4>المتبقي</h4>
+                            <p>${remaining.toLocaleString()} ريال</p>
+                        </div>
+                        <div class="account-summary-item">
+                            <h4>النسبة المئوية</h4>
+                            <p>${percentage.toFixed(2)}%</p>
+                        </div>
+                    </div>
+                    <button class="account-report-btn" onclick="shareAccountReport('${account.name}')">مشاركة تقرير الحساب</button>
+                `;
+                
+                accountReportsContainer.appendChild(accountReport);
             });
         }
 
@@ -1402,7 +1753,12 @@
             const searchTerm = searchReportsInput.value.toLowerCase();
             
             if (reports.length === 0) {
-                savedReportsList.innerHTML = '<p>لا توجد تقارير محفوظة</p>';
+                savedReportsList.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-file-alt"></i>
+                        <p>لا توجد تقارير محفوظة</p>
+                    </div>
+                `;
                 return;
             }
             
@@ -1412,7 +1768,12 @@
             );
             
             if (filteredReports.length === 0) {
-                savedReportsList.innerHTML = '<p>لا توجد تقارير تطابق البحث</p>';
+                savedReportsList.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-search"></i>
+                        <p>لا توجد تقارير تطابق البحث</p>
+                    </div>
+                `;
                 return;
             }
             
@@ -1444,6 +1805,48 @@
                     </div>
                 `;
                 savedReportsList.appendChild(reportItem);
+            });
+        }
+
+        // تحديث جداول العملاء المديونين
+        function updateDebtorsTables() {
+            updateDebtorsTable('khamis', khamisTableBody);
+            updateDebtorsTable('dharan', dharanTableBody);
+            updateDebtorsTable('other', otherTableBody);
+        }
+
+        // تحديث جدول العملاء المديونين لمنطقة محددة
+        function updateDebtorsTable(region, tableBody) {
+            tableBody.innerHTML = '';
+            
+            if (debtorsData[region].length === 0) {
+                tableBody.innerHTML = `
+                    <tr>
+                        <td colspan="5" class="empty-state">
+                            <i class="fas fa-users"></i>
+                            <p>لا توجد بيانات للعملاء المديونين في هذه المنطقة</p>
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+            
+            debtorsData[region].forEach((debtor, index) => {
+                const row = document.createElement('tr');
+                row.className = 'debtor-row';
+                
+                let statusClass = 'status-normal';
+                if (debtor.status === 'متأخر') statusClass = 'status-warning';
+                if (debtor.status === 'متأخر شديد') statusClass = 'status-overdue';
+                
+                row.innerHTML = `
+                    <td>${debtor.name}</td>
+                    <td>${debtor.amount.toLocaleString()} ريال</td>
+                    <td>${debtor.lastDate}</td>
+                    <td><span class="status-badge ${statusClass}">${debtor.status}</span></td>
+                    <td>${debtor.notes}</td>
+                `;
+                tableBody.appendChild(row);
             });
         }
 
@@ -1516,12 +1919,12 @@
                 const totalExpense = report.data.expenses.reduce((sum, item) => sum + item.amount, 0);
                 const remainingAmount = totalCollection - totalDeposit - totalExpense;
                 
-                const text = `تقرير تحصيل - ${report.date} - ${report.collectorName}
+                const text = `📊 تقرير تحصيل - ${report.date} - ${report.collectorName}
                 
-إجمالي التحصيلات: ${totalCollection.toLocaleString()} ريال
-إجمالي الإيداعات: ${totalDeposit.toLocaleString()} ريال
-إجمالي المصروفات: ${totalExpense.toLocaleString()} ريال
-المبلغ المتبقي: ${remainingAmount.toLocaleString()} ريال
+💸 إجمالي التحصيلات: ${totalCollection.toLocaleString()} ريال
+📥 إجمالي الإيداعات: ${totalDeposit.toLocaleString()} ريال
+📤 إجمالي المصروفات: ${totalExpense.toLocaleString()} ريال
+💰 المبلغ المتبقي: ${remainingAmount.toLocaleString()} ريال
 
 تم إنشاء التقرير بواسطة نظام التقارير الإلكتروني لشركة أبو حذيفة`;
                 
@@ -1749,10 +2152,12 @@
         // مشاركة تفاصيل العملية
         function shareDetails(type) {
             let message = '';
+            let icon = '';
             
             if (type === 'collection' && reportData.collections.length > 0) {
                 const lastCollection = reportData.collections[reportData.collections.length - 1];
-                message = `تحصيل جديد:
+                icon = '💸';
+                message = `${icon} تحصيل جديد:
 نوع التحصيل: ${lastCollection.type}
 العميل: ${lastCollection.clientName}
 المبلغ: ${lastCollection.amount.toLocaleString()} ريال
@@ -1767,9 +2172,16 @@
             }
             else if (type === 'deposit' && reportData.deposits.length > 0) {
                 const lastDeposit = reportData.deposits[reportData.deposits.length - 1];
-                message = `إيداع جديد:
+                const account = accounts.find(acc => acc.name === lastDeposit.depositName);
+                const totalToday = getAccountTotal(lastDeposit.depositName);
+                const remaining = account && account.limit ? account.limit - totalToday : 0;
+                
+                icon = '📥';
+                message = `${icon} إيداع جديد:
 الحساب: ${lastDeposit.depositName}
 المبلغ: ${lastDeposit.amount.toLocaleString()} ريال
+إجمالي إيداعات اليوم: ${totalToday.toLocaleString()} ريال
+المتبقي للسقف اليومي: ${remaining.toLocaleString()} ريال
 المندوب: ${reportData.collectorName}
 التاريخ: ${reportData.reportDate}`;
                 
@@ -1780,7 +2192,8 @@
             }
             else if (type === 'expense' && reportData.expenses.length > 0) {
                 const lastExpense = reportData.expenses[reportData.expenses.length - 1];
-                message = `مصروف جديد:
+                icon = '📤';
+                message = `${icon} مصروف جديد:
 النوع: ${lastExpense.type}
 المبلغ: ${lastExpense.amount.toLocaleString()} ريال
 التفاصيل: ${lastExpense.details}
@@ -1796,7 +2209,7 @@
                 
                 message += `
 
-المبلغ المتبقي: ${remainingAmount.toLocaleString()} ريال`;
+💰 المبلغ المتبقي: ${remainingAmount.toLocaleString()} ريال`;
                 
                 window.open(`https://wa.me/?text=${encodeURIComponent(message)}`, '_blank');
                 showNotification('تم فتح واتساب لمشاركة التفاصيل');
@@ -1810,13 +2223,13 @@
             const totalExpense = reportData.expenses.reduce((sum, item) => sum + item.amount, 0);
             const remainingAmount = totalCollection - totalDeposit - totalExpense;
             
-            const message = `ملخص التقرير - ${reportData.reportDate}
+            const message = `📊 ملخص التقرير - ${reportData.reportDate}
 المندوب: ${reportData.collectorName}
 
-إجمالي التحصيلات: ${totalCollection.toLocaleString()} ريال
-إجمالي الإيداعات: ${totalDeposit.toLocaleString()} ريال
-إجمالي المصروفات: ${totalExpense.toLocaleString()} ريال
-المبلغ المتبقي: ${remainingAmount.toLocaleString()} ريال
+💸 إجمالي التحصيلات: ${totalCollection.toLocaleString()} ريال
+📥 إجمالي الإيداعات: ${totalDeposit.toLocaleString()} ريال
+📤 إجمالي المصروفات: ${totalExpense.toLocaleString()} ريال
+💰 المبلغ المتبقي: ${remainingAmount.toLocaleString()} ريال
 
 تم إنشاء التقرير بواسطة نظام التقارير الإلكتروني لشركة أبو حذيفة`;
             
@@ -1941,7 +2354,7 @@
             
             // تحديث جدول التحصيلات
             collectionsTableBody.innerHTML = '';
-            reportData.collections.forEach((item, index) => {
+            reportData.collections.forEach((item, index) {
                 const row = document.createElement('tr');
                 row.className = 'fade-in';
                 row.innerHTML = `
@@ -1957,7 +2370,7 @@
             
             // تحديث جدول الإيداعات
             depositsTableBody.innerHTML = '';
-            reportData.deposits.forEach((item, index) => {
+            reportData.deposits.forEach((item, index) {
                 const row = document.createElement('tr');
                 row.className = 'fade-in';
                 row.innerHTML = `
@@ -1973,7 +2386,7 @@
             
             // تحديث جدول المصروفات
             expensesTableBody.innerHTML = '';
-            reportData.expenses.forEach((item, index) => {
+            reportData.expenses.forEach((item, index) {
                 const row = document.createElement('tr');
                 row.className = 'fade-in';
                 row.innerHTML = `
@@ -1991,10 +2404,12 @@
         // مشاركة عنصر فردي
         function shareSingleItem(type, index) {
             let message = '';
+            let icon = '';
             
             if (type === 'collection' && reportData.collections[index]) {
                 const item = reportData.collections[index];
-                message = `تفاصيل التحصيل:
+                icon = '💸';
+                message = `${icon} تفاصيل التحصيل:
 نوع التحصيل: ${item.type}
 العميل: ${item.clientName}
 المبلغ: ${item.amount.toLocaleString()} ريال
@@ -2009,9 +2424,16 @@
             }
             else if (type === 'deposit' && reportData.deposits[index]) {
                 const item = reportData.deposits[index];
-                message = `تفاصيل الإيداع:
+                const account = accounts.find(acc => acc.name === item.depositName);
+                const totalToday = getAccountTotal(item.depositName);
+                const remaining = account && account.limit ? account.limit - totalToday : 0;
+                
+                icon = '📥';
+                message = `${icon} تفاصيل الإيداع:
 الحساب: ${item.depositName}
 المبلغ: ${item.amount.toLocaleString()} ريال
+إجمالي إيداعات اليوم: ${totalToday.toLocaleString()} ريال
+المتبقي للسقف اليومي: ${remaining.toLocaleString()} ريال
 المندوب: ${reportData.collectorName}
 التاريخ: ${reportData.reportDate}`;
                 
@@ -2022,7 +2444,8 @@
             }
             else if (type === 'expense' && reportData.expenses[index]) {
                 const item = reportData.expenses[index];
-                message = `تفاصيل المصروف:
+                icon = '📤';
+                message = `${icon} تفاصيل المصروف:
 النوع: ${item.type}
 المبلغ: ${item.amount.toLocaleString()} ريال
 التفاصيل: ${item.details}
@@ -2175,12 +2598,12 @@
             const totalExpense = reportData.expenses.reduce((sum, item) => sum + item.amount, 0);
             const remainingAmount = totalCollection - totalDeposit - totalExpense;
             
-            const text = `تقرير تحصيل - ${reportData.reportDate} - ${reportData.collectorName}
+            const text = `📊 تقرير تحصيل - ${reportData.reportDate} - ${reportData.collectorName}
             
-إجمالي التحصيلات: ${totalCollection.toLocaleString()} ريال
-إجمالي الإيداعات: ${totalDeposit.toLocaleString()} ريال
-إجمالي المصروفات: ${totalExpense.toLocaleString()} ريال
-المبلغ المتبقي: ${remainingAmount.toLocaleString()} ريال
+💸 إجمالي التحصيلات: ${totalCollection.toLocaleString()} ريال
+📥 إجمالي الإيداعات: ${totalDeposit.toLocaleString()} ريال
+📤 إجمالي المصروفات: ${totalExpense.toLocaleString()} ريال
+💰 المبلغ المتبقي: ${remainingAmount.toLocaleString()} ريال
 
 تم إنشاء التقرير بواسطة نظام التقارير الإلكتروني لشركة أبو حذيفة`;
             
@@ -2189,34 +2612,68 @@
             showNotification(`تم فتح واتساب لمشاركة ${type === 'pdf' ? 'PDF' : 'Excel'}`);
         }
 
-        // تفعيل تبويب
-        function activateTab(tabId) {
-            tabs.forEach(tab => {
-                if (tab.getAttribute('data-tab') === tabId) {
-                    tab.classList.add('active');
-                } else {
-                    tab.classList.remove('active');
-                }
-            });
-            
-            tabContents.forEach(content => {
-                if (content.id === `${tabId}-tab`) {
-                    content.classList.add('active');
-                } else {
-                    content.classList.remove('active');
-                }
-            });
-        }
-
-        // تحميل بيانات العملاء المديونين
+        // تحميل بيانات العملاء المديونين من Google Sheets
         function loadDebtorsData() {
             // إذا كانت البيانات محفوظة محلياً، استخدمها
             if (debtorsData.khamis.length > 0 || debtorsData.dharan.length > 0 || debtorsData.other.length > 0) {
                 return;
             }
             
-            // إذا لم تكن هناك بيانات محفوظة، قم بتحميل بيانات افتراضية
-            loadSampleDebtorsData();
+            // جلب البيانات من Google Sheets
+            const sheetId = '1P7HtV_T7w-rL-dveiBjCr82T42UKOQ8Xd140HCKQGy8';
+            const url = `https://docs.google.com/spreadsheets/d/${sheetId}/gviz/tq?tqx=out:csv`;
+            
+            fetch(url)
+                .then(response => response.text())
+                .then(data => {
+                    processDebtorsData(data);
+                })
+                .catch(error => {
+                    console.error('Error fetching debtors data:', error);
+                    // إذا فشل جلب البيانات، قم بتحميل بيانات افتراضية
+                    loadSampleDebtorsData();
+                });
+        }
+
+        // معالجة بيانات العملاء المديونين من Google Sheets
+        function processDebtorsData(csvData) {
+            const rows = csvData.split('\n');
+            debtorsData = { khamis: [], dharan: [], other: [], lastSync: new Date().getTime() };
+            
+            // تخطي الصف الأول (العناوين)
+            for (let i = 1; i < rows.length; i++) {
+                const cells = rows[i].split(',');
+                if (cells.length >= 5) {
+                    const debtor = {
+                        name: cells[0].replace(/"/g, ''),
+                        amount: parseFloat(cells[1]) || 0,
+                        lastDate: cells[2].replace(/"/g, ''),
+                        status: cells[3].replace(/"/g, ''),
+                        notes: cells[4].replace(/"/g, ''),
+                        region: cells.length > 5 ? cells[5].replace(/"/g, '') : 'other'
+                    };
+                    
+                    // تصنيف العملاء حسب المنطقة
+                    if (debtor.region === 'خميس مشيط') {
+                        debtorsData.khamis.push(debtor);
+                    } else if (debtor.region === 'ظهران الجنوب') {
+                        debtorsData.dharan.push(debtor);
+                    } else {
+                        debtorsData.other.push(debtor);
+                    }
+                }
+            }
+            
+            // حفظ البيانات محلياً
+            localStorage.setItem('debtorsData', JSON.stringify(debtorsData));
+            
+            // تحديث حالة المزامنة
+            syncStatusElem.textContent = `آخر تحديث: ${new Date().toLocaleString('ar-SA')}`;
+            
+            // تحديث الجداول
+            updateDebtorsTables();
+            
+            showNotification('تم تحميل بيانات العملاء المديونين بنجاح');
         }
 
         // تحميل بيانات افتراضية للعملاء المديونين
@@ -2245,6 +2702,9 @@
             
             // تحديث حالة المزامنة
             syncStatusElem.textContent = `آخر تحديث: ${new Date().toLocaleString('ar-SA')}`;
+            
+            // تحديث الجداول
+            updateDebtorsTables();
         }
 
         // مزامنة بيانات العملاء المديونين يدوياً
@@ -2252,17 +2712,24 @@
             syncNowBtn.innerHTML = '<span class="loading"></span> جاري المزامنة...';
             syncNowBtn.disabled = true;
             
-            // محاكاة عملية المزامنة
-            setTimeout(() => {
-                // في الواقع الفعلي، هنا سيتم جلب البيانات من مصدر خارجي
-                // ولكن لأغراض العرض، سنستخدم البيانات الافتراضية
-                loadSampleDebtorsData();
-                
-                syncNowBtn.innerHTML = 'مزامنة الآن';
-                syncNowBtn.disabled = false;
-                
-                showNotification('تم مزامنة بيانات العملاء المديونين بنجاح');
-            }, 1500);
+            // جلب البيانات من Google Sheets
+            const sheetId = '1P7HtV_T7w-rL-dveiBjCr82T42UKOQ8Xd140HCKQGy8';
+            const url = `https://docs.google.com/spreadsheets/d/${sheetId}/gviz/tq?tqx=out:csv`;
+            
+            fetch(url)
+                .then(response => response.text())
+                .then(data => {
+                    processDebtorsData(data);
+                    syncNowBtn.innerHTML = 'مزامنة الآن';
+                    syncNowBtn.disabled = false;
+                    showNotification('تم مزامنة بيانات العملاء المديونين بنجاح');
+                })
+                .catch(error => {
+                    console.error('Error fetching debtors data:', error);
+                    syncNowBtn.innerHTML = 'مزامنة الآن';
+                    syncNowBtn.disabled = false;
+                    showNotification('فشل في مزامنة البيانات', 'error');
+                });
         }
 
         // وظيفة لعرض الإشعارات
@@ -2295,4 +2762,4 @@
         window.onload = init;
     </script>
 </body>
-</html>
+    </html>
