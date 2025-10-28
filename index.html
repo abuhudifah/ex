@@ -12,7 +12,6 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <style>
-        /* جميع الأنماط السابقة محفوظة */
         body {
             box-sizing: border-box;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -196,7 +195,45 @@
             backdrop-filter: blur(10px);
         }
         
-        /* تحسينات للأجهزة المحمولة */
+        /* تحسينات الهيدر للاستجابة */
+        .header-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem;
+        }
+        
+        .header-main {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            width: 100%;
+            justify-content: center;
+        }
+        
+        .header-info {
+            width: 100%;
+            max-width: 300px;
+        }
+        
+        @media (min-width: 768px) {
+            .header-container {
+                flex-direction: row;
+                justify-content: space-between;
+                align-items: center;
+            }
+            
+            .header-main {
+                width: auto;
+                justify-content: flex-start;
+            }
+            
+            .header-info {
+                width: auto;
+            }
+        }
+        
         @media (max-width: 768px) {
             .container {
                 padding-left: 1rem;
@@ -209,18 +246,8 @@
             
             .admin-header .container {
                 flex-direction: column;
-                align-items: flex-start;
-            }
-            
-            .admin-header .flex {
-                flex-direction: column;
-                align-items: flex-start;
-                width: 100%;
-            }
-            
-            .admin-header .text-left {
-                margin-top: 1rem;
-                width: 100%;
+                align-items: center;
+                text-align: center;
             }
             
             .logo-container {
@@ -323,7 +350,6 @@
                 padding: 1rem;
             }
             
-            /* تحسينات للشاشات الصغيرة جداً */
             @media (max-width: 480px) {
                 .tab-button {
                     padding: 0.5rem 0.75rem;
@@ -344,7 +370,6 @@
             }
         }
         
-        /* تحسينات للشاشات المتوسطة */
         @media (min-width: 769px) and (max-width: 1024px) {
             #agentsList, #adminAccountsList {
                 grid-template-columns: repeat(2, 1fr);
@@ -355,7 +380,6 @@
             }
         }
         
-        /* تحسينات لشاشات اللمس */
         @media (hover: none) and (pointer: coarse) {
             .admin-card:hover, .stat-card:hover, .transaction-row:hover {
                 transform: none;
@@ -367,7 +391,7 @@
             }
             
             .form-input, .btn-admin, .tab-button {
-                min-height: 44px; /* الحد الأدنى لحجم اللمس */
+                min-height: 44px;
             }
         }
     </style>
@@ -375,18 +399,18 @@
 <body class="min-h-full">
     <!-- Admin Header -->
     <header class="admin-header text-white p-4 md:p-6">
-        <div class="container mx-auto flex flex-col md:flex-row md:items-center md:justify-between">
-            <div class="flex items-center space-x-4 md:space-x-6 space-x-reverse mb-4 md:mb-0">
+        <div class="container mx-auto header-container">
+            <div class="header-main">
                 <div class="logo-container rounded-full p-1 md:p-2">
                     <img src="https://i.ibb.co/ZzzbL3Rg/image.png" alt="شعار شركة أبو حذيفة" class="h-12 w-12 md:h-16 md:w-16 rounded-full object-cover">
                 </div>
-                <div>
+                <div class="text-center md:text-right">
                     <h1 class="text-xl md:text-3xl font-bold mb-1">🏢 لوحة الإدارة المتقدمة</h1>
                     <p class="text-sm md:text-xl opacity-90">نظام أبو حذيفة للصرافة والتحويلات</p>
                 </div>
             </div>
-            <div class="w-full md:w-auto">
-                <div class="bg-white bg-opacity-20 rounded-xl p-3 md:p-4 backdrop-filter backdrop-blur-sm">
+            <div class="header-info">
+                <div class="bg-white bg-opacity-20 rounded-xl p-3 md:p-4 backdrop-filter backdrop-blur-sm text-center md:text-right">
                     <p class="text-base md:text-lg font-semibold">👨‍💼 مدير النظام</p>
                     <p class="text-xs md:text-sm opacity-90" id="currentDate"></p>
                     <p class="text-xs opacity-75" id="currentTime"></p>
@@ -509,6 +533,32 @@
                         <i class="fas fa-download ml-1 md:ml-2"></i>تصدير التقرير
                     </button>
                 </div>
+                
+                <!-- Date Filter for Agents -->
+                <div class="filter-card rounded-xl md:rounded-2xl p-4 md:p-6 mb-6">
+                    <h3 class="text-lg md:text-xl font-bold text-gray-800 mb-3 md:mb-4">📅 فلترة أداء المندوبين حسب اليوم</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-3 md:gap-4">
+                        <div>
+                            <label class="block text-xs md:text-sm font-semibold text-gray-700 mb-1 md:mb-2">اختر يوم محدد</label>
+                            <input type="date" id="agentsDate" class="w-full p-2 md:p-3 form-input rounded-xl" onchange="updateAgentsDate()">
+                        </div>
+                        <div class="flex items-end">
+                            <button onclick="showTodayAgents()" class="w-full btn-admin text-white px-4 md:px-6 py-2 md:py-3 rounded-xl font-semibold text-sm md:text-base">
+                                <i class="fas fa-calendar-day ml-1 md:ml-2"></i>عرض اليوم
+                            </button>
+                        </div>
+                        <div class="flex items-end">
+                            <button onclick="resetAgentsDate()" class="w-full bg-gray-600 text-white px-4 md:px-6 py-2 md:py-3 rounded-xl font-semibold hover:bg-gray-700 transition-all text-sm md:text-base">
+                                <i class="fas fa-redo ml-1 md:ml-2"></i>إعادة تعيين
+                            </button>
+                        </div>
+                    </div>
+                    <div class="mt-3 md:mt-4 text-xs md:text-sm text-gray-600">
+                        <i class="fas fa-info-circle ml-1 md:ml-2"></i>
+                        <span id="agentsDateInfo">يتم عرض أداء المندوبين في اليوم الحالي فقط</span>
+                    </div>
+                </div>
+                
                 <div id="agentsList" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6"></div>
             </div>
         </div>
@@ -519,7 +569,7 @@
                 <!-- Filters -->
                 <div class="filter-card rounded-xl md:rounded-2xl p-4 md:p-6">
                     <h3 class="text-lg md:text-xl font-bold text-gray-800 mb-3 md:mb-4">🔍 فلترة المعاملات</h3>
-                    <div class="grid grid-cols-1 md:grid-cols-4 gap-3 md:gap-4">
+                    <div class="grid grid-cols-1 md:grid-cols-5 gap-3 md:gap-4">
                         <div>
                             <label class="block text-xs md:text-sm font-semibold text-gray-700 mb-1 md:mb-2">المندوب</label>
                             <select id="filterAgent" class="w-full p-2 md:p-3 form-input rounded-xl" onchange="filterTransactions()">
@@ -535,6 +585,10 @@
                                 <option value="expense">مصروف</option>
                                 <option value="delivery">استلام/تسليم</option>
                             </select>
+                        </div>
+                        <div>
+                            <label class="block text-xs md:text-sm font-semibold text-gray-700 mb-1 md:mb-2">يوم محدد</label>
+                            <input type="date" id="filterSpecificDate" class="w-full p-2 md:p-3 form-input rounded-xl" onchange="filterTransactions()">
                         </div>
                         <div>
                             <label class="block text-xs md:text-sm font-semibold text-gray-700 mb-1 md:mb-2">من تاريخ</label>
@@ -601,14 +655,37 @@
                         </div>
                     </div>
                     <div class="flex flex-col md:flex-row space-y-2 md:space-y-0 md:space-x-3 space-x-reverse mt-2 md:mt-0">
-                        <button onclick="resetAllLimits()" class="bg-orange-600 text-white px-3 md:px-6 py-2 md:py-3 rounded-xl font-semibold hover:bg-orange-700 transition-all text-sm md:text-base">
-                            <i class="fas fa-redo ml-1 md:ml-2"></i>إعادة تعيين الحدود
-                        </button>
                         <button onclick="shareAllAccountsReport()" class="btn-admin text-white px-3 md:px-6 py-2 md:py-3 rounded-xl font-semibold text-sm md:text-base mt-2 md:mt-0">
                             <i class="fas fa-share-alt ml-1 md:ml-2"></i>مشاركة التقرير
                         </button>
                     </div>
                 </div>
+                
+                <!-- Date Filter for Bank Accounts -->
+                <div class="filter-card rounded-xl md:rounded-2xl p-4 md:p-6 mb-6">
+                    <h3 class="text-lg md:text-xl font-bold text-gray-800 mb-3 md:mb-4">📅 فلترة الإيداعات حسب اليوم</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-3 md:gap-4">
+                        <div>
+                            <label class="block text-xs md:text-sm font-semibold text-gray-700 mb-1 md:mb-2">اختر يوم محدد</label>
+                            <input type="date" id="bankAccountsDate" class="w-full p-2 md:p-3 form-input rounded-xl" onchange="updateBankAccountsDate()">
+                        </div>
+                        <div class="flex items-end">
+                            <button onclick="showTodayBankAccounts()" class="w-full btn-admin text-white px-4 md:px-6 py-2 md:py-3 rounded-xl font-semibold text-sm md:text-base">
+                                <i class="fas fa-calendar-day ml-1 md:ml-2"></i>عرض اليوم
+                            </button>
+                        </div>
+                        <div class="flex items-end">
+                            <button onclick="resetBankAccountsDate()" class="w-full bg-gray-600 text-white px-4 md:px-6 py-2 md:py-3 rounded-xl font-semibold hover:bg-gray-700 transition-all text-sm md:text-base">
+                                <i class="fas fa-redo ml-1 md:ml-2"></i>إعادة تعيين
+                            </button>
+                        </div>
+                    </div>
+                    <div class="mt-3 md:mt-4 text-xs md:text-sm text-gray-600">
+                        <i class="fas fa-info-circle ml-1 md:ml-2"></i>
+                        <span id="bankAccountsDateInfo">يتم عرض إيداعات اليوم الحالي فقط</span>
+                    </div>
+                </div>
+                
                 <div id="adminAccountsList" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6"></div>
             </div>
         </div>
@@ -740,7 +817,7 @@
     </div>
 
     <script>
-        // Firebase Configuration - نفس الإعدادات المستخدمة في نظام المندوبين
+        // Firebase Configuration
         const firebaseConfig = {
             apiKey: "AIzaSyCZ9IUXRK-5Kb-TWhQL9nuwse_lmdCzP9g",
             authDomain: "abu-hatheefa-app-68ff1.firebaseapp.com",
@@ -760,17 +837,26 @@
         let allBankAccounts = [];
         let filteredTransactions = [];
         let charts = {};
+        let selectedBankAccountsDate = new Date().toISOString().split('T')[0];
+        let selectedAgentsDate = new Date().toISOString().split('T')[0];
 
         // Initialize App
         document.addEventListener('DOMContentLoaded', function() {
             updateCurrentDateTime();
             loadAllData();
             
+            // تعيين تاريخ اليوم كتاريخ افتراضي
+            document.getElementById('bankAccountsDate').value = selectedBankAccountsDate;
+            document.getElementById('agentsDate').value = selectedAgentsDate;
+            
             // Update time every second
             setInterval(updateCurrentDateTime, 1000);
             
             // Auto refresh every 30 seconds
             setInterval(loadAllData, 30000);
+            
+            // Auto reset limits at start of new day
+            checkAndResetLimits();
         });
 
         function updateCurrentDateTime() {
@@ -789,6 +875,16 @@
             
             document.getElementById('currentDate').textContent = now.toLocaleDateString('en-US', dateOptions);
             document.getElementById('currentTime').textContent = now.toLocaleTimeString('en-US', timeOptions);
+        }
+
+        async function checkAndResetLimits() {
+            const lastReset = localStorage.getItem('lastResetDate');
+            const today = new Date().toDateString();
+            
+            if (lastReset !== today) {
+                await resetAllLimits();
+                localStorage.setItem('lastResetDate', today);
+            }
         }
 
         async function loadAllData() {
@@ -888,6 +984,10 @@
             // Load specific data for tabs
             if (tabName === 'analytics') {
                 setTimeout(updateCharts, 100);
+            } else if (tabName === 'accounts') {
+                updateBankAccountsList();
+            } else if (tabName === 'agents') {
+                updateAgentsList();
             }
         }
 
@@ -1090,9 +1190,39 @@
             });
         }
 
+        // ========== التعديلات على قسم إدارة المندوبين ==========
+        function updateAgentsDate() {
+            const dateInput = document.getElementById('agentsDate');
+            selectedAgentsDate = dateInput.value;
+            updateAgentsList();
+        }
+
+        function showTodayAgents() {
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('agentsDate').value = today;
+            selectedAgentsDate = today;
+            updateAgentsList();
+        }
+
+        function resetAgentsDate() {
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('agentsDate').value = today;
+            selectedAgentsDate = today;
+            updateAgentsList();
+        }
+
         function updateAgentsList() {
             const agentsList = document.getElementById('agentsList');
             agentsList.innerHTML = '';
+            
+            // تحديث معلومات التاريخ المعروض
+            const dateInfo = document.getElementById('agentsDateInfo');
+            if (selectedAgentsDate === new Date().toISOString().split('T')[0]) {
+                dateInfo.textContent = 'يتم عرض أداء المندوبين في اليوم الحالي فقط';
+            } else {
+                const dateObj = new Date(selectedAgentsDate);
+                dateInfo.textContent = `يتم عرض أداء المندوبين في تاريخ: ${dateObj.toLocaleDateString('en-US')}`;
+            }
             
             if (allAgents.length === 0) {
                 agentsList.innerHTML = `
@@ -1105,11 +1235,18 @@
             }
             
             allAgents.forEach(agent => {
-                const agentTransactions = allTransactions.filter(t => t.agent === agent.name);
-                const collections = agentTransactions.filter(t => t.type === 'collection');
-                const deposits = agentTransactions.filter(t => t.type === 'deposit');
-                const expenses = agentTransactions.filter(t => t.type === 'expense');
-                const deliveries = agentTransactions.filter(t => t.type === 'delivery');
+                // حساب الرصيد المتبقي الحالي للمندوب (لليوم المحدد فقط)
+                const agentSelectedDateTransactions = allTransactions.filter(t => {
+                    if (!t.timestamp || t.agent !== agent.name) return false;
+                    const transactionDate = new Date(t.timestamp.toDate ? 
+                        t.timestamp.toDate() : t.timestamp);
+                    return transactionDate.toISOString().split('T')[0] === selectedAgentsDate;
+                });
+                
+                const collections = agentSelectedDateTransactions.filter(t => t.type === 'collection');
+                const deposits = agentSelectedDateTransactions.filter(t => t.type === 'deposit');
+                const expenses = agentSelectedDateTransactions.filter(t => t.type === 'expense');
+                const deliveries = agentSelectedDateTransactions.filter(t => t.type === 'delivery');
                 
                 const totalCollections = collections.reduce((sum, t) => sum + (t.amount || 0), 0);
                 const totalDeposits = deposits.reduce((sum, t) => sum + (t.amount || 0), 0);
@@ -1122,7 +1259,8 @@
                 const totalReceived = receivedDeliveries.reduce((sum, t) => sum + (t.amount || 0), 0);
                 const totalSent = sentDeliveries.reduce((sum, t) => sum + (t.amount || 0), 0);
                 
-                const balance = totalCollections + totalReceived - totalDeposits - totalExpenses - totalSent;
+                // حساب الرصيد المتبقي الحالي (ليوم محدد)
+                const currentBalance = totalCollections + totalReceived - totalDeposits - totalExpenses - totalSent;
                 
                 const lastLogin = agent.lastLogin ? 
                     new Date(agent.lastLogin.toDate ? agent.lastLogin.toDate() : agent.lastLogin)
@@ -1146,35 +1284,101 @@
                         </div>
                         <div class="grid grid-cols-2 gap-3 md:gap-4 mb-3 md:mb-4">
                             <div>
-                                <p class="text-xs opacity-70">التحصيلات</p>
+                                <p class="text-xs opacity-70">التحصيلات اليوم</p>
                                 <p class="text-base md:text-lg font-bold">${totalCollections.toFixed(2)}</p>
                             </div>
                             <div>
-                                <p class="text-xs opacity-70">الرصيد</p>
-                                <p class="text-base md:text-lg font-bold ${balance >= 0 ? 'text-green-300' : 'text-red-300'}">
-                                    ${balance.toFixed(2)}
+                                <p class="text-xs opacity-70">الرصيد المتبقي الحالي</p>
+                                <p class="text-base md:text-lg font-bold ${currentBalance >= 0 ? 'text-green-300' : 'text-red-300'}">
+                                    ${currentBalance.toFixed(2)}
                                 </p>
                             </div>
                         </div>
                         <div class="flex justify-between text-xs md:text-sm">
-                            <span class="opacity-70">المعاملات:</span>
-                            <span class="font-semibold">${agentTransactions.length}</span>
+                            <span class="opacity-70">المعاملات اليوم:</span>
+                            <span class="font-semibold">${agentSelectedDateTransactions.length}</span>
                         </div>
                         <div class="flex justify-between text-xs md:text-sm mt-2">
-                            <span class="opacity-70">استلم:</span>
+                            <span class="opacity-70">استلم اليوم:</span>
                             <span class="font-semibold text-green-300">${totalReceived.toFixed(2)}</span>
                         </div>
                         <div class="flex justify-between text-xs md:text-sm">
-                            <span class="opacity-70">سلم:</span>
+                            <span class="opacity-70">سلم اليوم:</span>
                             <span class="font-semibold text-red-300">${totalSent.toFixed(2)}</span>
                         </div>
-                        <button onclick="showAgentDetails('${agent.name}')" class="w-full mt-3 md:mt-4 bg-white bg-opacity-20 hover:bg-opacity-30 py-2 rounded-lg transition-all text-sm md:text-base">
-                            <i class="fas fa-eye ml-1 md:ml-2"></i>عرض التفاصيل
+                        <button onclick="showAgentDayDetails('${agent.name}', '${selectedAgentsDate}')" class="w-full mt-3 md:mt-4 bg-white bg-opacity-20 hover:bg-opacity-30 py-2 rounded-lg transition-all text-sm md:text-base">
+                            <i class="fas fa-chart-bar ml-1 md:ml-2"></i>عرض تفاصيل اليوم
                         </button>
                     </div>
                 `;
                 agentsList.appendChild(div);
             });
+        }
+
+        function showAgentDayDetails(agentName, selectedDate) {
+            // الحصول على جميع معاملات المندوب في اليوم المحدد فقط
+            const agentDayTransactions = allTransactions.filter(t => {
+                if (!t.timestamp || t.agent !== agentName) return false;
+                const transactionDate = new Date(t.timestamp.toDate ? 
+                    t.timestamp.toDate() : t.timestamp);
+                return transactionDate.toISOString().split('T')[0] === selectedDate;
+            });
+            
+            const collections = agentDayTransactions.filter(t => t.type === 'collection');
+            const deposits = agentDayTransactions.filter(t => t.type === 'deposit');
+            const expenses = agentDayTransactions.filter(t => t.type === 'expense');
+            const deliveries = agentDayTransactions.filter(t => t.type === 'delivery');
+            
+            const totalCollections = collections.reduce((sum, t) => sum + (t.amount || 0), 0);
+            const totalDeposits = deposits.reduce((sum, t) => sum + (t.amount || 0), 0);
+            const totalExpenses = expenses.reduce((sum, t) => sum + (t.amount || 0), 0);
+            
+            // حساب الاستلام والتسليم بشكل منفصل
+            const receivedDeliveries = deliveries.filter(t => t.deliveryType === 'receive' && t.toAgent === agentName);
+            const sentDeliveries = deliveries.filter(t => t.deliveryType === 'send' && t.fromAgent === agentName);
+            
+            const totalReceived = receivedDeliveries.reduce((sum, t) => sum + (t.amount || 0), 0);
+            const totalSent = sentDeliveries.reduce((sum, t) => sum + (t.amount || 0), 0);
+            
+            const currentBalance = totalCollections + totalReceived - totalDeposits - totalExpenses - totalSent;
+            
+            let report = `🏢 شركة أبو حذيفة للصرافة والتحويلات\n`;
+            report += `👤 تقرير أداء المندوب: ${agentName}\n`;
+            report += `📅 التاريخ: ${new Date(selectedDate).toLocaleDateString('en-US')}\n`;
+            report += `━━━━━━━━━━━━━━━━━━━━\n\n`;
+            
+            report += `📊 ملخص الأداء ليوم ${new Date(selectedDate).toLocaleDateString('en-US')}:\n`;
+            report += `💰 إجمالي التحصيلات: ${totalCollections.toFixed(2)} ريال (${collections.length} معاملة)\n`;
+            report += `🏦 إجمالي الإيداعات: ${totalDeposits.toFixed(2)} ريال (${deposits.length} معاملة)\n`;
+            report += `💸 إجمالي المصروفات: ${totalExpenses.toFixed(2)} ريال (${expenses.length} معاملة)\n`;
+            report += `📥 إجمالي المستلم: ${totalReceived.toFixed(2)} ريال (${receivedDeliveries.length} معاملة)\n`;
+            report += `📤 إجمالي المسلم: ${totalSent.toFixed(2)} ريال (${sentDeliveries.length} معاملة)\n`;
+            report += `💵 الرصيد المتبقي الحالي: ${currentBalance.toFixed(2)} ريال\n`;
+            report += `📋 إجمالي المعاملات: ${agentDayTransactions.length}\n\n`;
+            
+            // تفاصيل المعاملات
+            if (collections.length > 0) {
+                report += `💰 تفاصيل التحصيلات:\n`;
+                collections.forEach((collection, index) => {
+                    const time = new Date(collection.timestamp.toDate ? collection.timestamp.toDate() : collection.timestamp)
+                        .toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+                    report += `${index + 1}. ${collection.customerName || 'غير محدد'} - ${collection.amount.toFixed(2)} ر.س - ${time}\n`;
+                });
+                report += `\n`;
+            }
+            
+            if (deposits.length > 0) {
+                report += `🏦 تفاصيل الإيداعات:\n`;
+                deposits.forEach((deposit, index) => {
+                    const time = new Date(deposit.timestamp.toDate ? deposit.timestamp.toDate() : deposit.timestamp)
+                        .toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+                    report += `${index + 1}. ${deposit.bankAccount || 'غير محدد'} - ${deposit.amount.toFixed(2)} ر.س - ${time}\n`;
+                });
+                report += `\n`;
+            }
+            
+            document.getElementById('shareText').value = report;
+            document.getElementById('shareModal').classList.remove('hidden');
         }
 
         function updateTransactionsList() {
@@ -1256,15 +1460,33 @@
                 return;
             }
             
+            // تحديث معلومات التاريخ المعروض
+            const dateInfo = document.getElementById('bankAccountsDateInfo');
+            if (selectedBankAccountsDate === new Date().toISOString().split('T')[0]) {
+                dateInfo.textContent = 'يتم عرض إيداعات اليوم الحالي فقط';
+            } else {
+                const dateObj = new Date(selectedBankAccountsDate);
+                dateInfo.textContent = `يتم عرض إيداعات تاريخ: ${dateObj.toLocaleDateString('en-US')}`;
+            }
+            
             allBankAccounts.forEach(account => {
-                const remaining = account.limit - (account.currentDeposits || 0);
-                const usedPercentage = ((account.currentDeposits || 0) / account.limit * 100).toFixed(1);
+                // حساب إيداعات اليوم المحدد فقط لهذا الحساب
+                const selectedDateDeposits = allTransactions.filter(t => 
+                    t.type === 'deposit' && 
+                    t.bankAccountId === account.id &&
+                    t.timestamp && 
+                    new Date(t.timestamp.toDate ? t.timestamp.toDate() : t.timestamp).toISOString().split('T')[0] === selectedBankAccountsDate
+                );
                 
-                // حساب إجمالي الإيداعات لهذا الحساب
-                const accountDeposits = allTransactions.filter(t => 
+                const totalSelectedDateDeposits = selectedDateDeposits.reduce((sum, t) => sum + (t.amount || 0), 0);
+                const remaining = account.limit - totalSelectedDateDeposits;
+                const usedPercentage = (totalSelectedDateDeposits / account.limit * 100).toFixed(1);
+                
+                // حساب إجمالي الإيداعات لهذا الحساب (جميع الأيام)
+                const accountAllDeposits = allTransactions.filter(t => 
                     t.type === 'deposit' && t.bankAccountId === account.id
                 );
-                const totalDeposited = accountDeposits.reduce((sum, t) => sum + (t.amount || 0), 0);
+                const totalAllDeposits = accountAllDeposits.reduce((sum, t) => sum + (t.amount || 0), 0);
                 
                 const div = document.createElement('div');
                 div.className = 'admin-card rounded-xl md:rounded-2xl p-4 md:p-6';
@@ -1275,7 +1497,7 @@
                             <p class="text-xs md:text-sm text-gray-600">رقم الحساب: ${account.number}</p>
                             <p class="text-xs md:text-sm text-gray-600">البطاقة: ${account.cardNumber || '****'}</p>
                         </div>
-                        <button onclick="shareAccountReport('${account.id}')" class="bg-blue-600 text-white px-2 md:px-3 py-1 rounded-lg text-xs md:text-sm hover:bg-blue-700 transition-all">
+                        <button onclick="shareAccountReport('${account.id}', '${selectedBankAccountsDate}')" class="bg-blue-600 text-white px-2 md:px-3 py-1 rounded-lg text-xs md:text-sm hover:bg-blue-700 transition-all">
                             <i class="fas fa-share-alt ml-1"></i>مشاركة
                         </button>
                     </div>
@@ -1285,8 +1507,8 @@
                             <p class="text-base md:text-lg font-bold text-gray-800">${account.limit.toFixed(2)} ريال</p>
                         </div>
                         <div>
-                            <p class="text-xs text-gray-500">المستخدم اليوم</p>
-                            <p class="text-base md:text-lg font-bold text-blue-600">${(account.currentDeposits || 0).toFixed(2)} ريال</p>
+                            <p class="text-xs text-gray-500">المستخدم (${new Date(selectedBankAccountsDate).toLocaleDateString('en-US')})</p>
+                            <p class="text-base md:text-lg font-bold text-blue-600">${totalSelectedDateDeposits.toFixed(2)} ريال</p>
                         </div>
                     </div>
                     <div class="mb-3 md:mb-4">
@@ -1302,8 +1524,22 @@
                         </div>
                     </div>
                     <div class="text-xs md:text-sm text-gray-600">
-                        <p>إجمالي الإيداعات: ${totalDeposited.toFixed(2)} ريال</p>
-                        <p>عدد الإيداعات: ${accountDeposits.length}</p>
+                        <p>إجمالي الإيداعات الكلي: ${totalAllDeposits.toFixed(2)} ريال</p>
+                        <p>عدد الإيداعات (اليوم المحدد): ${selectedDateDeposits.length}</p>
+                    </div>
+                    <div class="mt-3 md:mt-4 pt-3 md:pt-4 border-t border-gray-200">
+                        <h5 class="text-sm font-semibold text-gray-700 mb-2">إيداعات ${new Date(selectedBankAccountsDate).toLocaleDateString('en-US')}:</h5>
+                        <div class="max-h-32 overflow-y-auto">
+                            ${selectedDateDeposits.length === 0 ? 
+                                '<p class="text-xs text-gray-500 text-center">لا توجد إيداعات في هذا اليوم</p>' : 
+                                selectedDateDeposits.map(deposit => `
+                                    <div class="flex justify-between items-center py-1 border-b border-gray-100">
+                                        <span class="text-xs">${deposit.agent}</span>
+                                        <span class="text-xs font-semibold">${deposit.amount.toFixed(2)} ر.س</span>
+                                    </div>
+                                `).join('')
+                            }
+                        </div>
                     </div>
                 `;
                 accountsList.appendChild(div);
@@ -1351,6 +1587,7 @@
         function filterTransactions() {
             const agentFilter = document.getElementById('filterAgent').value;
             const typeFilter = document.getElementById('filterType').value;
+            const specificDate = document.getElementById('filterSpecificDate').value;
             const fromDate = document.getElementById('filterFromDate').value;
             const toDate = document.getElementById('filterToDate').value;
             
@@ -1367,6 +1604,7 @@
                         transaction.timestamp.toDate() : transaction.timestamp);
                     const transactionDateStr = transactionDate.toISOString().split('T')[0];
                     
+                    if (specificDate && transactionDateStr !== specificDate) return false;
                     if (fromDate && transactionDateStr < fromDate) return false;
                     if (toDate && transactionDateStr > toDate) return false;
                 }
@@ -1382,30 +1620,7 @@
             loadAllData();
         }
 
-        async function resetAccountLimit(accountId) {
-            try {
-                await db.collection('bankAccounts').doc(accountId).update({
-                    currentDeposits: 0
-                });
-                
-                // Update local data
-                const account = allBankAccounts.find(acc => acc.id === accountId);
-                if (account) {
-                    account.currentDeposits = 0;
-                }
-                
-                updateBankAccountsList();
-                showSuccessMessage('تم إعادة تعيين حد الحساب بنجاح');
-                
-            } catch (error) {
-                console.error('Error resetting account limit:', error);
-                showSuccessMessage('حدث خطأ في إعادة تعيين الحد');
-            }
-        }
-
         async function resetAllLimits() {
-            if (!confirm('هل أنت متأكد من إعادة تعيين جميع حدود الحسابات؟')) return;
-            
             try {
                 const batch = db.batch();
                 
@@ -1422,12 +1637,32 @@
                 });
                 
                 updateBankAccountsList();
-                showSuccessMessage('تم إعادة تعيين جميع الحدود بنجاح');
+                showSuccessMessage('تم إعادة تعيين جميع الحدود تلقائياً');
                 
             } catch (error) {
                 console.error('Error resetting all limits:', error);
-                showSuccessMessage('حدث خطأ في إعادة تعيين الحدود');
             }
+        }
+
+        // وظائف جديدة للحسابات البنكية
+        function updateBankAccountsDate() {
+            const dateInput = document.getElementById('bankAccountsDate');
+            selectedBankAccountsDate = dateInput.value;
+            updateBankAccountsList();
+        }
+
+        function showTodayBankAccounts() {
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('bankAccountsDate').value = today;
+            selectedBankAccountsDate = today;
+            updateBankAccountsList();
+        }
+
+        function resetBankAccountsDate() {
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('bankAccountsDate').value = today;
+            selectedBankAccountsDate = today;
+            updateBankAccountsList();
         }
 
         function generateReport() {
@@ -1611,17 +1846,25 @@
             document.getElementById('shareModal').classList.remove('hidden');
         }
 
-        function shareAccountReport(accountId) {
+        function shareAccountReport(accountId, selectedDate) {
             const account = allBankAccounts.find(acc => acc.id === accountId);
             if (!account) return;
             
-            const today = new Date().toLocaleDateString('ar-SA');
-            const remaining = account.limit - (account.currentDeposits || 0);
-            const usedPercentage = ((account.currentDeposits || 0) / account.limit * 100).toFixed(1);
+            // حساب إيداعات اليوم المحدد فقط
+            const selectedDateDeposits = allTransactions.filter(t => 
+                t.type === 'deposit' && 
+                t.bankAccountId === account.id &&
+                t.timestamp && 
+                new Date(t.timestamp.toDate ? t.timestamp.toDate() : t.timestamp).toISOString().split('T')[0] === selectedDate
+            );
+            
+            const totalSelectedDateDeposits = selectedDateDeposits.reduce((sum, t) => sum + (t.amount || 0), 0);
+            const remaining = account.limit - totalSelectedDateDeposits;
+            const usedPercentage = (totalSelectedDateDeposits / account.limit * 100).toFixed(1);
             
             let report = `🏢 شركة أبو حذيفة للصرافة والتحويلات\n`;
-            report += `💳 تقرير الحساب البنكي\n`;
-            report += `📅 التاريخ: ${today}\n\n`;
+            report += `💳 تقرير الحساب البنكي التفصيلي\n`;
+            report += `📅 التاريخ: ${new Date(selectedDate).toLocaleDateString('en-US')}\n\n`;
             
             report += `🏦 تفاصيل الحساب:\n`;
             report += `🏛️ البنك: ${account.name}\n`;
@@ -1629,15 +1872,27 @@
             report += `💳 رقم البطاقة: ${account.cardNumber || 'غير محدد'}\n`;
             report += `👤 صاحب البطاقة: ${account.cardHolder || 'غير محدد'}\n`;
             report += `💰 السقف اليومي: ${account.limit.toFixed(2)} ر.س\n`;
-            report += `📊 المستخدم اليوم: ${(account.currentDeposits || 0).toFixed(2)} ر.س (${usedPercentage}%)\n`;
-            report += `💵 المبلغ المتبقي: ${remaining.toFixed(2)} ر.س\n`;
+            report += `📊 المستخدم في ${new Date(selectedDate).toLocaleDateString('en-US')}: ${totalSelectedDateDeposits.toFixed(2)} ر.س (${usedPercentage}%)\n`;
+            report += `💵 المبلغ المتبقي: ${remaining.toFixed(2)} ر.س\n\n`;
+            
+            report += `📋 تفاصيل الإيداعات ليوم ${new Date(selectedDate).toLocaleDateString('en-US')}:\n`;
+            if (selectedDateDeposits.length === 0) {
+                report += `❌ لا توجد إيداعات في هذا اليوم.\n`;
+            } else {
+                selectedDateDeposits.forEach((deposit, index) => {
+                    const time = new Date(deposit.timestamp.toDate ? deposit.timestamp.toDate() : deposit.timestamp)
+                        .toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+                    report += `${index + 1}. ${deposit.agent} - ${deposit.amount.toFixed(2)} ر.س - ${time}\n`;
+                });
+                report += `\n💰 إجمالي الإيداعات: ${totalSelectedDateDeposits.toFixed(2)} ر.س\n`;
+            }
             
             document.getElementById('shareText').value = report;
             document.getElementById('shareModal').classList.remove('hidden');
         }
 
         function shareAllAccountsReport() {
-            const today = new Date().toLocaleDateString('ar-SA');
+            const today = new Date().toLocaleDateString('en-US');
             
             let report = `🏢 شركة أبو حذيفة للصرافة والتحويلات\n`;
             report += `🏦 تقرير جميع الحسابات البنكية\n`;
@@ -1650,73 +1905,34 @@
                 let totalUsed = 0;
                 
                 allBankAccounts.forEach((account, index) => {
-                    const remaining = account.limit - (account.currentDeposits || 0);
-                    const usedPercentage = ((account.currentDeposits || 0) / account.limit * 100).toFixed(1);
+                    // حساب إيداعات اليوم فقط
+                    const todayDeposits = allTransactions.filter(t => 
+                        t.type === 'deposit' && 
+                        t.bankAccountId === account.id &&
+                        t.timestamp && 
+                        new Date(t.timestamp.toDate ? t.timestamp.toDate() : t.timestamp).toISOString().split('T')[0] === new Date().toISOString().split('T')[0]
+                    );
+                    
+                    const totalTodayDeposits = todayDeposits.reduce((sum, t) => sum + (t.amount || 0), 0);
+                    const remaining = account.limit - totalTodayDeposits;
+                    const usedPercentage = (totalTodayDeposits / account.limit * 100).toFixed(1);
                     
                     totalLimit += account.limit;
-                    totalUsed += (account.currentDeposits || 0);
+                    totalUsed += totalTodayDeposits;
                     
                     report += `${index + 1}. ${account.name}\n`;
-                    report += `   📊 رقم الحساب: ${account.number}\n`;
                     report += `   💰 السقف: ${account.limit.toFixed(2)} ر.س\n`;
-                    report += `   📊 المستخدم: ${(account.currentDeposits || 0).toFixed(2)} ر.س (${usedPercentage}%)\n`;
+                    report += `   📊 المستخدم اليوم: ${totalTodayDeposits.toFixed(2)} ر.س (${usedPercentage}%)\n`;
                     report += `   💵 المتبقي: ${remaining.toFixed(2)} ر.س\n\n`;
                 });
                 
                 const totalRemaining = totalLimit - totalUsed;
                 const totalUsedPercentage = (totalUsed / totalLimit * 100).toFixed(1);
                 
-                report += `📊 الملخص العام:\n`;
+                report += `📊 الملخص العام ليوم ${today}:\n`;
                 report += `💰 إجمالي السقوف: ${totalLimit.toFixed(2)} ر.س\n`;
                 report += `📊 إجمالي المستخدم: ${totalUsed.toFixed(2)} ر.س (${totalUsedPercentage}%)\n`;
                 report += `💵 إجمالي المبلغ المتبقي: ${totalRemaining.toFixed(2)} ر.س\n`;
-            }
-            
-            document.getElementById('shareText').value = report;
-            document.getElementById('shareModal').classList.remove('hidden');
-        }
-
-        function showAgentDetails(agentName) {
-            const agentTransactions = allTransactions.filter(t => t.agent === agentName);
-            const collections = agentTransactions.filter(t => t.type === 'collection');
-            const deposits = agentTransactions.filter(t => t.type === 'deposit');
-            const expenses = agentTransactions.filter(t => t.type === 'expense');
-            const deliveries = agentTransactions.filter(t => t.type === 'delivery');
-            
-            const totalCollections = collections.reduce((sum, t) => sum + (t.amount || 0), 0);
-            const totalDeposits = deposits.reduce((sum, t) => sum + (t.amount || 0), 0);
-            const totalExpenses = expenses.reduce((sum, t) => sum + (t.amount || 0), 0);
-            
-            // حساب الاستلام والتسليم بشكل منفصل
-            const receivedDeliveries = deliveries.filter(t => t.deliveryType === 'receive' && t.toAgent === agentName);
-            const sentDeliveries = deliveries.filter(t => t.deliveryType === 'send' && t.fromAgent === agentName);
-            
-            const totalReceived = receivedDeliveries.reduce((sum, t) => sum + (t.amount || 0), 0);
-            const totalSent = sentDeliveries.reduce((sum, t) => sum + (t.amount || 0), 0);
-            
-            const balance = totalCollections + totalReceived - totalDeposits - totalExpenses - totalSent;
-            
-            let report = `🏢 شركة أبو حذيفة للصرافة والتحويلات\n`;
-            report += `👤 تقرير تفصيلي للمندوب: ${agentName}\n`;
-            report += `📅 تاريخ التقرير: ${new Date().toLocaleDateString('en-US')}\n`;
-            report += `━━━━━━━━━━━━━━━━━━━━\n\n`;
-            
-            report += `📊 ملخص الأداء:\n`;
-            report += `💰 إجمالي التحصيلات: ${totalCollections.toFixed(2)} ريال (${collections.length} معاملة)\n`;
-            report += `🏦 إجمالي الإيداعات: ${totalDeposits.toFixed(2)} ريال (${deposits.length} معاملة)\n`;
-            report += `💸 إجمالي المصروفات: ${totalExpenses.toFixed(2)} ريال (${expenses.length} معاملة)\n`;
-            report += `📥 إجمالي المستلم: ${totalReceived.toFixed(2)} ريال (${receivedDeliveries.length} معاملة)\n`;
-            report += `📤 إجمالي المسلم: ${totalSent.toFixed(2)} ريال (${sentDeliveries.length} معاملة)\n`;
-            report += `💵 الرصيد الحالي: ${balance.toFixed(2)} ريال\n`;
-            report += `📋 إجمالي المعاملات: ${agentTransactions.length}\n\n`;
-            
-            if (collections.length > 0) {
-                report += `💰 تفاصيل التحصيلات:\n`;
-                collections.forEach((t, index) => {
-                    const date = new Date(t.timestamp.toDate ? t.timestamp.toDate() : t.timestamp);
-                    report += `${index + 1}. ${t.customerName || 'غير محدد'} - ${(t.amount || 0).toFixed(2)} ريال - ${date.toLocaleDateString('en-US')}\n`;
-                });
-                report += `\n`;
             }
             
             document.getElementById('shareText').value = report;
@@ -1727,15 +1943,21 @@
             const wb = XLSX.utils.book_new();
             
             const agentsData = [
-                ['اسم المندوب', 'إجمالي التحصيلات', 'إجمالي الإيداعات', 'إجمالي المصروفات', 'إجمالي المستلم', 'إجمالي المسلم', 'الرصيد', 'عدد المعاملات', 'آخر دخول']
+                ['اسم المندوب', 'التحصيلات اليوم', 'الإيداعات اليوم', 'المصروفات اليوم', 'المستلم اليوم', 'المسلم اليوم', 'الرصيد المتبقي الحالي', 'عدد المعاملات اليوم', 'آخر دخول']
             ];
             
             allAgents.forEach(agent => {
-                const agentTransactions = allTransactions.filter(t => t.agent === agent.name);
-                const collections = agentTransactions.filter(t => t.type === 'collection');
-                const deposits = agentTransactions.filter(t => t.type === 'deposit');
-                const expenses = agentTransactions.filter(t => t.type === 'expense');
-                const deliveries = agentTransactions.filter(t => t.type === 'delivery');
+                const agentDayTransactions = allTransactions.filter(t => {
+                    if (!t.timestamp || t.agent !== agent.name) return false;
+                    const transactionDate = new Date(t.timestamp.toDate ? 
+                        t.timestamp.toDate() : t.timestamp);
+                    return transactionDate.toISOString().split('T')[0] === selectedAgentsDate;
+                });
+                
+                const collections = agentDayTransactions.filter(t => t.type === 'collection');
+                const deposits = agentDayTransactions.filter(t => t.type === 'deposit');
+                const expenses = agentDayTransactions.filter(t => t.type === 'expense');
+                const deliveries = agentDayTransactions.filter(t => t.type === 'delivery');
                 
                 const totalCollections = collections.reduce((sum, t) => sum + (t.amount || 0), 0);
                 const totalDeposits = deposits.reduce((sum, t) => sum + (t.amount || 0), 0);
@@ -1748,7 +1970,7 @@
                 const totalReceived = receivedDeliveries.reduce((sum, t) => sum + (t.amount || 0), 0);
                 const totalSent = sentDeliveries.reduce((sum, t) => sum + (t.amount || 0), 0);
                 
-                const balance = totalCollections + totalReceived - totalDeposits - totalExpenses - totalSent;
+                const currentBalance = totalCollections + totalReceived - totalDeposits - totalExpenses - totalSent;
                 
                 const lastLogin = agent.lastLogin ? 
                     new Date(agent.lastLogin.toDate ? agent.lastLogin.toDate() : agent.lastLogin)
@@ -1761,8 +1983,8 @@
                     totalExpenses.toFixed(2),
                     totalReceived.toFixed(2),
                     totalSent.toFixed(2),
-                    balance.toFixed(2),
-                    agentTransactions.length,
+                    currentBalance.toFixed(2),
+                    agentDayTransactions.length,
                     lastLogin
                 ]);
             });
@@ -1782,8 +2004,17 @@
             ];
             
             allBankAccounts.forEach(account => {
-                const remaining = account.limit - (account.currentDeposits || 0);
-                const usedPercentage = ((account.currentDeposits || 0) / account.limit * 100).toFixed(1);
+                // حساب إيداعات اليوم فقط
+                const todayDeposits = allTransactions.filter(t => 
+                    t.type === 'deposit' && 
+                    t.bankAccountId === account.id &&
+                    t.timestamp && 
+                    new Date(t.timestamp.toDate ? t.timestamp.toDate() : t.timestamp).toISOString().split('T')[0] === new Date().toISOString().split('T')[0]
+                );
+                
+                const totalTodayDeposits = todayDeposits.reduce((sum, t) => sum + (t.amount || 0), 0);
+                const remaining = account.limit - totalTodayDeposits;
+                const usedPercentage = (totalTodayDeposits / account.limit * 100).toFixed(1);
                 
                 accountsData.push([
                     account.name,
@@ -1791,7 +2022,7 @@
                     account.cardNumber || 'غير محدد',
                     account.cardHolder || 'غير محدد',
                     account.limit.toFixed(2),
-                    (account.currentDeposits || 0).toFixed(2),
+                    totalTodayDeposits.toFixed(2),
                     remaining.toFixed(2),
                     `${usedPercentage}%`
                 ]);
@@ -1992,7 +2223,16 @@
             }
             
             const bankUsageData = allBankAccounts.map(account => {
-                const usedPercentage = ((account.currentDeposits || 0) / account.limit * 100);
+                // حساب إيداعات اليوم فقط
+                const todayDeposits = allTransactions.filter(t => 
+                    t.type === 'deposit' && 
+                    t.bankAccountId === account.id &&
+                    t.timestamp && 
+                    new Date(t.timestamp.toDate ? t.timestamp.toDate() : t.timestamp).toISOString().split('T')[0] === new Date().toISOString().split('T')[0]
+                );
+                
+                const totalTodayDeposits = todayDeposits.reduce((sum, t) => sum + (t.amount || 0), 0);
+                const usedPercentage = (totalTodayDeposits / account.limit * 100);
                 return {
                     name: account.name,
                     used: usedPercentage,
