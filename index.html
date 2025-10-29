@@ -1056,6 +1056,13 @@
                         colorClass = 'text-green-600';
                         typeText = 'تحصيل';
                         details = `من ${transaction.customerName || 'غير محدد'}`;
+                        
+                        // إضافة معلومات الحساب البنكي إذا كان النوع "سحب من البطاقة"
+                        if (transaction.collectionType === 'سحب من البطاقة' && transaction.bankAccountName) {
+                            details += ` - ${transaction.bankAccountName}`;
+                        } else {
+                            details += ` - ${transaction.collectionType || 'غير محدد'}`;
+                        }
                         break;
                     case 'deposit':
                         iconClass = 'fas fa-university';
@@ -1362,7 +1369,16 @@
                 collections.forEach((collection, index) => {
                     const time = new Date(collection.timestamp.toDate ? collection.timestamp.toDate() : collection.timestamp)
                         .toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
-                    report += `${index + 1}. ${collection.customerName || 'غير محدد'} - ${collection.amount.toFixed(2)} ر.س - ${time}\n`;
+                    let collectionInfo = `${collection.customerName || 'غير محدد'} - ${collection.amount.toFixed(2)} ر.س`;
+                    
+                    // إضافة معلومات الحساب البنكي إذا كان النوع "سحب من البطاقة"
+                    if (collection.collectionType === 'سحب من البطاقة' && collection.bankAccountName) {
+                        collectionInfo += ` - ${collection.bankAccountName}`;
+                    } else {
+                        collectionInfo += ` - ${collection.collectionType || 'غير محدد'}`;
+                    }
+                    
+                    report += `${index + 1}. ${collectionInfo} - ${time}\n`;
                 });
                 report += `\n`;
             }
@@ -1415,6 +1431,12 @@
                     case 'collection':
                         typeText = '💰 تحصيل';
                         details = `العميل: ${transaction.customerName || 'غير محدد'}<br>النوع: ${transaction.collectionType || 'غير محدد'}`;
+                        
+                        // إضافة معلومات الحساب البنكي إذا كان النوع "سحب من البطاقة"
+                        if (transaction.collectionType === 'سحب من البطاقة' && transaction.bankAccountName) {
+                            details += `<br>الحساب: ${transaction.bankAccountName}`;
+                        }
+                        
                         colorClass = 'text-green-600';
                         break;
                     case 'deposit':
@@ -1478,7 +1500,17 @@
                     new Date(t.timestamp.toDate ? t.timestamp.toDate() : t.timestamp).toISOString().split('T')[0] === selectedBankAccountsDate
                 );
                 
+                // حساب السحوبات (التحصيلات من البطاقة) لليوم المحدد
+                const selectedDateWithdrawals = allTransactions.filter(t => 
+                    t.type === 'collection' && 
+                    t.collectionType === 'سحب من البطاقة' &&
+                    t.bankAccountId === account.id &&
+                    t.timestamp && 
+                    new Date(t.timestamp.toDate ? t.timestamp.toDate() : t.timestamp).toISOString().split('T')[0] === selectedBankAccountsDate
+                );
+                
                 const totalSelectedDateDeposits = selectedDateDeposits.reduce((sum, t) => sum + (t.amount || 0), 0);
+                const totalSelectedDateWithdrawals = selectedDateWithdrawals.reduce((sum, t) => sum + (t.amount || 0), 0);
                 const remaining = account.limit - totalSelectedDateDeposits;
                 const usedPercentage = (totalSelectedDateDeposits / account.limit * 100).toFixed(1);
                 
@@ -1526,6 +1558,7 @@
                     <div class="text-xs md:text-sm text-gray-600">
                         <p>إجمالي الإيداعات الكلي: ${totalAllDeposits.toFixed(2)} ريال</p>
                         <p>عدد الإيداعات (اليوم المحدد): ${selectedDateDeposits.length}</p>
+                        <p class="font-semibold text-red-600">السحوبات اليوم: ${totalSelectedDateWithdrawals.toFixed(2)} ريال</p>
                     </div>
                     <div class="mt-3 md:mt-4 pt-3 md:pt-4 border-t border-gray-200">
                         <h5 class="text-sm font-semibold text-gray-700 mb-2">إيداعات ${new Date(selectedBankAccountsDate).toLocaleDateString('en-US')}:</h5>
@@ -1536,6 +1569,20 @@
                                     <div class="flex justify-between items-center py-1 border-b border-gray-100">
                                         <span class="text-xs">${deposit.agent}</span>
                                         <span class="text-xs font-semibold">${deposit.amount.toFixed(2)} ر.س</span>
+                                    </div>
+                                `).join('')
+                            }
+                        </div>
+                    </div>
+                    <div class="mt-2 pt-2 border-t border-gray-200">
+                        <h5 class="text-sm font-semibold text-gray-700 mb-2">سحوبات ${new Date(selectedBankAccountsDate).toLocaleDateString('en-US')}:</h5>
+                        <div class="max-h-32 overflow-y-auto">
+                            ${selectedDateWithdrawals.length === 0 ? 
+                                '<p class="text-xs text-gray-500 text-center">لا توجد سحوبات في هذا اليوم</p>' : 
+                                selectedDateWithdrawals.map(withdrawal => `
+                                    <div class="flex justify-between items-center py-1 border-b border-gray-100">
+                                        <span class="text-xs">${withdrawal.agent} - ${withdrawal.customerName}</span>
+                                        <span class="text-xs font-semibold text-red-600">${withdrawal.amount.toFixed(2)} ر.س</span>
                                     </div>
                                 `).join('')
                             }
@@ -1626,7 +1673,10 @@
                 
                 allBankAccounts.forEach(account => {
                     const docRef = db.collection('bankAccounts').doc(account.id);
-                    batch.update(docRef, { currentDeposits: 0 });
+                    batch.update(docRef, { 
+                        currentDeposits: 0,
+                        currentWithdrawals: 0 
+                    });
                 });
                 
                 await batch.commit();
@@ -1634,6 +1684,7 @@
                 // Update local data
                 allBankAccounts.forEach(account => {
                     account.currentDeposits = 0;
+                    account.currentWithdrawals = 0;
                 });
                 
                 updateBankAccountsList();
@@ -1858,7 +1909,17 @@
                 new Date(t.timestamp.toDate ? t.timestamp.toDate() : t.timestamp).toISOString().split('T')[0] === selectedDate
             );
             
+            // حساب السحوبات (التحصيلات من البطاقة) لليوم المحدد
+            const selectedDateWithdrawals = allTransactions.filter(t => 
+                t.type === 'collection' && 
+                t.collectionType === 'سحب من البطاقة' &&
+                t.bankAccountId === account.id &&
+                t.timestamp && 
+                new Date(t.timestamp.toDate ? t.timestamp.toDate() : t.timestamp).toISOString().split('T')[0] === selectedDate
+            );
+            
             const totalSelectedDateDeposits = selectedDateDeposits.reduce((sum, t) => sum + (t.amount || 0), 0);
+            const totalSelectedDateWithdrawals = selectedDateWithdrawals.reduce((sum, t) => sum + (t.amount || 0), 0);
             const remaining = account.limit - totalSelectedDateDeposits;
             const usedPercentage = (totalSelectedDateDeposits / account.limit * 100).toFixed(1);
             
@@ -1873,7 +1934,8 @@
             report += `👤 صاحب البطاقة: ${account.cardHolder || 'غير محدد'}\n`;
             report += `💰 السقف اليومي: ${account.limit.toFixed(2)} ر.س\n`;
             report += `📊 المستخدم في ${new Date(selectedDate).toLocaleDateString('en-US')}: ${totalSelectedDateDeposits.toFixed(2)} ر.س (${usedPercentage}%)\n`;
-            report += `💵 المبلغ المتبقي: ${remaining.toFixed(2)} ر.س\n\n`;
+            report += `💵 المبلغ المتبقي: ${remaining.toFixed(2)} ر.س\n`;
+            report += `💳 السحوبات اليوم: ${totalSelectedDateWithdrawals.toFixed(2)} ر.س\n\n`;
             
             report += `📋 تفاصيل الإيداعات ليوم ${new Date(selectedDate).toLocaleDateString('en-US')}:\n`;
             if (selectedDateDeposits.length === 0) {
@@ -1885,6 +1947,18 @@
                     report += `${index + 1}. ${deposit.agent} - ${deposit.amount.toFixed(2)} ر.س - ${time}\n`;
                 });
                 report += `\n💰 إجمالي الإيداعات: ${totalSelectedDateDeposits.toFixed(2)} ر.س\n`;
+            }
+            
+            report += `\n📋 تفاصيل السحوبات ليوم ${new Date(selectedDate).toLocaleDateString('en-US')}:\n`;
+            if (selectedDateWithdrawals.length === 0) {
+                report += `❌ لا توجد سحوبات في هذا اليوم.\n`;
+            } else {
+                selectedDateWithdrawals.forEach((withdrawal, index) => {
+                    const time = new Date(withdrawal.timestamp.toDate ? withdrawal.timestamp.toDate() : withdrawal.timestamp)
+                        .toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+                    report += `${index + 1}. ${withdrawal.agent} - ${withdrawal.customerName} - ${withdrawal.amount.toFixed(2)} ر.س - ${time}\n`;
+                });
+                report += `\n💳 إجمالي السحوبات: ${totalSelectedDateWithdrawals.toFixed(2)} ر.س\n`;
             }
             
             document.getElementById('shareText').value = report;
@@ -1903,6 +1977,7 @@
             } else {
                 let totalLimit = 0;
                 let totalUsed = 0;
+                let totalWithdrawals = 0;
                 
                 allBankAccounts.forEach((account, index) => {
                     // حساب إيداعات اليوم فقط
@@ -1913,17 +1988,29 @@
                         new Date(t.timestamp.toDate ? t.timestamp.toDate() : t.timestamp).toISOString().split('T')[0] === new Date().toISOString().split('T')[0]
                     );
                     
+                    // حساب السحوبات (التحصيلات من البطاقة) لليوم
+                    const todayWithdrawals = allTransactions.filter(t => 
+                        t.type === 'collection' && 
+                        t.collectionType === 'سحب من البطاقة' &&
+                        t.bankAccountId === account.id &&
+                        t.timestamp && 
+                        new Date(t.timestamp.toDate ? t.timestamp.toDate() : t.timestamp).toISOString().split('T')[0] === new Date().toISOString().split('T')[0]
+                    );
+                    
                     const totalTodayDeposits = todayDeposits.reduce((sum, t) => sum + (t.amount || 0), 0);
+                    const totalTodayWithdrawals = todayWithdrawals.reduce((sum, t) => sum + (t.amount || 0), 0);
                     const remaining = account.limit - totalTodayDeposits;
                     const usedPercentage = (totalTodayDeposits / account.limit * 100).toFixed(1);
                     
                     totalLimit += account.limit;
                     totalUsed += totalTodayDeposits;
+                    totalWithdrawals += totalTodayWithdrawals;
                     
                     report += `${index + 1}. ${account.name}\n`;
                     report += `   💰 السقف: ${account.limit.toFixed(2)} ر.س\n`;
                     report += `   📊 المستخدم اليوم: ${totalTodayDeposits.toFixed(2)} ر.س (${usedPercentage}%)\n`;
-                    report += `   💵 المتبقي: ${remaining.toFixed(2)} ر.س\n\n`;
+                    report += `   💵 المتبقي: ${remaining.toFixed(2)} ر.س\n`;
+                    report += `   💳 السحوبات اليوم: ${totalTodayWithdrawals.toFixed(2)} ر.س\n\n`;
                 });
                 
                 const totalRemaining = totalLimit - totalUsed;
@@ -1933,6 +2020,7 @@
                 report += `💰 إجمالي السقوف: ${totalLimit.toFixed(2)} ر.س\n`;
                 report += `📊 إجمالي المستخدم: ${totalUsed.toFixed(2)} ر.س (${totalUsedPercentage}%)\n`;
                 report += `💵 إجمالي المبلغ المتبقي: ${totalRemaining.toFixed(2)} ر.س\n`;
+                report += `💳 إجمالي السحوبات: ${totalWithdrawals.toFixed(2)} ر.س\n`;
             }
             
             document.getElementById('shareText').value = report;
@@ -2000,7 +2088,7 @@
             const wb = XLSX.utils.book_new();
             
             const accountsData = [
-                ['اسم البنك', 'رقم الحساب', 'رقم البطاقة', 'صاحب البطاقة', 'السقف اليومي', 'المستخدم اليوم', 'المتبقي', 'النسبة المستخدمة']
+                ['اسم البنك', 'رقم الحساب', 'رقم البطاقة', 'صاحب البطاقة', 'السقف اليومي', 'المستخدم اليوم', 'المتبقي', 'النسبة المستخدمة', 'السحوبات اليوم']
             ];
             
             allBankAccounts.forEach(account => {
@@ -2012,7 +2100,17 @@
                     new Date(t.timestamp.toDate ? t.timestamp.toDate() : t.timestamp).toISOString().split('T')[0] === new Date().toISOString().split('T')[0]
                 );
                 
+                // حساب السحوبات (التحصيلات من البطاقة) لليوم
+                const todayWithdrawals = allTransactions.filter(t => 
+                    t.type === 'collection' && 
+                    t.collectionType === 'سحب من البطاقة' &&
+                    t.bankAccountId === account.id &&
+                    t.timestamp && 
+                    new Date(t.timestamp.toDate ? t.timestamp.toDate() : t.timestamp).toISOString().split('T')[0] === new Date().toISOString().split('T')[0]
+                );
+                
                 const totalTodayDeposits = todayDeposits.reduce((sum, t) => sum + (t.amount || 0), 0);
+                const totalTodayWithdrawals = todayWithdrawals.reduce((sum, t) => sum + (t.amount || 0), 0);
                 const remaining = account.limit - totalTodayDeposits;
                 const usedPercentage = (totalTodayDeposits / account.limit * 100).toFixed(1);
                 
@@ -2024,7 +2122,8 @@
                     account.limit.toFixed(2),
                     totalTodayDeposits.toFixed(2),
                     remaining.toFixed(2),
-                    `${usedPercentage}%`
+                    `${usedPercentage}%`,
+                    totalTodayWithdrawals.toFixed(2)
                 ]);
             });
             
@@ -2050,6 +2149,11 @@
                 switch (transaction.type) {
                     case 'collection':
                         details = `العميل: ${transaction.customerName || 'غير محدد'} - النوع: ${transaction.collectionType || 'غير محدد'}`;
+                        
+                        // إضافة معلومات الحساب البنكي إذا كان النوع "سحب من البطاقة"
+                        if (transaction.collectionType === 'سحب من البطاقة' && transaction.bankAccountName) {
+                            details += ` - الحساب: ${transaction.bankAccountName}`;
+                        }
                         break;
                     case 'deposit':
                         details = `الحساب: ${transaction.bankAccount || 'غير محدد'}`;
