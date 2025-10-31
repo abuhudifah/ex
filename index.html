@@ -24,7 +24,6 @@
             background: linear-gradient(135deg, #0d3b66 0%, #1e5f8b 100%);
         }
         
-        /* تحسينات الهيدر الجديدة */
         .modern-header {
             background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 50%, #60a5fa 100%);
             box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
@@ -195,7 +194,6 @@
             position: relative;
         }
         
-        /* تحسينات الرسومات البيانية للكمبيوتر */
         .chart-wrapper {
             position: relative;
             height: 300px;
@@ -386,22 +384,6 @@
             }
         }
         
-        @media (hover: none) and (pointer: coarse) {
-            .admin-card:hover, .stat-card:hover, .transaction-row:hover {
-                transform: none;
-            }
-            
-            .btn-admin:hover, .tab-inactive:hover {
-                transform: none;
-                box-shadow: none;
-            }
-            
-            .form-input, .btn-admin, .tab-button {
-                min-height: 44px;
-            }
-        }
-        
-        /* تحسينات إضافية للهيدر */
         .header-glow {
             box-shadow: 0 0 20px rgba(59, 130, 246, 0.5);
         }
@@ -411,6 +393,25 @@
             backdrop-filter: blur(15px);
             border: 1px solid rgba(255, 255, 255, 0.3);
             box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+
+        /* تحسينات إضافية للعمليات */
+        .action-buttons {
+            display: flex;
+            gap: 0.5rem;
+            margin-top: 0.5rem;
+        }
+
+        .btn-edit {
+            background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+        }
+
+        .btn-delete {
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+        }
+
+        .btn-share {
+            background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
         }
     </style>
 </head>
@@ -653,6 +654,7 @@
                                     <th class="p-2 md:p-4 text-right font-semibold text-xs md:text-base">النوع</th>
                                     <th class="p-2 md:p-4 text-right font-semibold text-xs md:text-base">التفاصيل</th>
                                     <th class="p-2 md:p-4 text-right font-semibold text-xs md:text-base">المبلغ</th>
+                                    <th class="p-2 md:p-4 text-right font-semibold text-xs md:text-base">الإجراءات</th>
                                 </tr>
                             </thead>
                             <tbody id="transactionsTableBody">
@@ -842,6 +844,99 @@
         </div>
     </div>
 
+    <!-- Edit Transaction Modal -->
+    <div id="editTransactionModal" class="fixed inset-0 modal-backdrop flex items-center justify-center z-50 hidden p-2 md:p-4">
+        <div class="glass-card rounded-xl md:rounded-2xl p-4 md:p-8 w-full max-w-2xl mx-2 md:mx-4 max-h-80 md:max-h-96 overflow-y-auto">
+            <div class="flex items-center mb-4 md:mb-6">
+                <div class="bg-blue-100 p-2 md:p-3 rounded-full ml-2 md:ml-4">
+                    <i class="fas fa-edit text-blue-600 text-lg md:text-xl"></i>
+                </div>
+                <h3 class="text-xl md:text-2xl font-bold text-gray-800">تعديل المعاملة</h3>
+            </div>
+            <form id="editTransactionForm" class="space-y-4 md:space-y-6">
+                <input type="hidden" id="editTransactionId">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">نوع المعاملة</label>
+                        <select id="editTransactionType" class="w-full p-3 form-input rounded-xl" onchange="toggleEditTransactionFields()">
+                            <option value="collection">تحصيل</option>
+                            <option value="deposit">إيداع</option>
+                            <option value="expense">مصروف</option>
+                            <option value="delivery">استلام/تسليم</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">المبلغ</label>
+                        <input type="number" id="editTransactionAmount" class="w-full p-3 form-input rounded-xl" required>
+                    </div>
+                    <div id="editCollectionFields" class="md:col-span-2 space-y-4">
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-700 mb-2">اسم العميل</label>
+                            <input type="text" id="editCustomerName" class="w-full p-3 form-input rounded-xl">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-700 mb-2">نوع التحصيل</label>
+                            <select id="editCollectionType" class="w-full p-3 form-input rounded-xl">
+                                <option value="نقدي">نقدي</option>
+                                <option value="سحب من البطاقة">سحب من البطاقة</option>
+                                <option value="استلام لشركة أخرى">استلام لشركة أخرى</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div id="editDepositFields" class="md:col-span-2 hidden">
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">الحساب البنكي</label>
+                        <select id="editBankAccount" class="w-full p-3 form-input rounded-xl">
+                            <option value="">اختر الحساب البنكي</option>
+                        </select>
+                    </div>
+                    <div id="editExpenseFields" class="md:col-span-2 hidden">
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-700 mb-2">نوع المصروف</label>
+                            <select id="editExpenseType" class="w-full p-3 form-input rounded-xl">
+                                <option value="وقود">وقود</option>
+                                <option value="صيانة">صيانة</option>
+                                <option value="أخرى">أخرى</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-700 mb-2">الوصف</label>
+                            <input type="text" id="editExpenseDescription" class="w-full p-3 form-input rounded-xl">
+                        </div>
+                    </div>
+                    <div id="editDeliveryFields" class="md:col-span-2 hidden">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-semibold text-gray-700 mb-2">نوع العملية</label>
+                                <select id="editDeliveryType" class="w-full p-3 form-input rounded-xl">
+                                    <option value="receive">استلام</option>
+                                    <option value="send">تسليم</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-semibold text-gray-700 mb-2">المندوب</label>
+                                <select id="editDeliveryAgent" class="w-full p-3 form-input rounded-xl">
+                                    <option value="">اختر المندوب</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="md:col-span-2">
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">ملاحظات</label>
+                        <textarea id="editTransactionNotes" class="w-full p-3 form-input rounded-xl" rows="3"></textarea>
+                    </div>
+                </div>
+                <div class="flex flex-col md:flex-row gap-2 md:gap-4 mt-4 md:mt-6">
+                    <button type="submit" class="flex-1 btn-admin text-white py-3 rounded-xl font-semibold">
+                        <i class="fas fa-save ml-2"></i>حفظ التعديلات
+                    </button>
+                    <button type="button" onclick="hideEditTransactionModal()" class="flex-1 bg-gray-500 text-white py-3 rounded-xl font-semibold hover:bg-gray-600 transition-colors">
+                        <i class="fas fa-times ml-2"></i>إلغاء
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <script>
         // Firebase Configuration
         const firebaseConfig = {
@@ -869,6 +964,21 @@
         // دالة مساعدة لتنسيق المبالغ بدون كسور
         function formatAmount(amount) {
             return Math.round(amount).toString();
+        }
+
+        // دالة لتنسيق التاريخ والوقت
+        function formatDateTime(timestamp) {
+            if (!timestamp) return 'غير محدد';
+            
+            const date = timestamp.toDate ? timestamp.toDate() : new Date(timestamp);
+            return date.toLocaleString('en-US', {
+                year: 'numeric',
+                month: '2-digit',
+                day: '2-digit',
+                hour: '2-digit',
+                minute: '2-digit',
+                hour12: true
+            });
         }
 
         // دالة لحساب الرصيد من اليوم السابق
@@ -930,6 +1040,12 @@
             
             // Auto reset limits at start of new day
             checkAndResetLimits();
+
+            // Setup edit form listener
+            document.getElementById('editTransactionForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+                updateTransaction();
+            });
         });
 
         function updateCurrentDateTime() {
@@ -1016,6 +1132,17 @@
                     option.textContent = agent.name;
                     filterSelect.appendChild(option);
                 });
+
+                // Update edit delivery agent dropdown
+                const editDeliveryAgent = document.getElementById('editDeliveryAgent');
+                editDeliveryAgent.innerHTML = '<option value="">اختر المندوب</option>';
+                
+                allAgents.forEach(agent => {
+                    const option = document.createElement('option');
+                    option.value = agent.name;
+                    option.textContent = agent.name;
+                    editDeliveryAgent.appendChild(option);
+                });
                 
             } catch (error) {
                 console.error('Error loading agents:', error);
@@ -1029,6 +1156,17 @@
                 
                 snapshot.forEach(doc => {
                     allBankAccounts.push({ id: doc.id, ...doc.data() });
+                });
+
+                // Update edit bank account dropdown
+                const editBankAccount = document.getElementById('editBankAccount');
+                editBankAccount.innerHTML = '<option value="">اختر الحساب البنكي</option>';
+                
+                allBankAccounts.forEach(account => {
+                    const option = document.createElement('option');
+                    option.value = account.id;
+                    option.textContent = `${account.name} - ${account.number}`;
+                    editBankAccount.appendChild(option);
                 });
                 
             } catch (error) {
@@ -1130,7 +1268,6 @@
                         typeText = 'تحصيل';
                         details = `من ${transaction.customerName || 'غير محدد'}`;
                         
-                        // إضافة معلومات الحساب البنكي إذا كان النوع "سحب من البطاقة"
                         if (transaction.collectionType === 'سحب من البطاقة' && transaction.bankAccountName) {
                             details += ` - ${transaction.bankAccountName}`;
                         } else {
@@ -1157,9 +1294,7 @@
                         break;
                 }
                 
-                const time = transaction.timestamp ? 
-                    new Date(transaction.timestamp.toDate ? transaction.timestamp.toDate() : transaction.timestamp)
-                        .toLocaleString('en-US') : 'غير محدد';
+                const time = formatDateTime(transaction.timestamp);
                 
                 div.innerHTML = `
                     <div class="flex items-center mb-2 md:mb-0">
@@ -1456,7 +1591,6 @@
                         .toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
                     let collectionInfo = `${collection.customerName || 'غير محدد'} - ${formatAmount(collection.amount)} ر.س`;
                     
-                    // إضافة معلومات الحساب البنكي إذا كان النوع "سحب من البطاقة"
                     if (collection.collectionType === 'سحب من البطاقة' && collection.bankAccountName) {
                         collectionInfo += ` - ${collection.bankAccountName}`;
                     } else {
@@ -1491,7 +1625,7 @@
             if (filteredTransactions.length === 0) {
                 tbody.innerHTML = `
                     <tr>
-                        <td colspan="5" class="text-center py-8 md:py-12">
+                        <td colspan="6" class="text-center py-8 md:py-12">
                             <i class="fas fa-search text-4xl md:text-6xl text-gray-300 mb-3 md:mb-4"></i>
                             <p class="text-lg md:text-xl text-gray-500">لا توجد معاملات تطابق المعايير</p>
                         </td>
@@ -1504,9 +1638,7 @@
                 const row = document.createElement('tr');
                 row.className = 'border-b border-gray-100 hover:bg-gray-50 transition-colors';
                 
-                const timestamp = transaction.timestamp ? 
-                    new Date(transaction.timestamp.toDate ? transaction.timestamp.toDate() : transaction.timestamp)
-                        .toLocaleString('en-US') : 'غير محدد';
+                const timestamp = formatDateTime(transaction.timestamp);
                 
                 let typeText = '';
                 let details = '';
@@ -1517,7 +1649,6 @@
                         typeText = '💰 تحصيل';
                         details = `العميل: ${transaction.customerName || 'غير محدد'}<br>النوع: ${transaction.collectionType || 'غير محدد'}`;
                         
-                        // إضافة معلومات الحساب البنكي إذا كان النوع "سحب من البطاقة"
                         if (transaction.collectionType === 'سحب من البطاقة' && transaction.bankAccountName) {
                             details += `<br>الحساب: ${transaction.bankAccountName}`;
                         }
@@ -1547,6 +1678,19 @@
                     <td class="p-2 md:p-4 text-xs md:text-base">${typeText}</td>
                     <td class="p-2 md:p-4 text-xs md:text-sm">${details}</td>
                     <td class="p-2 md:p-4 font-bold ${colorClass} text-xs md:text-base">${formatAmount(transaction.amount || 0)} ريال</td>
+                    <td class="p-2 md:p-4 text-xs md:text-base">
+                        <div class="action-buttons">
+                            <button onclick="editTransaction('${transaction.id}')" class="btn-edit text-white px-2 py-1 rounded text-xs">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button onclick="deleteTransaction('${transaction.id}')" class="btn-delete text-white px-2 py-1 rounded text-xs">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                            <button onclick="shareTransaction('${transaction.id}')" class="btn-share text-white px-2 py-1 rounded text-xs">
+                                <i class="fas fa-share"></i>
+                            </button>
+                        </div>
+                    </td>
                 `;
                 
                 tbody.appendChild(row);
@@ -1800,6 +1944,220 @@
             selectedBankAccountsDate = today;
             updateBankAccountsList();
         }
+
+        // ========== وظائف التعديل والحذف والمشاركة للمعاملات ==========
+        function editTransaction(transactionId) {
+            const transaction = allTransactions.find(t => t.id === transactionId);
+            if (!transaction) return;
+
+            document.getElementById('editTransactionId').value = transactionId;
+            document.getElementById('editTransactionType').value = transaction.type;
+            document.getElementById('editTransactionAmount').value = transaction.amount;
+            document.getElementById('editTransactionNotes').value = transaction.notes || '';
+
+            // إخفاء جميع الحقول أولاً
+            document.getElementById('editCollectionFields').classList.add('hidden');
+            document.getElementById('editDepositFields').classList.add('hidden');
+            document.getElementById('editExpenseFields').classList.add('hidden');
+            document.getElementById('editDeliveryFields').classList.add('hidden');
+
+            // تعبئة الحقول حسب نوع المعاملة
+            switch (transaction.type) {
+                case 'collection':
+                    document.getElementById('editCollectionFields').classList.remove('hidden');
+                    document.getElementById('editCustomerName').value = transaction.customerName || '';
+                    document.getElementById('editCollectionType').value = transaction.collectionType || 'نقدي';
+                    break;
+                case 'deposit':
+                    document.getElementById('editDepositFields').classList.remove('hidden');
+                    document.getElementById('editBankAccount').value = transaction.bankAccountId || '';
+                    break;
+                case 'expense':
+                    document.getElementById('editExpenseFields').classList.remove('hidden');
+                    document.getElementById('editExpenseType').value = transaction.expenseType || 'أخرى';
+                    document.getElementById('editExpenseDescription').value = transaction.description || '';
+                    break;
+                case 'delivery':
+                    document.getElementById('editDeliveryFields').classList.remove('hidden');
+                    document.getElementById('editDeliveryType').value = transaction.deliveryType || 'receive';
+                    document.getElementById('editDeliveryAgent').value = 
+                        transaction.deliveryType === 'receive' ? transaction.fromAgent : transaction.toAgent;
+                    break;
+            }
+
+            document.getElementById('editTransactionModal').classList.remove('hidden');
+        }
+
+        function toggleEditTransactionFields() {
+            const type = document.getElementById('editTransactionType').value;
+            
+            // إخفاء جميع الحقول أولاً
+            document.getElementById('editCollectionFields').classList.add('hidden');
+            document.getElementById('editDepositFields').classList.add('hidden');
+            document.getElementById('editExpenseFields').classList.add('hidden');
+            document.getElementById('editDeliveryFields').classList.add('hidden');
+
+            // إظهار الحقول المناسبة
+            switch (type) {
+                case 'collection':
+                    document.getElementById('editCollectionFields').classList.remove('hidden');
+                    break;
+                case 'deposit':
+                    document.getElementById('editDepositFields').classList.remove('hidden');
+                    break;
+                case 'expense':
+                    document.getElementById('editExpenseFields').classList.remove('hidden');
+                    break;
+                case 'delivery':
+                    document.getElementById('editDeliveryFields').classList.remove('hidden');
+                    break;
+            }
+        }
+
+        async function updateTransaction() {
+            const transactionId = document.getElementById('editTransactionId').value;
+            const type = document.getElementById('editTransactionType').value;
+            const amount = parseFloat(document.getElementById('editTransactionAmount').value);
+            const notes = document.getElementById('editTransactionNotes').value;
+
+            let updateData = {
+                type,
+                amount,
+                notes,
+                updatedAt: new Date()
+            };
+
+            // إضافة الحقول الإضافية حسب نوع المعاملة
+            switch (type) {
+                case 'collection':
+                    updateData.customerName = document.getElementById('editCustomerName').value;
+                    updateData.collectionType = document.getElementById('editCollectionType').value;
+                    break;
+                case 'deposit':
+                    updateData.bankAccountId = document.getElementById('editBankAccount').value;
+                    const selectedAccount = allBankAccounts.find(acc => acc.id === updateData.bankAccountId);
+                    if (selectedAccount) {
+                        updateData.bankAccount = selectedAccount.name;
+                    }
+                    break;
+                case 'expense':
+                    updateData.expenseType = document.getElementById('editExpenseType').value;
+                    updateData.description = document.getElementById('editExpenseDescription').value;
+                    break;
+                case 'delivery':
+                    updateData.deliveryType = document.getElementById('editDeliveryType').value;
+                    if (updateData.deliveryType === 'receive') {
+                        updateData.fromAgent = document.getElementById('editDeliveryAgent').value;
+                        updateData.toAgent = allTransactions.find(t => t.id === transactionId).agent;
+                    } else {
+                        updateData.fromAgent = allTransactions.find(t => t.id === transactionId).agent;
+                        updateData.toAgent = document.getElementById('editDeliveryAgent').value;
+                    }
+                    break;
+            }
+
+            try {
+                await db.collection('transactions').doc(transactionId).update(updateData);
+                
+                // تحديث البيانات المحلية
+                const index = allTransactions.findIndex(t => t.id === transactionId);
+                if (index !== -1) {
+                    allTransactions[index] = { ...allTransactions[index], ...updateData };
+                }
+                
+                // تحديث الواجهة
+                updateTransactionsList();
+                updateDashboard();
+                updateAgentsList();
+                updateBankAccountsList();
+                
+                showSuccessMessage('تم تعديل المعاملة بنجاح!');
+                hideEditTransactionModal();
+                
+            } catch (error) {
+                console.error('Error updating transaction:', error);
+                showSuccessMessage('حدث خطأ في تعديل المعاملة');
+            }
+        }
+
+        async function deleteTransaction(transactionId) {
+            if (!confirm('هل أنت متأكد من حذف هذه المعاملة؟')) return;
+
+            try {
+                await db.collection('transactions').doc(transactionId).delete();
+                
+                // إزالة من البيانات المحلية
+                allTransactions = allTransactions.filter(t => t.id !== transactionId);
+                filteredTransactions = filteredTransactions.filter(t => t.id !== transactionId);
+                
+                // تحديث الواجهة
+                updateTransactionsList();
+                updateDashboard();
+                updateAgentsList();
+                updateBankAccountsList();
+                
+                showSuccessMessage('تم حذف المعاملة بنجاح!');
+                
+            } catch (error) {
+                console.error('Error deleting transaction:', error);
+                showSuccessMessage('حدث خطأ في حذف المعاملة');
+            }
+        }
+
+        function shareTransaction(transactionId) {
+            const transaction = allTransactions.find(t => t.id === transactionId);
+            if (!transaction) return;
+
+            let shareText = `🏢 أبو حذيفة للصرافة والتحويلات\n`;
+            shareText += `📋 تفاصيل المعاملة\n`;
+            shareText += `━━━━━━━━━━━━━━━━━━━━\n\n`;
+            
+            const timestamp = formatDateTime(transaction.timestamp);
+            
+            shareText += `📅 التاريخ: ${timestamp}\n`;
+            shareText += `👤 المندوب: ${transaction.agent}\n`;
+            
+            switch (transaction.type) {
+                case 'collection':
+                    shareText += `💰 نوع المعاملة: تحصيل\n`;
+                    shareText += `👥 العميل: ${transaction.customerName || 'غير محدد'}\n`;
+                    shareText += `📋 نوع التحصيل: ${transaction.collectionType || 'غير محدد'}\n`;
+                    if (transaction.collectionType === 'سحب من البطاقة' && transaction.bankAccountName) {
+                        shareText += `🏦 الحساب البنكي: ${transaction.bankAccountName}\n`;
+                    }
+                    break;
+                case 'deposit':
+                    shareText += `🏦 نوع المعاملة: إيداع\n`;
+                    shareText += `🏛️ الحساب البنكي: ${transaction.bankAccount || 'غير محدد'}\n`;
+                    break;
+                case 'expense':
+                    shareText += `💸 نوع المعاملة: مصروف\n`;
+                    shareText += `📋 نوع المصروف: ${transaction.expenseType || 'غير محدد'}\n`;
+                    shareText += `📝 الوصف: ${transaction.description || 'غير محدد'}\n`;
+                    break;
+                case 'delivery':
+                    shareText += `📦 نوع المعاملة: ${transaction.deliveryType === 'receive' ? 'استلام' : 'تسليم'}\n`;
+                    shareText += `👤 ${transaction.deliveryType === 'receive' ? 'من' : 'إلى'}: ${transaction.deliveryType === 'receive' ? transaction.fromAgent : transaction.toAgent}\n`;
+                    break;
+            }
+            
+            shareText += `💵 المبلغ: ${formatAmount(transaction.amount)} ريال\n`;
+            
+            if (transaction.notes) {
+                shareText += `📝 الملاحظات: ${transaction.notes}\n`;
+            }
+
+            document.getElementById('shareText').value = shareText;
+            document.getElementById('shareModal').classList.remove('hidden');
+        }
+
+        function hideEditTransactionModal() {
+            document.getElementById('editTransactionModal').classList.add('hidden');
+            document.getElementById('editTransactionForm').reset();
+        }
+
+        // باقي الدوال (generateReport, shareGeneratedReport, etc.) تبقى كما هي
+        // ... [الكود المتبقي يبقى كما هو]
 
         function generateReport() {
             const reportType = document.getElementById('reportType').value;
@@ -2227,7 +2585,6 @@
                     case 'collection':
                         details = `العميل: ${transaction.customerName || 'غير محدد'} - النوع: ${transaction.collectionType || 'غير محدد'}`;
                         
-                        // إضافة معلومات الحساب البنكي إذا كان النوع "سحب من البطاقة"
                         if (transaction.collectionType === 'سحب من البطاقة' && transaction.bankAccountName) {
                             details += ` - الحساب: ${transaction.bankAccountName}`;
                         }
