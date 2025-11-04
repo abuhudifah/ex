@@ -12,7 +12,6 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <style>
-        /* الأنماط تبقى كما هي */
         body {
             box-sizing: border-box;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -414,6 +413,29 @@
         .btn-share {
             background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
         }
+        
+        /* كشف الحساب التراكمي */
+        .statement-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1rem;
+        }
+        
+        .statement-table th,
+        .statement-table td {
+            padding: 0.75rem;
+            text-align: right;
+            border-bottom: 1px solid #e5e7eb;
+        }
+        
+        .statement-table th {
+            background-color: #f8fafc;
+            font-weight: 600;
+        }
+        
+        .statement-table tr:hover {
+            background-color: #f9fafb;
+        }
     </style>
 </head>
 <body class="min-h-full">
@@ -422,7 +444,7 @@
         <div class="container mx-auto header-container">
             <div class="header-main">
                 <div class="logo-container rounded-full p-1 md:p-2">
-                    <img src="https://i.ibb.co/whLbwk4s/20250730-012920.png" alt="شعار شركة أبو حذيفة" class="h-12 w-12 md:h-16 md:w-16 rounded-full object-cover">
+                    <img src="https://i.ibb.co/ZzzbL3Rg/image.png" alt="شعار شركة أبو حذيفة" class="h-12 w-12 md:h-16 md:w-16 rounded-full object-cover">
                 </div>
                 <div class="text-center md:text-right">
                     <h1 class="text-xl md:text-3xl font-bold mb-1">🏢 لوحة الإدارة المتقدمة</h1>
@@ -553,9 +575,14 @@
                             <p class="text-sm md:text-gray-600">عرض وإدارة جميع المندوبين في النظام</p>
                         </div>
                     </div>
-                    <button onclick="exportAgentsReport()" class="btn-admin text-white px-4 md:px-6 py-2 md:py-3 rounded-xl font-semibold self-start md:self-auto mt-2 md:mt-0">
-                        <i class="fas fa-download ml-1 md:ml-2"></i>تصدير التقرير
-                    </button>
+                    <div class="flex flex-col md:flex-row gap-2 md:gap-3">
+                        <button onclick="exportAgentsReport()" class="btn-admin text-white px-4 md:px-6 py-2 md:py-3 rounded-xl font-semibold text-sm md:text-base">
+                            <i class="fas fa-download ml-1 md:ml-2"></i>تصدير التقرير
+                        </button>
+                        <button onclick="showAddAgentModal()" class="bg-green-600 text-white px-4 md:px-6 py-2 md:py-3 rounded-xl font-semibold text-sm md:text-base">
+                            <i class="fas fa-plus ml-1 md:ml-2"></i>إضافة مندوب
+                        </button>
+                    </div>
                 </div>
                 
                 <!-- Date Filter for Agents -->
@@ -581,13 +608,6 @@
                         <i class="fas fa-info-circle ml-1 md:ml-2"></i>
                         <span id="agentsDateInfo">يتم عرض أداء المندوبين في اليوم الحالي فقط</span>
                     </div>
-                </div>
-                
-                <!-- كشف حساب المندوبين -->
-                <div class="mb-6">
-                    <button onclick="showAllAgentsStatement()" class="w-full md:w-auto px-4 py-3 bg-indigo-600 text-white rounded-xl font-semibold hover:bg-indigo-700 transition-all text-sm md:text-base mb-4">
-                        <i class="fas fa-file-invoice ml-2"></i>كشف حساب تراكمي لجميع المندوبين
-                    </button>
                 </div>
                 
                 <div id="agentsList" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6"></div>
@@ -945,35 +965,69 @@
         </div>
     </div>
 
-    <!-- Agent Statement Modal -->
-    <div id="agentStatementModal" class="fixed inset-0 modal-backdrop flex items-center justify-center z-50 hidden p-2 md:p-4">
-        <div class="glass-card rounded-xl md:rounded-2xl p-4 md:p-8 w-full max-w-6xl mx-2 md:mx-4 max-h-80 md:max-h-96 overflow-y-auto">
+    <!-- Add Agent Modal -->
+    <div id="addAgentModal" class="fixed inset-0 modal-backdrop flex items-center justify-center z-50 hidden p-2 md:p-4">
+        <div class="glass-card rounded-xl md:rounded-2xl p-4 md:p-8 w-full max-w-md mx-2 md:mx-4">
             <div class="flex items-center mb-4 md:mb-6">
                 <div class="bg-blue-100 p-2 md:p-3 rounded-full ml-2 md:ml-4">
-                    <i class="fas fa-file-invoice text-blue-600 text-lg md:text-xl"></i>
+                    <i class="fas fa-user-plus text-blue-600 text-lg md:text-xl"></i>
                 </div>
-                <h3 class="text-xl md:text-2xl font-bold text-gray-800" id="statementTitle">كشف حساب المندوب</h3>
+                <h3 class="text-xl md:text-2xl font-bold text-gray-800">إضافة مندوب جديد</h3>
             </div>
-            <div id="statementContent" class="space-y-4">
-                <!-- سيتم تعبئة المحتوى هنا -->
-            </div>
-            <div class="flex flex-col md:flex-row gap-2 md:gap-4 mt-4 md:mt-6">
-                <button onclick="hideAgentStatementModal()" class="flex-1 bg-gray-500 text-white py-3 rounded-xl font-semibold hover:bg-gray-600 transition-colors">
-                    <i class="fas fa-times ml-2"></i>إغلاق
+            <form id="addAgentForm" class="space-y-4 md:space-y-6">
+                <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-2">اسم المندوب</label>
+                    <input type="text" id="newAgentName" class="w-full p-3 form-input rounded-xl" required>
+                </div>
+                <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-2">البريد الإلكتروني</label>
+                    <input type="email" id="newAgentEmail" class="w-full p-3 form-input rounded-xl">
+                </div>
+                <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-2">رقم الهاتف</label>
+                    <input type="tel" id="newAgentPhone" class="w-full p-3 form-input rounded-xl">
+                </div>
+                <div class="flex flex-col md:flex-row gap-2 md:gap-4 mt-4 md:mt-6">
+                    <button type="submit" class="flex-1 btn-admin text-white py-3 rounded-xl font-semibold">
+                        <i class="fas fa-save ml-2"></i>إضافة المندوب
+                    </button>
+                    <button type="button" onclick="hideAddAgentModal()" class="flex-1 bg-gray-500 text-white py-3 rounded-xl font-semibold hover:bg-gray-600 transition-colors">
+                        <i class="fas fa-times ml-2"></i>إلغاء
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Agent Statement Modal -->
+    <div id="agentStatementModal" class="fixed inset-0 modal-backdrop flex items-center justify-center z-50 hidden p-2 md:p-4">
+        <div class="glass-card rounded-xl md:rounded-2xl p-4 md:p-8 w-full max-w-6xl mx-2 md:mx-4 max-h-96 md:max-h-[80vh] overflow-y-auto">
+            <div class="flex items-center justify-between mb-4 md:mb-6">
+                <div class="flex items-center">
+                    <div class="bg-blue-100 p-2 md:p-3 rounded-full ml-2 md:ml-4">
+                        <i class="fas fa-file-invoice text-blue-600 text-lg md:text-xl"></i>
+                    </div>
+                    <h3 class="text-xl md:text-2xl font-bold text-gray-800" id="statementTitle">كشف حساب مندوب</h3>
+                </div>
+                <button onclick="hideAgentStatementModal()" class="bg-gray-500 text-white p-2 rounded-full hover:bg-gray-600 transition-colors">
+                    <i class="fas fa-times"></i>
                 </button>
+            </div>
+            <div id="agentStatementContent" class="space-y-4">
+                <!-- سيتم ملء المحتوى هنا -->
             </div>
         </div>
     </div>
 
     <script>
-        // Firebase Configuration - محدث
+        // Firebase Configuration
         const firebaseConfig = {
-            apiKey: "AIzaSyAizCuDiHNIBORzr-L82g55kZ8KDckgN4I",
-            authDomain: "app-new1-975e5.firebaseapp.com",
-            projectId: "app-new1-975e5",
-            storageBucket: "app-new1-975e5.firebasestorage.app",
-            messagingSenderId: "903391698039",
-            appId: "1:903391698039:web:dfa21c4cad0f1a27efba72"
+            apiKey: "AIzaSyCZ9IUXRK-5Kb-TWhQL9nuwse_lmdCzP9g",
+            authDomain: "abu-hatheefa-app-68ff1.firebaseapp.com",
+            projectId: "abu-hatheefa-app-68ff1",
+            storageBucket: "abu-hatheefa-app-68ff1.firebasestorage.app",
+            messagingSenderId: "33088080519",
+            appId: "1:33088080519:web:d7ee753b3751a0d2828622"
         };
 
         // Initialize Firebase
@@ -1009,7 +1063,7 @@
             });
         }
 
-        // دالة لحساب الرصيد من اليوم السابق - محسنة
+        // دالة لحساب الرصيد من اليوم السابق
         async function calculatePreviousDayBalance(agentName, selectedDate) {
             try {
                 const selectedDateObj = new Date(selectedDate);
@@ -1025,35 +1079,30 @@
                     return transactionDate.toISOString().split('T')[0] === previousDateStr;
                 });
 
-                return calculateBalanceFromTransactions(previousDayTransactions, agentName);
+                const collections = previousDayTransactions.filter(t => t.type === 'collection');
+                const deposits = previousDayTransactions.filter(t => t.type === 'deposit');
+                const expenses = previousDayTransactions.filter(t => t.type === 'expense');
+                const deliveries = previousDayTransactions.filter(t => t.type === 'delivery');
+                
+                const totalCollections = collections.reduce((sum, t) => sum + (t.amount || 0), 0);
+                const totalDeposits = deposits.reduce((sum, t) => sum + (t.amount || 0), 0);
+                const totalExpenses = expenses.reduce((sum, t) => sum + (t.amount || 0), 0);
+                
+                // حساب الاستلام والتسليم بشكل منفصل
+                const receivedDeliveries = deliveries.filter(t => t.deliveryType === 'receive' && t.toAgent === agentName);
+                const sentDeliveries = deliveries.filter(t => t.deliveryType === 'send' && t.fromAgent === agentName);
+                
+                const totalReceived = receivedDeliveries.reduce((sum, t) => sum + (t.amount || 0), 0);
+                const totalSent = sentDeliveries.reduce((sum, t) => sum + (t.amount || 0), 0);
+                
+                // حساب الرصيد النهائي لليوم السابق
+                const previousBalance = totalCollections + totalReceived - totalDeposits - totalExpenses - totalSent;
+                
+                return previousBalance;
             } catch (error) {
                 console.error('Error calculating previous day balance:', error);
                 return 0;
             }
-        }
-
-        // دالة جديدة لحساب الرصيد من مجموعة معاملات
-        function calculateBalanceFromTransactions(transactions, agentName) {
-            const collections = transactions.filter(t => t.type === 'collection');
-            const deposits = transactions.filter(t => t.type === 'deposit');
-            const expenses = transactions.filter(t => t.type === 'expense');
-            const deliveries = transactions.filter(t => t.type === 'delivery');
-            
-            const totalCollections = collections.reduce((sum, t) => sum + (t.amount || 0), 0);
-            const totalDeposits = deposits.reduce((sum, t) => sum + (t.amount || 0), 0);
-            const totalExpenses = expenses.reduce((sum, t) => sum + (t.amount || 0), 0);
-            
-            // حساب الاستلام والتسليم بشكل منفصل
-            const receivedDeliveries = deliveries.filter(t => t.deliveryType === 'receive' && t.toAgent === agentName);
-            const sentDeliveries = deliveries.filter(t => t.deliveryType === 'send' && t.fromAgent === agentName);
-            
-            const totalReceived = receivedDeliveries.reduce((sum, t) => sum + (t.amount || 0), 0);
-            const totalSent = sentDeliveries.reduce((sum, t) => sum + (t.amount || 0), 0);
-            
-            // حساب الرصيد النهائي
-            const balance = totalCollections + totalReceived - totalDeposits - totalExpenses - totalSent;
-            
-            return balance;
         }
 
         // Initialize App
@@ -1078,6 +1127,12 @@
             document.getElementById('editTransactionForm').addEventListener('submit', function(e) {
                 e.preventDefault();
                 updateTransaction();
+            });
+
+            // Setup add agent form listener
+            document.getElementById('addAgentForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+                addNewAgent();
             });
         });
 
@@ -1491,11 +1546,27 @@
                     return transactionDate.toISOString().split('T')[0] === selectedAgentsDate;
                 });
                 
+                const collections = agentSelectedDateTransactions.filter(t => t.type === 'collection');
+                const deposits = agentSelectedDateTransactions.filter(t => t.type === 'deposit');
+                const expenses = agentSelectedDateTransactions.filter(t => t.type === 'expense');
+                const deliveries = agentSelectedDateTransactions.filter(t => t.type === 'delivery');
+                
+                const totalCollections = collections.reduce((sum, t) => sum + (t.amount || 0), 0);
+                const totalDeposits = deposits.reduce((sum, t) => sum + (t.amount || 0), 0);
+                const totalExpenses = expenses.reduce((sum, t) => sum + (t.amount || 0), 0);
+                
+                // حساب الاستلام والتسليم بشكل منفصل
+                const receivedDeliveries = deliveries.filter(t => t.deliveryType === 'receive' && t.toAgent === agent.name);
+                const sentDeliveries = deliveries.filter(t => t.deliveryType === 'send' && t.fromAgent === agent.name);
+                
+                const totalReceived = receivedDeliveries.reduce((sum, t) => sum + (t.amount || 0), 0);
+                const totalSent = sentDeliveries.reduce((sum, t) => sum + (t.amount || 0), 0);
+                
                 // حساب الرصيد من اليوم السابق
                 const previousBalance = await calculatePreviousDayBalance(agent.name, selectedAgentsDate);
                 
-                // حساب الرصيد الحالي (ليوم محدد) مع احتساب الرصيد السابق
-                const currentBalance = previousBalance + calculateBalanceFromTransactions(agentSelectedDateTransactions, agent.name);
+                // حساب الرصيد المتبقي الحالي (ليوم محدد) مع احتساب الرصيد السابق
+                const currentBalance = previousBalance + totalCollections + totalReceived - totalDeposits - totalExpenses - totalSent;
                 
                 const lastLogin = agent.lastLogin ? 
                     new Date(agent.lastLogin.toDate ? agent.lastLogin.toDate() : agent.lastLogin)
@@ -1520,7 +1591,7 @@
                         <div class="grid grid-cols-2 gap-3 md:gap-4 mb-3 md:mb-4">
                             <div>
                                 <p class="text-xs opacity-70">التحصيلات اليوم</p>
-                                <p class="text-base md:text-lg font-bold">${formatAmount(calculateTotalCollections(agentSelectedDateTransactions))}</p>
+                                <p class="text-base md:text-lg font-bold">${formatAmount(totalCollections)}</p>
                             </div>
                             <div>
                                 <p class="text-xs opacity-70">الرصيد المتبقي الحالي</p>
@@ -1541,18 +1612,21 @@
                         </div>
                         <div class="flex justify-between text-xs md:text-sm">
                             <span class="opacity-70">استلم اليوم:</span>
-                            <span class="font-semibold text-green-300">${formatAmount(calculateTotalReceived(agentSelectedDateTransactions, agent.name))}</span>
+                            <span class="font-semibold text-green-300">${formatAmount(totalReceived)}</span>
                         </div>
                         <div class="flex justify-between text-xs md:text-sm">
                             <span class="opacity-70">سلم اليوم:</span>
-                            <span class="font-semibold text-red-300">${formatAmount(calculateTotalSent(agentSelectedDateTransactions, agent.name))}</span>
+                            <span class="font-semibold text-red-300">${formatAmount(totalSent)}</span>
                         </div>
-                        <div class="flex space-x-2 mt-3 md:mt-4">
-                            <button onclick="showAgentDayDetails('${agent.name}', '${selectedAgentsDate}', ${previousBalance})" class="flex-1 bg-white bg-opacity-20 hover:bg-opacity-30 py-2 rounded-lg transition-all text-sm md:text-base">
-                                <i class="fas fa-chart-bar ml-1 md:ml-2"></i>تفاصيل اليوم
+                        <div class="flex flex-col gap-2 mt-3 md:mt-4">
+                            <button onclick="showAgentDayDetails('${agent.name}', '${selectedAgentsDate}', ${previousBalance})" class="w-full bg-white bg-opacity-20 hover:bg-opacity-30 py-2 rounded-lg transition-all text-sm md:text-base">
+                                <i class="fas fa-chart-bar ml-1 md:ml-2"></i>عرض تفاصيل اليوم
                             </button>
-                            <button onclick="showAgentStatement('${agent.name}')" class="flex-1 bg-white bg-opacity-20 hover:bg-opacity-30 py-2 rounded-lg transition-all text-sm md:text-base">
-                                <i class="fas fa-file-invoice ml-1 md:ml-2"></i>كشف حساب
+                            <button onclick="showAgentStatement('${agent.name}')" class="w-full bg-white bg-opacity-20 hover:bg-opacity-30 py-2 rounded-lg transition-all text-sm md:text-base">
+                                <i class="fas fa-file-invoice ml-1 md:ml-2"></i>كشف حساب تراكمي
+                            </button>
+                            <button onclick="deleteAgent('${agent.id}', '${agent.name}')" class="w-full bg-red-600 hover:bg-red-700 py-2 rounded-lg transition-all text-sm md:text-base">
+                                <i class="fas fa-trash ml-1 md:ml-2"></i>حذف المندوب
                             </button>
                         </div>
                     </div>
@@ -1560,257 +1634,6 @@
                 agentsList.appendChild(div);
             }
         }
-
-        // دوال مساعدة لحساب المبالغ
-        function calculateTotalCollections(transactions) {
-            const collections = transactions.filter(t => t.type === 'collection');
-            return collections.reduce((sum, t) => sum + (t.amount || 0), 0);
-        }
-
-        function calculateTotalReceived(transactions, agentName) {
-            const deliveries = transactions.filter(t => t.type === 'delivery');
-            const receivedDeliveries = deliveries.filter(t => t.deliveryType === 'receive' && t.toAgent === agentName);
-            return receivedDeliveries.reduce((sum, t) => sum + (t.amount || 0), 0);
-        }
-
-        function calculateTotalSent(transactions, agentName) {
-            const deliveries = transactions.filter(t => t.type === 'delivery');
-            const sentDeliveries = deliveries.filter(t => t.deliveryType === 'send' && t.fromAgent === agentName);
-            return sentDeliveries.reduce((sum, t) => sum + (t.amount || 0), 0);
-        }
-
-        // دالة لعرض كشف حساب المندوب
-        async function showAgentStatement(agentName) {
-            document.getElementById('statementTitle').textContent = `كشف حساب تراكمي - ${agentName}`;
-            const statementContent = document.getElementById('statementContent');
-            statementContent.innerHTML = '<div class="loading text-center py-8">جاري تحميل البيانات...</div>';
-
-            document.getElementById('agentStatementModal').classList.remove('hidden');
-
-            try {
-                // جلب جميع معاملات المندوب
-                const agentTransactions = allTransactions.filter(t => t.agent === agentName);
-                
-                if (agentTransactions.length === 0) {
-                    statementContent.innerHTML = '<div class="text-center py-8 text-gray-500">لا توجد معاملات لهذا المندوب</div>';
-                    return;
-                }
-
-                // تجميع المعاملات حسب التاريخ
-                const transactionsByDate = {};
-                agentTransactions.forEach(transaction => {
-                    const date = new Date(transaction.timestamp.toDate ? 
-                        transaction.timestamp.toDate() : transaction.timestamp);
-                    const dateStr = date.toISOString().split('T')[0];
-                    
-                    if (!transactionsByDate[dateStr]) {
-                        transactionsByDate[dateStr] = [];
-                    }
-                    transactionsByDate[dateStr].push(transaction);
-                });
-
-                // ترتيب التواريخ من الأحدث إلى الأقدم
-                const sortedDates = Object.keys(transactionsByDate).sort((a, b) => new Date(b) - new Date(a));
-
-                let totalCollections = 0;
-                let totalDeposits = 0;
-                let totalExpenses = 0;
-                let totalReceived = 0;
-                let totalSent = 0;
-                let runningBalance = 0;
-
-                let html = `
-                    <div class="overflow-x-auto">
-                        <table class="w-full min-w-full text-sm md:text-base">
-                            <thead>
-                                <tr class="bg-gray-100">
-                                    <th class="p-2 md:p-3 text-right font-semibold">التاريخ</th>
-                                    <th class="p-2 md:p-3 text-right font-semibold">التحصيلات</th>
-                                    <th class="p-2 md:p-3 text-right font-semibold">الإيداعات</th>
-                                    <th class="p-2 md:p-3 text-right font-semibold">المصروفات</th>
-                                    <th class="p-2 md:p-3 text-right font-semibold">المستلم</th>
-                                    <th class="p-2 md:p-3 text-right font-semibold">المسلم</th>
-                                    <th class="p-2 md:p-3 text-right font-semibold">رصيد اليوم</th>
-                                    <th class="p-2 md:p-3 text-right font-semibold">الرصيد التراكمي</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                `;
-
-                sortedDates.forEach(dateStr => {
-                    const dateTransactions = transactionsByDate[dateStr];
-                    const dateObj = new Date(dateStr);
-                    
-                    const collections = dateTransactions.filter(t => t.type === 'collection');
-                    const deposits = dateTransactions.filter(t => t.type === 'deposit');
-                    const expenses = dateTransactions.filter(t => t.type === 'expense');
-                    const deliveries = dateTransactions.filter(t => t.type === 'delivery');
-                    
-                    const dayCollections = collections.reduce((sum, t) => sum + (t.amount || 0), 0);
-                    const dayDeposits = deposits.reduce((sum, t) => sum + (t.amount || 0), 0);
-                    const dayExpenses = expenses.reduce((sum, t) => sum + (t.amount || 0), 0);
-                    
-                    const receivedDeliveries = deliveries.filter(t => t.deliveryType === 'receive' && t.toAgent === agentName);
-                    const sentDeliveries = deliveries.filter(t => t.deliveryType === 'send' && t.fromAgent === agentName);
-                    
-                    const dayReceived = receivedDeliveries.reduce((sum, t) => sum + (t.amount || 0), 0);
-                    const daySent = sentDeliveries.reduce((sum, t) => sum + (t.amount || 0), 0);
-                    
-                    const dayBalance = dayCollections + dayReceived - dayDeposits - dayExpenses - daySent;
-                    runningBalance += dayBalance;
-
-                    totalCollections += dayCollections;
-                    totalDeposits += dayDeposits;
-                    totalExpenses += dayExpenses;
-                    totalReceived += dayReceived;
-                    totalSent += daySent;
-
-                    html += `
-                        <tr class="border-b hover:bg-gray-50">
-                            <td class="p-2 md:p-3">${dateObj.toLocaleDateString('en-US')}</td>
-                            <td class="p-2 md:p-3 text-green-600">${formatAmount(dayCollections)}</td>
-                            <td class="p-2 md:p-3 text-blue-600">${formatAmount(dayDeposits)}</td>
-                            <td class="p-2 md:p-3 text-red-600">${formatAmount(dayExpenses)}</td>
-                            <td class="p-2 md:p-3 text-green-600">${formatAmount(dayReceived)}</td>
-                            <td class="p-2 md:p-3 text-red-600">${formatAmount(daySent)}</td>
-                            <td class="p-2 md:p-3 font-semibold ${dayBalance >= 0 ? 'text-green-600' : 'text-red-600'}">${formatAmount(dayBalance)}</td>
-                            <td class="p-2 md:p-3 font-bold ${runningBalance >= 0 ? 'text-green-600' : 'text-red-600'}">${formatAmount(runningBalance)}</td>
-                        </tr>
-                    `;
-                });
-
-                html += `
-                            </tbody>
-                            <tfoot class="bg-gray-100 font-semibold">
-                                <tr>
-                                    <td class="p-2 md:p-3">الإجمالي</td>
-                                    <td class="p-2 md:p-3 text-green-600">${formatAmount(totalCollections)}</td>
-                                    <td class="p-2 md:p-3 text-blue-600">${formatAmount(totalDeposits)}</td>
-                                    <td class="p-2 md:p-3 text-red-600">${formatAmount(totalExpenses)}</td>
-                                    <td class="p-2 md:p-3 text-green-600">${formatAmount(totalReceived)}</td>
-                                    <td class="p-2 md:p-3 text-red-600">${formatAmount(totalSent)}</td>
-                                    <td class="p-2 md:p-3" colspan="2"></td>
-                                </tr>
-                                <tr>
-                                    <td class="p-2 md:p-3" colspan="7">الرصيد النهائي</td>
-                                    <td class="p-2 md:p-3 font-bold text-lg ${runningBalance >= 0 ? 'text-green-600' : 'text-red-600'}">${formatAmount(runningBalance)}</td>
-                                </tr>
-                            </tfoot>
-                        </table>
-                    </div>
-                `;
-
-                statementContent.innerHTML = html;
-
-            } catch (error) {
-                console.error('Error generating agent statement:', error);
-                statementContent.innerHTML = '<div class="text-center py-8 text-red-500">حدث خطأ في تحميل البيانات</div>';
-            }
-        }
-
-        // دالة لعرض كشف حساب لجميع المندوبين
-        async function showAllAgentsStatement() {
-            document.getElementById('statementTitle').textContent = 'كشف حساب تراكمي لجميع المندوبين';
-            const statementContent = document.getElementById('statementContent');
-            statementContent.innerHTML = '<div class="loading text-center py-8">جاري تحميل البيانات...</div>';
-
-            document.getElementById('agentStatementModal').classList.remove('hidden');
-
-            try {
-                let html = `
-                    <div class="overflow-x-auto">
-                        <table class="w-full min-w-full text-sm md:text-base">
-                            <thead>
-                                <tr class="bg-gray-100">
-                                    <th class="p-2 md:p-3 text-right font-semibold">المندوب</th>
-                                    <th class="p-2 md:p-3 text-right font-semibold">التحصيلات</th>
-                                    <th class="p-2 md:p-3 text-right font-semibold">الإيداعات</th>
-                                    <th class="p-2 md:p-3 text-right font-semibold">المصروفات</th>
-                                    <th class="p-2 md:p-3 text-right font-semibold">المستلم</th>
-                                    <th class="p-2 md:p-3 text-right font-semibold">المسلم</th>
-                                    <th class="p-2 md:p-3 text-right font-semibold">الرصيد الحالي</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                `;
-
-                let grandTotalCollections = 0;
-                let grandTotalDeposits = 0;
-                let grandTotalExpenses = 0;
-                let grandTotalReceived = 0;
-                let grandTotalSent = 0;
-
-                for (const agent of allAgents) {
-                    const agentTransactions = allTransactions.filter(t => t.agent === agent.name);
-                    
-                    const collections = agentTransactions.filter(t => t.type === 'collection');
-                    const deposits = agentTransactions.filter(t => t.type === 'deposit');
-                    const expenses = agentTransactions.filter(t => t.type === 'expense');
-                    const deliveries = agentTransactions.filter(t => t.type === 'delivery');
-                    
-                    const totalCollections = collections.reduce((sum, t) => sum + (t.amount || 0), 0);
-                    const totalDeposits = deposits.reduce((sum, t) => sum + (t.amount || 0), 0);
-                    const totalExpenses = expenses.reduce((sum, t) => sum + (t.amount || 0), 0);
-                    
-                    const receivedDeliveries = deliveries.filter(t => t.deliveryType === 'receive' && t.toAgent === agent.name);
-                    const sentDeliveries = deliveries.filter(t => t.deliveryType === 'send' && t.fromAgent === agent.name);
-                    
-                    const totalReceived = receivedDeliveries.reduce((sum, t) => sum + (t.amount || 0), 0);
-                    const totalSent = sentDeliveries.reduce((sum, t) => sum + (t.amount || 0), 0);
-                    
-                    const currentBalance = totalCollections + totalReceived - totalDeposits - totalExpenses - totalSent;
-
-                    grandTotalCollections += totalCollections;
-                    grandTotalDeposits += totalDeposits;
-                    grandTotalExpenses += totalExpenses;
-                    grandTotalReceived += totalReceived;
-                    grandTotalSent += totalSent;
-
-                    html += `
-                        <tr class="border-b hover:bg-gray-50">
-                            <td class="p-2 md:p-3 font-semibold">${agent.name}</td>
-                            <td class="p-2 md:p-3 text-green-600">${formatAmount(totalCollections)}</td>
-                            <td class="p-2 md:p-3 text-blue-600">${formatAmount(totalDeposits)}</td>
-                            <td class="p-2 md:p-3 text-red-600">${formatAmount(totalExpenses)}</td>
-                            <td class="p-2 md:p-3 text-green-600">${formatAmount(totalReceived)}</td>
-                            <td class="p-2 md:p-3 text-red-600">${formatAmount(totalSent)}</td>
-                            <td class="p-2 md:p-3 font-bold ${currentBalance >= 0 ? 'text-green-600' : 'text-red-600'}">${formatAmount(currentBalance)}</td>
-                        </tr>
-                    `;
-                }
-
-                const grandTotalBalance = grandTotalCollections + grandTotalReceived - grandTotalDeposits - grandTotalExpenses - grandTotalSent;
-
-                html += `
-                            </tbody>
-                            <tfoot class="bg-gray-100 font-semibold">
-                                <tr>
-                                    <td class="p-2 md:p-3">الإجمالي العام</td>
-                                    <td class="p-2 md:p-3 text-green-600">${formatAmount(grandTotalCollections)}</td>
-                                    <td class="p-2 md:p-3 text-blue-600">${formatAmount(grandTotalDeposits)}</td>
-                                    <td class="p-2 md:p-3 text-red-600">${formatAmount(grandTotalExpenses)}</td>
-                                    <td class="p-2 md:p-3 text-green-600">${formatAmount(grandTotalReceived)}</td>
-                                    <td class="p-2 md:p-3 text-red-600">${formatAmount(grandTotalSent)}</td>
-                                    <td class="p-2 md:p-3 font-bold text-lg ${grandTotalBalance >= 0 ? 'text-green-600' : 'text-red-600'}">${formatAmount(grandTotalBalance)}</td>
-                                </tr>
-                            </tfoot>
-                        </table>
-                    </div>
-                `;
-
-                statementContent.innerHTML = html;
-
-            } catch (error) {
-                console.error('Error generating all agents statement:', error);
-                statementContent.innerHTML = '<div class="text-center py-8 text-red-500">حدث خطأ في تحميل البيانات</div>';
-            }
-        }
-
-        function hideAgentStatementModal() {
-            document.getElementById('agentStatementModal').classList.add('hidden');
-        }
-
-        // ... [بقية الدوال تبقى كما هي مع التعديلات الطفيفة] ...
 
         async function showAgentDayDetails(agentName, selectedDate, previousBalance) {
             // الحصول على جميع معاملات المندوب في اليوم المحدد فقط
@@ -1889,7 +1712,420 @@
             document.getElementById('shareModal').classList.remove('hidden');
         }
 
-        // ... [بقية الدوال تبقى كما هي] ...
+        // ========== كشف الحساب التراكمي للمندوب ==========
+        async function showAgentStatement(agentName) {
+            const agentTransactions = allTransactions
+                .filter(t => t.agent === agentName)
+                .sort((a, b) => {
+                    const dateA = a.timestamp ? (a.timestamp.toDate ? a.timestamp.toDate() : new Date(a.timestamp)) : new Date(0);
+                    const dateB = b.timestamp ? (b.timestamp.toDate ? b.timestamp.toDate() : new Date(b.timestamp)) : new Date(0);
+                    return dateB - dateA;
+                });
+
+            let runningBalance = 0;
+            const statementData = [];
+
+            // حساب الرصيد التراكمي
+            agentTransactions.forEach(transaction => {
+                let amount = transaction.amount || 0;
+                
+                switch (transaction.type) {
+                    case 'collection':
+                        runningBalance += amount;
+                        break;
+                    case 'deposit':
+                        runningBalance -= amount;
+                        break;
+                    case 'expense':
+                        runningBalance -= amount;
+                        break;
+                    case 'delivery':
+                        if (transaction.deliveryType === 'receive' && transaction.toAgent === agentName) {
+                            runningBalance += amount;
+                        } else if (transaction.deliveryType === 'send' && transaction.fromAgent === agentName) {
+                            runningBalance -= amount;
+                        }
+                        break;
+                }
+
+                statementData.push({
+                    date: formatDateTime(transaction.timestamp),
+                    type: transaction.type,
+                    description: getTransactionDescription(transaction),
+                    amount: amount,
+                    balance: runningBalance
+                });
+            });
+
+            const statementContent = document.getElementById('agentStatementContent');
+            statementContent.innerHTML = `
+                <div class="bg-white rounded-lg p-4 md:p-6">
+                    <h4 class="text-lg md:text-xl font-bold text-gray-800 mb-4">كشف حساب تراكمي - ${agentName}</h4>
+                    <div class="overflow-x-auto">
+                        <table class="statement-table">
+                            <thead>
+                                <tr>
+                                    <th>التاريخ</th>
+                                    <th>النوع</th>
+                                    <th>الوصف</th>
+                                    <th>المبلغ</th>
+                                    <th>الرصيد</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${statementData.map(item => `
+                                    <tr>
+                                        <td>${item.date}</td>
+                                        <td>${getTypeArabicName(item.type)}</td>
+                                        <td>${item.description}</td>
+                                        <td class="${getAmountColor(item.type, item.amount)}">${formatAmount(item.amount)}</td>
+                                        <td class="${item.balance >= 0 ? 'text-green-600' : 'text-red-600'}">${formatAmount(item.balance)}</td>
+                                    </tr>
+                                `).join('')}
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="mt-4 p-4 bg-gray-50 rounded-lg">
+                        <p class="text-lg font-bold ${runningBalance >= 0 ? 'text-green-600' : 'text-red-600'}">
+                            الرصيد النهائي: ${formatAmount(runningBalance)} ريال
+                        </p>
+                    </div>
+                </div>
+            `;
+
+            document.getElementById('statementTitle').textContent = `كشف حساب تراكمي - ${agentName}`;
+            document.getElementById('agentStatementModal').classList.remove('hidden');
+        }
+
+        function getTransactionDescription(transaction) {
+            switch (transaction.type) {
+                case 'collection':
+                    return `تحصيل من ${transaction.customerName || 'غير محدد'} - ${transaction.collectionType || 'غير محدد'}`;
+                case 'deposit':
+                    return `إيداع في ${transaction.bankAccount || 'غير محدد'}`;
+                case 'expense':
+                    return `مصروف ${transaction.expenseType || 'غير محدد'} - ${transaction.description || ''}`;
+                case 'delivery':
+                    if (transaction.deliveryType === 'receive') {
+                        return `استلام من ${transaction.fromAgent || 'غير محدد'}`;
+                    } else {
+                        return `تسليم إلى ${transaction.toAgent || 'غير محدد'}`;
+                    }
+                default:
+                    return 'غير محدد';
+            }
+        }
+
+        function getTypeArabicName(type) {
+            const types = {
+                'collection': 'تحصيل',
+                'deposit': 'إيداع',
+                'expense': 'مصروف',
+                'delivery': 'استلام/تسليم'
+            };
+            return types[type] || type;
+        }
+
+        function getAmountColor(type, amount) {
+            if (type === 'collection' || (type === 'delivery' && amount > 0)) {
+                return 'text-green-600';
+            }
+            return 'text-red-600';
+        }
+
+        function hideAgentStatementModal() {
+            document.getElementById('agentStatementModal').classList.add('hidden');
+        }
+
+        // ========== إدارة المندوبين - إضافة وحذف ==========
+        function showAddAgentModal() {
+            document.getElementById('addAgentModal').classList.remove('hidden');
+        }
+
+        function hideAddAgentModal() {
+            document.getElementById('addAgentModal').classList.add('hidden');
+            document.getElementById('addAgentForm').reset();
+        }
+
+        async function addNewAgent() {
+            const name = document.getElementById('newAgentName').value.trim();
+            const email = document.getElementById('newAgentEmail').value.trim();
+            const phone = document.getElementById('newAgentPhone').value.trim();
+
+            if (!name) {
+                showSuccessMessage('يرجى إدخال اسم المندوب');
+                return;
+            }
+
+            // التحقق من عدم وجود مندوب بنفس الاسم
+            const existingAgent = allAgents.find(agent => agent.name === name);
+            if (existingAgent) {
+                showSuccessMessage('هذا المندوب مسجل بالفعل');
+                return;
+            }
+
+            const agentData = {
+                name: name,
+                email: email || '',
+                phone: phone || '',
+                isActive: true,
+                createdAt: new Date(),
+                lastLogin: null
+            };
+
+            try {
+                await db.collection('agents').add(agentData);
+                showSuccessMessage('تم إضافة المندوب بنجاح!');
+                hideAddAgentModal();
+                loadAgents(); // إعادة تحميل قائمة المندوبين
+            } catch (error) {
+                console.error('Error adding agent:', error);
+                showSuccessMessage('حدث خطأ في إضافة المندوب');
+            }
+        }
+
+        async function deleteAgent(agentId, agentName) {
+            if (!confirm(`هل أنت متأكد من حذف المندوب "${agentName}"؟ سيتم حذف جميع معاملاته أيضاً.`)) {
+                return;
+            }
+
+            try {
+                // حذف جميع معاملات المندوب أولاً
+                const agentTransactions = allTransactions.filter(t => t.agent === agentName);
+                const batch = db.batch();
+                
+                for (const transaction of agentTransactions) {
+                    const transactionRef = db.collection('transactions').doc(transaction.id);
+                    batch.delete(transactionRef);
+                }
+                
+                await batch.commit();
+
+                // حذف المندوب
+                await db.collection('agents').doc(agentId).delete();
+                
+                showSuccessMessage(`تم حذف المندوب "${agentName}" وجميع معاملاته بنجاح!`);
+                loadAllData(); // إعادة تحميل جميع البيانات
+                
+            } catch (error) {
+                console.error('Error deleting agent:', error);
+                showSuccessMessage('حدث خطأ في حذف المندوب');
+            }
+        }
+
+        // ========== باقي الدوال (بدون تغيير) ==========
+        function updateTransactionsList() {
+            const tbody = document.getElementById('transactionsTableBody');
+            tbody.innerHTML = '';
+            
+            document.getElementById('transactionsCount').textContent = `${filteredTransactions.length} معاملة`;
+            
+            if (filteredTransactions.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="6" class="text-center py-8 md:py-12">
+                            <i class="fas fa-search text-4xl md:text-6xl text-gray-300 mb-3 md:mb-4"></i>
+                            <p class="text-lg md:text-xl text-gray-500">لا توجد معاملات تطابق المعايير</p>
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+            
+            filteredTransactions.forEach(transaction => {
+                const row = document.createElement('tr');
+                row.className = 'border-b border-gray-100 hover:bg-gray-50 transition-colors';
+                
+                const timestamp = formatDateTime(transaction.timestamp);
+                
+                let typeText = '';
+                let details = '';
+                let colorClass = '';
+                
+                switch (transaction.type) {
+                    case 'collection':
+                        typeText = '💰 تحصيل';
+                        details = `العميل: ${transaction.customerName || 'غير محدد'}<br>النوع: ${transaction.collectionType || 'غير محدد'}`;
+                        
+                        if (transaction.collectionType === 'سحب من البطاقة' && transaction.bankAccountName) {
+                            details += `<br>الحساب: ${transaction.bankAccountName}`;
+                        }
+                        
+                        colorClass = 'text-green-600';
+                        break;
+                    case 'deposit':
+                        typeText = '🏦 إيداع';
+                        details = `الحساب: ${transaction.bankAccount || 'غير محدد'}`;
+                        colorClass = 'text-blue-600';
+                        break;
+                    case 'expense':
+                        typeText = '💸 مصروف';
+                        details = `النوع: ${transaction.expenseType || 'غير محدد'}<br>الوصف: ${transaction.description || 'غير محدد'}`;
+                        colorClass = 'text-red-600';
+                        break;
+                    case 'delivery':
+                        typeText = transaction.deliveryType === 'receive' ? '📥 استلام' : '📤 تسليم';
+                        details = `من ${transaction.fromAgent || 'غير محدد'} إلى ${transaction.toAgent || 'غير محدد'}`;
+                        colorClass = 'text-purple-600';
+                        break;
+                }
+                
+                row.innerHTML = `
+                    <td class="p-2 md:p-4 text-xs md:text-base">${timestamp}</td>
+                    <td class="p-2 md:p-4 font-semibold text-xs md:text-base">${transaction.agent || 'غير محدد'}</td>
+                    <td class="p-2 md:p-4 text-xs md:text-base">${typeText}</td>
+                    <td class="p-2 md:p-4 text-xs md:text-sm">${details}</td>
+                    <td class="p-2 md:p-4 font-bold ${colorClass} text-xs md:text-base">${formatAmount(transaction.amount || 0)} ريال</td>
+                    <td class="p-2 md:p-4 text-xs md:text-base">
+                        <div class="action-buttons">
+                            <button onclick="editTransaction('${transaction.id}')" class="btn-edit text-white px-2 py-1 rounded text-xs">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button onclick="deleteTransaction('${transaction.id}')" class="btn-delete text-white px-2 py-1 rounded text-xs">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                            <button onclick="shareTransaction('${transaction.id}')" class="btn-share text-white px-2 py-1 rounded text-xs">
+                                <i class="fas fa-share"></i>
+                            </button>
+                        </div>
+                    </td>
+                `;
+                
+                tbody.appendChild(row);
+            });
+        }
+
+        function updateBankAccountsList() {
+            const accountsList = document.getElementById('adminAccountsList');
+            accountsList.innerHTML = '';
+            
+            if (allBankAccounts.length === 0) {
+                accountsList.innerHTML = `
+                    <div class="col-span-full text-center py-8 md:py-12">
+                        <i class="fas fa-university text-4xl md:text-6xl text-gray-300 mb-3 md:mb-4"></i>
+                        <p class="text-lg md:text-xl text-gray-500">لا توجد حسابات بنكية مسجلة</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            // تحديث معلومات التاريخ المعروض
+            const dateInfo = document.getElementById('bankAccountsDateInfo');
+            if (selectedBankAccountsDate === new Date().toISOString().split('T')[0]) {
+                dateInfo.textContent = 'يتم عرض إيداعات اليوم الحالي فقط';
+            } else {
+                const dateObj = new Date(selectedBankAccountsDate);
+                dateInfo.textContent = `يتم عرض إيداعات تاريخ: ${dateObj.toLocaleDateString('en-US')}`;
+            }
+            
+            allBankAccounts.forEach(account => {
+                // حساب إيداعات اليوم المحدد فقط لهذا الحساب
+                const selectedDateDeposits = allTransactions.filter(t => 
+                    t.type === 'deposit' && 
+                    t.bankAccountId === account.id &&
+                    t.timestamp && 
+                    new Date(t.timestamp.toDate ? t.timestamp.toDate() : t.timestamp).toISOString().split('T')[0] === selectedBankAccountsDate
+                );
+                
+                // حساب السحوبات (التحصيلات من البطاقة) لليوم المحدد
+                const selectedDateWithdrawals = allTransactions.filter(t => 
+                    t.type === 'collection' && 
+                    t.collectionType === 'سحب من البطاقة' &&
+                    t.bankAccountId === account.id &&
+                    t.timestamp && 
+                    new Date(t.timestamp.toDate ? t.timestamp.toDate() : t.timestamp).toISOString().split('T')[0] === selectedBankAccountsDate
+                );
+                
+                const totalSelectedDateDeposits = selectedDateDeposits.reduce((sum, t) => sum + (t.amount || 0), 0);
+                const totalSelectedDateWithdrawals = selectedDateWithdrawals.reduce((sum, t) => sum + (t.amount || 0), 0);
+                const remaining = account.limit - totalSelectedDateDeposits;
+                const usedPercentage = (totalSelectedDateDeposits / account.limit * 100).toFixed(1);
+                
+                // حساب إجمالي الإيداعات لهذا الحساب (جميع الأيام)
+                const accountAllDeposits = allTransactions.filter(t => 
+                    t.type === 'deposit' && t.bankAccountId === account.id
+                );
+                const totalAllDeposits = accountAllDeposits.reduce((sum, t) => sum + (t.amount || 0), 0);
+                
+                const div = document.createElement('div');
+                div.className = 'admin-card rounded-xl md:rounded-2xl p-4 md:p-6';
+                div.innerHTML = `
+                    <div class="flex justify-between items-start mb-3 md:mb-4">
+                        <div>
+                            <h4 class="text-lg md:text-xl font-bold text-gray-800 mb-1">${account.name}</h4>
+                            <p class="text-xs md:text-sm text-gray-600">رقم الحساب: ${account.number}</p>
+                            <p class="text-xs md:text-sm text-gray-600">البطاقة: ${account.cardNumber || '****'}</p>
+                        </div>
+                        <button onclick="shareAccountReport('${account.id}', '${selectedBankAccountsDate}')" class="bg-blue-600 text-white px-2 md:px-3 py-1 rounded-lg text-xs md:text-sm hover:bg-blue-700 transition-all">
+                            <i class="fas fa-share-alt ml-1"></i>مشاركة
+                        </button>
+                    </div>
+                    <div class="grid grid-cols-2 gap-3 md:gap-4 mb-3 md:mb-4">
+                        <div>
+                            <p class="text-xs text-gray-500">السقف اليومي</p>
+                            <p class="text-base md:text-lg font-bold text-gray-800">${formatAmount(account.limit)} ريال</p>
+                        </div>
+                        <div>
+                            <p class="text-xs text-gray-500">المستخدم (${new Date(selectedBankAccountsDate).toLocaleDateString('en-US')})</p>
+                            <p class="text-base md:text-lg font-bold text-blue-600">${formatAmount(totalSelectedDateDeposits)} ريال</p>
+                        </div>
+                    </div>
+                    <div class="mb-3 md:mb-4">
+                        <div class="flex justify-between text-xs md:text-sm mb-1 md:mb-2">
+                            <span class="text-gray-600">المتبقي</span>
+                            <span class="font-semibold ${remaining > 0 ? 'text-green-600' : 'text-red-600'}">
+                                ${formatAmount(remaining)} ريال (${usedPercentage}%)
+                            </span>
+                        </div>
+                        <div class="w-full bg-gray-200 rounded-full h-2 md:h-3">
+                            <div class="bg-gradient-to-r from-blue-500 to-purple-600 h-2 md:h-3 rounded-full transition-all" 
+                                 style="width: ${Math.min(usedPercentage, 100)}%"></div>
+                        </div>
+                    </div>
+                    <div class="text-xs md:text-sm text-gray-600">
+                        <p>إجمالي الإيداعات الكلي: ${formatAmount(totalAllDeposits)} ريال</p>
+                        <p>عدد الإيداعات (اليوم المحدد): ${selectedDateDeposits.length}</p>
+                        <p class="font-semibold text-red-600">السحوبات اليوم: ${formatAmount(totalSelectedDateWithdrawals)} ريال</p>
+                    </div>
+                    <div class="mt-3 md:mt-4 pt-3 md:pt-4 border-t border-gray-200">
+                        <h5 class="text-sm font-semibold text-gray-700 mb-2">إيداعات ${new Date(selectedBankAccountsDate).toLocaleDateString('en-US')}:</h5>
+                        <div class="max-h-32 overflow-y-auto">
+                            ${selectedDateDeposits.length === 0 ? 
+                                '<p class="text-xs text-gray-500 text-center">لا توجد إيداعات في هذا اليوم</p>' : 
+                                selectedDateDeposits.map(deposit => `
+                                    <div class="flex justify-between items-center py-1 border-b border-gray-100">
+                                        <span class="text-xs">${deposit.agent}</span>
+                                        <span class="text-xs font-semibold">${formatAmount(deposit.amount)} ر.س</span>
+                                    </div>
+                                `).join('')
+                            }
+                        </div>
+                    </div>
+                    <div class="mt-2 pt-2 border-t border-gray-200">
+                        <h5 class="text-sm font-semibold text-gray-700 mb-2">سحوبات ${new Date(selectedBankAccountsDate).toLocaleDateString('en-US')}:</h5>
+                        <div class="max-h-32 overflow-y-auto">
+                            ${selectedDateWithdrawals.length === 0 ? 
+                                '<p class="text-xs text-gray-500 text-center">لا توجد سحوبات في هذا اليوم</p>' : 
+                                selectedDateWithdrawals.map(withdrawal => `
+                                    <div class="flex justify-between items-center py-1 border-b border-gray-100">
+                                        <span class="text-xs">${withdrawal.agent} - ${withdrawal.customerName}</span>
+                                        <span class="text-xs font-semibold text-red-600">${formatAmount(withdrawal.amount)} ر.س</span>
+                                    </div>
+                                `).join('')
+                            }
+                        </div>
+                    </div>
+                `;
+                accountsList.appendChild(div);
+            });
+        }
+
+        // ========== باقي الدوال (بدون تغيير) ==========
+        // ... [يتبع باقي الدوال كما هي في الكود الأصلي]
+
+        // ملاحظة: تم إضافة الدوال الأساسية فقط للتعديلات المطلوبة
+        // باقي الدوال (filterTransactions, editTransaction, deleteTransaction, etc.)
+        // تبقى كما هي في الكود الأصلي
 
     </script>
 </body>
