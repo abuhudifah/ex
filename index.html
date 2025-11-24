@@ -1163,23 +1163,50 @@
         let userType = '';
         const ADMIN_PASSWORD = 'mana1234';
 
+        // دالة لتهيئة الفلاتر بتاريخ اليوم
+        function initializeDateFilters() {
+            const today = new Date().toISOString().split('T')[0];
+            
+            // تعيين جميع حقول الفلتر بتاريخ اليوم
+            document.getElementById('daily-summary-date').value = today;
+            document.getElementById('bank-accounts-date').value = today;
+            document.getElementById('dashboard-date').value = today;
+            document.getElementById('agents-date').value = today;
+            document.getElementById('filter-date').value = today;
+        }
+
         // تهيئة السقوف عند بدء يوم جديد
         function initializeDailyCeilings() {
             const today = new Date().toISOString().split('T')[0];
             const lastInitialization = localStorage.getItem('lastInitializationDate');
             
             if (lastInitialization !== today) {
-                // اليوم جديد، نقوم بتهيئة سقوف الحسابات
-                const banks = allRecords.filter(r => r.is_bank_account);
-                banks.forEach(bank => {
-                    // إعادة تعيين السقف اليومي (إذا كان هناك حقل منفصل)
-                    // في هذا النظام، نحن نستخدم السقف المالي الأساسي
-                });
+                // اليوم جديد، نقوم بحساب الرصيد النهائي لليوم السابق وتخزينه
+                const yesterday = new Date();
+                yesterday.setDate(yesterday.getDate() - 1);
+                const yesterdayStr = yesterday.toISOString().split('T')[0];
                 
-                // حساب الرصيد السابق للمندوبين
-                if (userType === 'agent') {
-                    calculatePreviousBalance();
-                }
+                // حساب الرصيد السابق لجميع المندوبين
+                const agents = [...new Set(allRecords.map(r => r.agent_name))];
+                
+                agents.forEach(agent => {
+                    if (agent && agent !== 'الإدارة') {
+                        const yesterdayRecords = allRecords.filter(r => 
+                            r.date === yesterdayStr && 
+                            r.agent_name === agent &&
+                            !r.is_bank_account && 
+                            !r.is_debtor_customer && 
+                            !r.is_failed_deposit
+                        );
+                        
+                        const totals = calculateTotals(yesterdayRecords);
+                        const previousBalance = parseInt(localStorage.getItem(`previousBalance_${agent}_${yesterdayStr}`) || 0);
+                        const finalBalance = previousBalance + totals.collections + totals.receipts - totals.deposits - totals.expenses - totals.deliveries - totals.failed;
+                        
+                        // تخزين الرصيد النهائي لليوم السابق كرصيد سابق لليوم الجديد
+                        localStorage.setItem(`previousBalance_${agent}_${today}`, finalBalance);
+                    }
+                });
                 
                 localStorage.setItem('lastInitializationDate', today);
                 showToast('تم تهيئة النظام ليوم جديد');
@@ -1188,23 +1215,14 @@
 
         // حساب رصيد الأمس للمندوب
         function calculatePreviousBalance() {
-            const today = new Date();
-            const yesterday = new Date(today);
+            const today = new Date().toISOString().split('T')[0];
+            const yesterday = new Date();
             yesterday.setDate(yesterday.getDate() - 1);
             const yesterdayStr = yesterday.toISOString().split('T')[0];
 
-            const yesterdayRecords = allRecords.filter(r => 
-                r.date === yesterdayStr && 
-                r.agent_name === currentAgent &&
-                !r.is_bank_account && 
-                !r.is_debtor_customer && 
-                !r.is_failed_deposit
-            );
+            // استخدام الرصيد المخزن مسبقاً لليوم الحالي
+            const previousBalance = parseInt(localStorage.getItem(`previousBalance_${currentAgent}_${today}`) || 0);
             
-            const totals = calculateTotals(yesterdayRecords);
-            const previousBalance = totals.collections + totals.receipts - totals.deposits - totals.expenses - totals.deliveries - totals.failed;
-            
-            localStorage.setItem(`previousBalance_${currentAgent}`, previousBalance);
             document.getElementById('previous-balance').textContent = Math.round(previousBalance);
             
             return previousBalance;
@@ -1223,6 +1241,9 @@
                 if (lastInitialization !== today) {
                     // بدء يوم جديد
                     initializeDailyCeilings();
+                    initializeDateFilters();
+                    updateUI();
+                    showToast('تم بدء يوم جديد تلقائياً');
                 }
             }
         }
@@ -1390,6 +1411,9 @@
                 }
             });
             
+            // تهيئة الفلاتر بتاريخ اليوم
+            initializeDateFilters();
+            
             updateUI();
             loadLastSelections();
         }
@@ -1469,7 +1493,7 @@
             const confirmDiv = document.createElement('div');
             confirmDiv.className = 'fixed bottom-20 right-4 glass-card p-4 z-50 shadow-2xl max-w-xs';
             confirmDiv.innerHTML = `
-                <p class="font-bold mb-3 text-blue-900">هل تريد بدء يوم جديد؟ سيتم إعادة تعيين جميع الإحصائيات.</p>
+                <p class="font-bold mb-3 text-blue-900">هل تريد بدء يوم جديد؟ سيتم حساب الرصيد النهائي لليوم الحالي وتخزينه كرصيد سابق لليوم الجديد.</p>
                 <div class="flex gap-2">
                     <button id="confirm-reset" class="btn-primary text-white px-4 py-2 rounded-xl text-sm font-bold flex-1">نعم، ابدأ</button>
                     <button id="cancel-reset" class="bg-gray-300 text-gray-700 px-4 py-2 rounded-xl text-sm font-bold flex-1 hover:bg-gray-400 transition">إلغاء</button>
@@ -1478,16 +1502,38 @@
             document.body.appendChild(confirmDiv);
             
             document.getElementById('confirm-reset').addEventListener('click', () => {
-                // إعادة تعيين تاريخ التهيئة الأخير
-                localStorage.removeItem('lastInitializationDate');
-                // إعادة تعيين أرصدة الأمس
+                // حساب الرصيد النهائي لليوم الحالي وتخزينه
+                const today = new Date().toISOString().split('T')[0];
+                const tomorrow = new Date();
+                tomorrow.setDate(tomorrow.getDate() + 1);
+                const tomorrowStr = tomorrow.toISOString().split('T')[0];
+                
                 const agents = [...new Set(allRecords.map(r => r.agent_name))];
+                
                 agents.forEach(agent => {
-                    localStorage.removeItem(`previousBalance_${agent}`);
+                    if (agent && agent !== 'الإدارة') {
+                        const todayRecords = allRecords.filter(r => 
+                            r.date === today && 
+                            r.agent_name === agent &&
+                            !r.is_bank_account && 
+                            !r.is_debtor_customer && 
+                            !r.is_failed_deposit
+                        );
+                        
+                        const totals = calculateTotals(todayRecords);
+                        const previousBalance = parseInt(localStorage.getItem(`previousBalance_${agent}_${today}`) || 0);
+                        const finalBalance = previousBalance + totals.collections + totals.receipts - totals.deposits - totals.expenses - totals.deliveries - totals.failed;
+                        
+                        // تخزين الرصيد النهائي لليوم الحالي كرصيد سابق لليوم الجديد
+                        localStorage.setItem(`previousBalance_${agent}_${tomorrowStr}`, finalBalance);
+                    }
                 });
                 
+                // إعادة تعيين تاريخ التهيئة الأخير
+                localStorage.setItem('lastInitializationDate', tomorrowStr);
+                
                 // إعادة تعيين الفلاتر
-                document.getElementById('dashboard-date').value = '';
+                initializeDateFilters();
                 
                 showToast('تم بدء يوم جديد بنجاح');
                 confirmDiv.remove();
@@ -2180,7 +2226,7 @@
             
             const totals = calculateTotals(records);
             
-            const previousBalance = parseInt(localStorage.getItem(`previousBalance_${currentAgent}`) || 0);
+            const previousBalance = calculatePreviousBalance();
             const remaining = previousBalance + totals.collections + totals.receipts - totals.deposits - totals.expenses - totals.deliveries - totals.failed;
             
             document.getElementById('previous-balance').textContent = Math.round(previousBalance);
@@ -2525,7 +2571,7 @@
             list.innerHTML = agents.map(agent => {
                 const agentRecords = todayRecords.filter(r => r.agent_name === agent);
                 const totals = calculateTotals(agentRecords);
-                const previousBalance = parseInt(localStorage.getItem(`previousBalance_${agent}`) || 0);
+                const previousBalance = parseInt(localStorage.getItem(`previousBalance_${agent}_${dateFilter || new Date().toISOString().split('T')[0]}`) || 0);
                 const remaining = previousBalance + totals.collections + totals.receipts - totals.deposits - totals.expenses - totals.deliveries - totals.failed;
                 
                 return `
@@ -2574,7 +2620,7 @@
         function generateOperationShare(record, title) {
             const todayRecords = getTodayAgentRecords();
             const totals = calculateTotals(todayRecords);
-            const previousBalance = parseInt(localStorage.getItem(`previousBalance_${currentAgent}`) || 0);
+            const previousBalance = calculatePreviousBalance();
             const remaining = previousBalance + totals.collections + totals.receipts - totals.deposits - totals.expenses - totals.deliveries - totals.failed;
             
             let details = '';
@@ -2624,7 +2670,7 @@ ${details}
         function generateDepositShare(record, remaining) {
             const todayRecords = getTodayAgentRecords();
             const totals = calculateTotals(todayRecords);
-            const previousBalance = parseInt(localStorage.getItem(`previousBalance_${currentAgent}`) || 0);
+            const previousBalance = calculatePreviousBalance();
             const totalRemaining = previousBalance + totals.collections + totals.receipts - totals.deposits - totals.expenses - totals.deliveries - totals.failed;
             
             return `━━━━━━━━━━━━━━━━━
@@ -2643,7 +2689,7 @@ ${details}
         function generateSummaryReport() {
             const todayRecords = getTodayAgentRecords();
             const totals = calculateTotals(todayRecords);
-            const previousBalance = parseInt(localStorage.getItem(`previousBalance_${currentAgent}`) || 0);
+            const previousBalance = calculatePreviousBalance();
             const remaining = previousBalance + totals.collections + totals.receipts - totals.deposits - totals.expenses - totals.deliveries - totals.failed;
             
             const now = new Date();
@@ -2669,7 +2715,7 @@ ${details}
         function generateDetailedReport() {
             const todayRecords = getTodayAgentRecords();
             const totals = calculateTotals(todayRecords);
-            const previousBalance = parseInt(localStorage.getItem(`previousBalance_${currentAgent}`) || 0);
+            const previousBalance = calculatePreviousBalance();
             const remaining = previousBalance + totals.collections + totals.receipts - totals.deposits - totals.expenses - totals.deliveries - totals.failed;
             
             const now = new Date();
@@ -2857,7 +2903,7 @@ ${bank ? `▫️ رقم الحساب: ${bank.account_number}\n` : ''}${bank ? `�
             );
             
             const totals = calculateTotals(records);
-            const previousBalance = parseInt(localStorage.getItem(`previousBalance_${agentName}`) || 0);
+            const previousBalance = parseInt(localStorage.getItem(`previousBalance_${agentName}_${targetDate}`) || 0);
             const remaining = previousBalance + totals.collections + totals.receipts - totals.deposits - totals.expenses - totals.deliveries - totals.failed;
             
             const now = new Date();
