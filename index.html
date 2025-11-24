@@ -5,19 +5,29 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>نظام أبو حذيفة للصرافة والتحويلات</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
+        :root {
+            --primary: #1e40af;
+            --primary-light: #3b82f6;
+            --primary-lighter: #60a5fa;
+            --success: #10b981;
+            --danger: #ef4444;
+            --warning: #f59e0b;
+            --purple: #8b5cf6;
+            --teal: #14b8a6;
+            --indigo: #6366f1;
+            --pink: #ec4899;
+        }
+        
         body {
             box-sizing: border-box;
             margin: 0;
             padding: 0;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #1e40af 0%, #3b82f6 50%, #60a5fa 100%);
-            height: 100%;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 50%, var(--primary-lighter) 100%);
+            min-height: 100vh;
             overflow-x: hidden;
-        }
-        
-        html {
-            height: 100%;
         }
 
         .glass-card {
@@ -35,7 +45,7 @@
         }
 
         .tab-button.active {
-            background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%);
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
             color: white;
             transform: translateY(-2px);
             box-shadow: 0 4px 12px rgba(30, 64, 175, 0.4);
@@ -53,11 +63,11 @@
         .input-field:focus {
             transform: translateY(-1px);
             box-shadow: 0 4px 12px rgba(59, 130, 246, 0.2);
-            border-color: #3b82f6;
+            border-color: var(--primary-light);
         }
 
         .btn-primary {
-            background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%);
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
             transition: all 0.3s ease;
             border-radius: 10px;
             font-weight: 600;
@@ -69,7 +79,7 @@
         }
 
         .btn-secondary {
-            background: linear-gradient(135deg, #2563eb 0%, #60a5fa 100%);
+            background: linear-gradient(135deg, #2563eb 0%, var(--primary-lighter) 100%);
             transition: all 0.3s ease;
             border-radius: 10px;
             font-weight: 600;
@@ -89,7 +99,7 @@
         .operation-card:hover {
             transform: translateX(-4px);
             box-shadow: 0 6px 20px rgba(0, 0, 0, 0.12);
-            border-right-color: #3b82f6;
+            border-right-color: var(--primary-light);
         }
 
         @keyframes slideIn {
@@ -105,7 +115,7 @@
 
         .stat-card {
             background: linear-gradient(135deg, #ffffff 0%, #eff6ff 100%);
-            border-right: 4px solid #3b82f6;
+            border-right: 4px solid var(--primary-light);
             box-shadow: 0 4px 12px rgba(59, 130, 246, 0.08);
             transition: all 0.3s ease;
             border-radius: 12px;
@@ -118,7 +128,7 @@
 
         .loading-spinner {
             border: 3px solid rgba(59, 130, 246, 0.2);
-            border-top: 3px solid #3b82f6;
+            border-top: 3px solid var(--primary-light);
             border-radius: 50%;
             width: 20px;
             height: 20px;
@@ -134,7 +144,7 @@
             position: fixed;
             bottom: 24px;
             right: 24px;
-            background: linear-gradient(135deg, #10b981, #059669);
+            background: linear-gradient(135deg, var(--success), #059669);
             color: white;
             padding: 14px 20px;
             border-radius: 10px;
@@ -162,7 +172,7 @@
 
         .progress-bar {
             transition: width 0.6s ease;
-            background: linear-gradient(90deg, #1e40af 0%, #3b82f6 50%, #60a5fa 100%);
+            background: linear-gradient(90deg, var(--primary) 0%, var(--primary-light) 50%, var(--primary-lighter) 100%);
             border-radius: 10px;
         }
 
@@ -177,12 +187,260 @@
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
         }
 
+        .modern-header {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+            color: white;
+            padding: 1.5rem;
+            border-radius: 0 0 20px 20px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+        }
+
+        .logo-container {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .logo {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        }
+
+        .header-title {
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin: 0;
+        }
+
+        .header-subtitle {
+            font-size: 1rem;
+            opacity: 0.9;
+            margin: 5px 0 0 0;
+        }
+
+        .user-info {
+            text-align: left;
+            background: rgba(255, 255, 255, 0.2);
+            padding: 10px 15px;
+            border-radius: 10px;
+            backdrop-filter: blur(10px);
+        }
+
+        .date-display {
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+
+        .agent-display {
+            font-size: 1rem;
+            font-weight: 700;
+            margin: 5px 0;
+        }
+
+        .card-modern {
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
+            transition: all 0.3s ease;
+            border: none;
+        }
+
+        .card-modern:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 25px rgba(0, 0, 0, 0.15);
+        }
+
+        .card-header {
+            color: white;
+            padding: 15px 20px;
+            font-weight: 700;
+            font-size: 1.2rem;
+        }
+
+        /* تحسين ألوان البطاقات لتتناسب مع التصميم العام */
+        .collection-card .card-header {
+            background: linear-gradient(135deg, var(--primary), var(--primary-light));
+        }
+
+        .deposit-card .card-header {
+            background: linear-gradient(135deg, var(--primary-light), var(--primary-lighter));
+        }
+
+        .expense-card .card-header {
+            background: linear-gradient(135deg, #2563eb, #3b82f6);
+        }
+
+        .transfer-card .card-header {
+            background: linear-gradient(135deg, #1d4ed8, #2563eb);
+        }
+
+        .card-body {
+            padding: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #374151;
+        }
+
+        .nav-tabs {
+            display: flex;
+            overflow-x: auto;
+            gap: 8px;
+            padding: 10px 0;
+            scrollbar-width: none;
+        }
+
+        .nav-tabs::-webkit-scrollbar {
+            display: none;
+        }
+
+        .nav-tab {
+            padding: 12px 20px;
+            border-radius: 10px;
+            font-weight: 600;
+            white-space: nowrap;
+            transition: all 0.3s ease;
+            background: rgba(255, 255, 255, 0.7);
+        }
+
+        .nav-tab.active {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+            color: white;
+            box-shadow: 0 4px 12px rgba(30, 64, 175, 0.3);
+        }
+
+        .nav-tab:hover:not(.active) {
+            background: rgba(59, 130, 246, 0.1);
+        }
+
+        .share-template {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 10px;
+            padding: 15px;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            white-space: pre-line;
+        }
+
+        .share-header {
+            text-align: center;
+            font-weight: 700;
+            font-size: 1.2rem;
+            margin-bottom: 15px;
+            color: var(--primary);
+            border-bottom: 2px solid var(--primary-light);
+            padding-bottom: 10px;
+        }
+
+        .share-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+        }
+
+        .share-label {
+            font-weight: 600;
+            color: #4b5563;
+        }
+
+        .share-value {
+            font-weight: 700;
+            color: var(--primary);
+        }
+
+        .share-total {
+            background: #eff6ff;
+            padding: 10px;
+            border-radius: 8px;
+            margin-top: 15px;
+            font-weight: 700;
+            text-align: center;
+            color: var(--primary);
+            border: 1px solid #bfdbfe;
+        }
+
+        .region-tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            overflow-x: auto;
+            padding-bottom: 10px;
+        }
+
+        .region-tab {
+            padding: 10px 15px;
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.7);
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            white-space: nowrap;
+        }
+
+        .region-tab.active {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+            color: white;
+            box-shadow: 0 4px 12px rgba(30, 64, 175, 0.3);
+        }
+
+        .region-tab:hover:not(.active) {
+            background: rgba(59, 130, 246, 0.1);
+        }
+
+        .region-section {
+            display: none;
+        }
+
+        .region-section.active {
+            display: block;
+        }
+
+        /* تحسينات جديدة للاستجابة */
+        .filter-section {
+            background: rgba(255, 255, 255, 0.8);
+            border-radius: 12px;
+            padding: 15px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+        }
+
+        .filter-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            align-items: end;
+        }
+
+        .filter-group {
+            flex: 1;
+            min-width: 200px;
+        }
+
+        .data-entry-bg {
+            background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+            border-radius: 16px;
+            padding: 20px;
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
+        }
+
         @media (max-width: 768px) {
             .glass-card {
                 border-radius: 12px;
             }
             
-            .tab-button {
+            .tab-button, .nav-tab {
                 font-size: 0.813rem;
                 padding: 0.5rem 0.75rem;
             }
@@ -207,57 +465,93 @@
                 height: 40px;
                 font-size: 20px;
             }
+
+            .header-title {
+                font-size: 1.4rem;
+            }
+
+            .logo {
+                width: 50px;
+                height: 50px;
+            }
+
+            .filter-group {
+                min-width: 100%;
+            }
+
+            .filter-row {
+                flex-direction: column;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .header-title {
+                font-size: 1.2rem;
+            }
+            
+            .card-modern {
+                margin-bottom: 15px;
+            }
+            
+            .nav-tab {
+                padding: 10px 15px;
+                font-size: 0.75rem;
+            }
         }
     </style>
 </head>
 <body>
-    <div id="app" class="min-h-full">
-        <!-- Header -->
-        <header class="glass-card mx-4 my-4 p-5">
-            <div class="flex items-center justify-between flex-wrap gap-4">
-                <div class="flex items-center gap-4">
-                    <div class="icon-circle" style="background: linear-gradient(135deg, #1e40af, #3b82f6);">
-                        <img src="https://i.ibb.co/whLbwk4s/20250730-012920.png" alt="أبو حذيفة" class="w-10 h-10 rounded-full object-cover">
+    <div id="app" class="min-h-screen">
+        <!-- Modern Header -->
+        <header class="modern-header">
+            <div class="container mx-auto">
+                <div class="flex flex-col md:flex-row justify-between items-center gap-4">
+                    <div class="logo-container">
+                        <img src="https://i.ibb.co/whLbwk4s/20250730-012920.png" alt="أبو حذيفة" class="logo">
+                        <div>
+                            <h1 class="header-title">نظام إدارة التحصيلات والإيداعات</h1>
+                            <p class="header-subtitle">أبو حذيفة للصرافة والتحويلات</p>
+                        </div>
                     </div>
-                    <div>
-                        <h1 class="text-2xl font-bold text-blue-900">نظام إدارة التحصيلات والإيداعات</h1>
-                        <p class="text-blue-600 font-medium">أبو حذيفة للصرافة والتحويلات</p>
+                    <div class="user-info">
+                        <p class="date-display" id="current-date"></p>
+                        <p class="agent-display" id="current-agent">المستخدم: غير محدد</p>
+                        <button id="logout-btn" class="mt-2 bg-white text-red-600 px-4 py-1.5 rounded-lg text-sm font-semibold hover:bg-red-50 transition w-full">
+                            <i class="fas fa-sign-out-alt ml-1"></i> تسجيل خروج
+                        </button>
                     </div>
-                </div>
-                <div class="text-left">
-                    <p class="text-sm text-gray-600 font-medium" id="current-date"></p>
-                    <p class="text-base font-bold text-blue-700" id="current-agent">المستخدم: غير محدد</p>
-                    <button id="logout-btn" class="mt-2 bg-gradient-to-r from-red-500 to-red-600 text-white px-5 py-2 rounded-lg text-sm font-semibold hover:shadow-lg transition">تسجيل خروج</button>
                 </div>
             </div>
         </header>
 
         <!-- Login Screen -->
-        <div id="login-screen" class="glass-card mx-4 my-4 p-10 max-w-md mx-auto">
+        <div id="login-screen" class="glass-card mx-4 my-6 p-8 max-w-md mx-auto">
             <div class="text-center mb-6">
-                <div class="icon-circle mx-auto mb-4" style="background: linear-gradient(135deg, #1e40af, #3b82f6); width: 80px; height: 80px;">
+                <div class="icon-circle mx-auto mb-4" style="background: linear-gradient(135deg, var(--primary), var(--primary-light)); width: 80px; height: 80px;">
                     <img src="https://i.ibb.co/whLbwk4s/20250730-012920.png" alt="أبو حذيفة" class="w-16 h-16 rounded-full object-cover">
                 </div>
                 <h2 class="text-3xl font-bold text-blue-900">تسجيل الدخول</h2>
             </div>
             <form id="login-form" class="space-y-4">
-                <div>
-                    <label class="block text-sm font-bold text-gray-700 mb-2">نوع المستخدم</label>
-                    <select id="user-type" class="input-field w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none" required>
+                <div class="form-group">
+                    <label class="form-label">نوع المستخدم</label>
+                    <select id="user-type" class="input-field w-full px-4 py-3 border-2 border-gray-200 focus:outline-none" required>
                         <option value="">اختر نوع المستخدم</option>
                         <option value="agent">مندوب</option>
                         <option value="admin">إدارة</option>
                     </select>
                 </div>
-                <div id="agent-name-field" class="hidden">
-                    <label class="block text-sm font-bold text-gray-700 mb-2">اسم المندوب</label>
-                    <input type="text" id="agent-name-input" class="input-field w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none" placeholder="أدخل اسمك">
+                <div id="agent-name-field" class="hidden form-group">
+                    <label class="form-label">اسم المندوب</label>
+                    <input type="text" id="agent-name-input" class="input-field w-full px-4 py-3 border-2 border-gray-200 focus:outline-none" placeholder="أدخل اسمك">
                 </div>
-                <div id="admin-password-field" class="hidden">
-                    <label class="block text-sm font-bold text-gray-700 mb-2">كلمة المرور</label>
-                    <input type="password" id="admin-password-input" class="input-field w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none" placeholder="أدخل كلمة المرور">
+                <div id="admin-password-field" class="hidden form-group">
+                    <label class="form-label">كلمة المرور</label>
+                    <input type="password" id="admin-password-input" class="input-field w-full px-4 py-3 border-2 border-gray-200 focus:outline-none" placeholder="أدخل كلمة المرور">
                 </div>
-                <button type="submit" class="btn-primary w-full text-white py-4 rounded-xl">دخول</button>
+                <button type="submit" class="btn-primary w-full text-white py-4 rounded-xl flex items-center justify-center gap-2">
+                    <i class="fas fa-sign-in-alt"></i> دخول
+                </button>
             </form>
         </div>
 
@@ -265,178 +559,205 @@
         <div id="main-content" class="hidden">
             <!-- Navigation Tabs -->
             <div class="glass-card mx-4 my-4 p-3">
-                <div class="flex gap-2 overflow-x-auto pb-2">
-                    <button class="tab-button active px-5 py-3 rounded-xl whitespace-nowrap" data-tab="data-entry">📝 إدخال البيانات</button>
-                    <button class="tab-button px-5 py-3 rounded-xl whitespace-nowrap" data-tab="daily-summary">📊 ملخص اليوم</button>
-                    <button class="tab-button px-5 py-3 rounded-xl whitespace-nowrap" data-tab="bank-accounts">🏦 الحسابات البنكية</button>
-                    <button class="tab-button px-5 py-3 rounded-xl whitespace-nowrap" data-tab="debtor-customers">👥 العملاء المديونين</button>
-                    <button class="tab-button px-5 py-3 rounded-xl whitespace-nowrap" data-tab="failed-deposits">❌ الإيداعات الفاشلة</button>
-                    <button class="tab-button px-5 py-3 rounded-xl whitespace-nowrap" data-tab="all-operations">📋 جميع العمليات</button>
-                    <button class="tab-button px-5 py-3 rounded-xl whitespace-nowrap" data-tab="dashboard">📈 لوحة المعلومات</button>
-                    <button class="tab-button px-5 py-3 rounded-xl whitespace-nowrap" data-tab="agents">👨‍💼 إدارة المندوبين</button>
+                <div class="nav-tabs">
+                    <button class="nav-tab active" data-tab="data-entry"><i class="fas fa-edit ml-2"></i> إدخال البيانات</button>
+                    <button class="nav-tab" data-tab="daily-summary"><i class="fas fa-chart-bar ml-2"></i> ملخص اليوم</button>
+                    <button class="nav-tab" data-tab="bank-accounts"><i class="fas fa-university ml-2"></i> الحسابات البنكية</button>
+                    <button class="nav-tab" data-tab="debtor-customers"><i class="fas fa-users ml-2"></i> العملاء المديونين</button>
+                    <button class="nav-tab" data-tab="failed-deposits"><i class="fas fa-times-circle ml-2"></i> الإيداعات الفاشلة</button>
+                    <button class="nav-tab" data-tab="all-operations"><i class="fas fa-list-alt ml-2"></i> جميع العمليات</button>
+                    <button class="nav-tab" data-tab="dashboard"><i class="fas fa-tachometer-alt ml-2"></i> لوحة المعلومات</button>
+                    <button class="nav-tab" data-tab="agents"><i class="fas fa-user-tie ml-2"></i> إدارة المندوبين</button>
                 </div>
             </div>
 
             <!-- Data Entry Tab -->
             <div id="data-entry-tab" class="tab-content">
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mx-4">
-                    <!-- Collections -->
-                    <div class="glass-card p-6">
-                        <div class="flex items-center gap-3 mb-6">
-                            <div class="icon-circle" style="background: linear-gradient(135deg, #10b981, #059669);">
-                                💰
+                <div class="data-entry-bg mx-4 my-4">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <!-- Collections -->
+                        <div class="card-modern collection-card">
+                            <div class="card-header">
+                                <i class="fas fa-money-bill-wave ml-2"></i> التحصيلات
                             </div>
-                            <h3 class="text-xl font-bold text-blue-900">التحصيلات</h3>
+                            <div class="card-body">
+                                <form id="collection-form" class="space-y-4">
+                                    <div class="form-group">
+                                        <label class="form-label">نوع التحصيل</label>
+                                        <select id="collection-type" class="input-field w-full px-4 py-3 border-2 border-gray-200 focus:outline-none" required>
+                                            <option value="">اختر النوع</option>
+                                            <option value="نقدي">نقدي</option>
+                                            <option value="سحب من بطاقة">سحب من بطاقة</option>
+                                        </select>
+                                    </div>
+                                    <div id="bank-card-select-div" class="hidden form-group">
+                                        <label class="form-label">اختر البطاقة البنكية</label>
+                                        <select id="collection-bank-card" class="input-field w-full px-4 py-3 border-2 border-gray-200 focus:outline-none">
+                                            <option value="">اختر البطاقة</option>
+                                        </select>
+                                    </div>
+                                    <div id="customer-name-field" class="form-group">
+                                        <label class="form-label">اسم العميل</label>
+                                        <input type="text" id="customer-name" class="input-field w-full px-4 py-3 border-2 border-gray-200 focus:outline-none" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label">المبلغ</label>
+                                        <input type="number" id="collection-amount" class="input-field w-full px-4 py-3 border-2 border-gray-200 focus:outline-none" required>
+                                    </div>
+                                    <button type="submit" class="btn-primary w-full text-white py-3 rounded-xl flex items-center justify-center gap-2">
+                                        <span id="collection-btn-text"><i class="fas fa-plus-circle ml-2"></i> إضافة تحصيل</span>
+                                        <span id="collection-spinner" class="loading-spinner hidden"></span>
+                                    </button>
+                                </form>
+                            </div>
                         </div>
-                        <form id="collection-form" class="space-y-4">
-                            <div>
-                                <label class="block text-sm font-bold text-gray-700 mb-2">نوع التحصيل</label>
-                                <select id="collection-type" class="input-field w-full px-4 py-3 border-2 border-gray-200 focus:outline-none" required>
-                                    <option value="">اختر النوع</option>
-                                    <option value="نقدي">نقدي</option>
-                                    <option value="سحب من بطاقة">سحب من بطاقة</option>
-                                </select>
-                            </div>
-                            <div id="bank-card-select-div" class="hidden">
-                                <label class="block text-sm font-bold text-gray-700 mb-2">اختر البطاقة البنكية</label>
-                                <select id="collection-bank-card" class="input-field w-full px-4 py-3 border-2 border-gray-200 focus:outline-none">
-                                    <option value="">اختر البطاقة</option>
-                                </select>
-                            </div>
-                            <div>
-                                <label class="block text-sm font-bold text-gray-700 mb-2">اسم العميل</label>
-                                <input type="text" id="customer-name" class="input-field w-full px-4 py-3 border-2 border-gray-200 focus:outline-none" required>
-                            </div>
-                            <div>
-                                <label class="block text-sm font-bold text-gray-700 mb-2">المبلغ</label>
-                                <input type="number" id="collection-amount" class="input-field w-full px-4 py-3 border-2 border-gray-200 focus:outline-none" required>
-                            </div>
-                            <button type="submit" class="btn-primary w-full text-white py-3 rounded-xl flex items-center justify-center gap-2">
-                                <span id="collection-btn-text">إضافة تحصيل</span>
-                                <span id="collection-spinner" class="loading-spinner hidden"></span>
-                            </button>
-                        </form>
-                    </div>
 
-                    <!-- Deposits -->
-                    <div class="glass-card p-6">
-                        <div class="flex items-center gap-3 mb-6">
-                            <div class="icon-circle" style="background: linear-gradient(135deg, #3b82f6, #2563eb);">
-                                🏦
+                        <!-- Deposits -->
+                        <div class="card-modern deposit-card">
+                            <div class="card-header">
+                                <i class="fas fa-university ml-2"></i> الإيداعات
                             </div>
-                            <h3 class="text-xl font-bold text-blue-900">الإيداعات</h3>
+                            <div class="card-body">
+                                <form id="deposit-form" class="space-y-4">
+                                    <div class="form-group">
+                                        <label class="form-label">الحساب البنكي</label>
+                                        <select id="deposit-bank" class="input-field w-full px-4 py-3 border-2 border-gray-200 focus:outline-none" required>
+                                            <option value="">اختر الحساب</option>
+                                        </select>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label">المبلغ</label>
+                                        <input type="number" id="deposit-amount" class="input-field w-full px-4 py-3 border-2 border-gray-200 focus:outline-none" required>
+                                    </div>
+                                    <button type="submit" class="btn-primary w-full text-white py-3 rounded-xl flex items-center justify-center gap-2">
+                                        <span id="deposit-btn-text"><i class="fas fa-plus-circle ml-2"></i> إضافة إيداع</span>
+                                        <span id="deposit-spinner" class="loading-spinner hidden"></span>
+                                    </button>
+                                </form>
+                            </div>
                         </div>
-                        <form id="deposit-form" class="space-y-4">
-                            <div>
-                                <label class="block text-sm font-bold text-gray-700 mb-2">الحساب البنكي</label>
-                                <select id="deposit-bank" class="input-field w-full px-4 py-3 border-2 border-gray-200 focus:outline-none" required>
-                                    <option value="">اختر الحساب</option>
-                                </select>
-                            </div>
-                            <div>
-                                <label class="block text-sm font-bold text-gray-700 mb-2">المبلغ</label>
-                                <input type="number" id="deposit-amount" class="input-field w-full px-4 py-3 border-2 border-gray-200 focus:outline-none" required>
-                            </div>
-                            <button type="submit" class="btn-primary w-full text-white py-3 rounded-xl flex items-center justify-center gap-2">
-                                <span id="deposit-btn-text">إضافة إيداع</span>
-                                <span id="deposit-spinner" class="loading-spinner hidden"></span>
-                            </button>
-                        </form>
-                    </div>
 
-                    <!-- Expenses -->
-                    <div class="glass-card p-6">
-                        <div class="flex items-center gap-3 mb-6">
-                            <div class="icon-circle" style="background: linear-gradient(135deg, #ef4444, #dc2626);">
-                                💸
+                        <!-- Expenses -->
+                        <div class="card-modern expense-card">
+                            <div class="card-header">
+                                <i class="fas fa-receipt ml-2"></i> المصروفات
                             </div>
-                            <h3 class="text-xl font-bold text-blue-900">المصروفات</h3>
+                            <div class="card-body">
+                                <form id="expense-form" class="space-y-4">
+                                    <div class="form-group">
+                                        <label class="form-label">نوع المصروف</label>
+                                        <select id="expense-type" class="input-field w-full px-4 py-3 border-2 border-gray-200 focus:outline-none" required>
+                                            <option value="">اختر النوع</option>
+                                            <option value="وقود">وقود</option>
+                                            <option value="صيانة">صيانة</option>
+                                            <option value="رسوم">رسوم</option>
+                                            <option value="أخرى">أخرى</option>
+                                        </select>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label">المبلغ</label>
+                                        <input type="number" id="expense-amount" class="input-field w-full px-4 py-3 border-2 border-gray-200 focus:outline-none" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label">تفاصيل المصروف</label>
+                                        <textarea id="expense-details" class="input-field w-full px-4 py-3 border-2 border-gray-200 focus:outline-none" rows="2"></textarea>
+                                    </div>
+                                    <button type="submit" class="btn-primary w-full text-white py-3 rounded-xl flex items-center justify-center gap-2">
+                                        <span id="expense-btn-text"><i class="fas fa-plus-circle ml-2"></i> إضافة مصروف</span>
+                                        <span id="expense-spinner" class="loading-spinner hidden"></span>
+                                    </button>
+                                </form>
+                            </div>
                         </div>
-                        <form id="expense-form" class="space-y-4">
-                            <div>
-                                <label class="block text-sm font-bold text-gray-700 mb-2">نوع المصروف</label>
-                                <select id="expense-type" class="input-field w-full px-4 py-3 border-2 border-gray-200 focus:outline-none" required>
-                                    <option value="">اختر النوع</option>
-                                    <option value="وقود">وقود</option>
-                                    <option value="صيانة">صيانة</option>
-                                    <option value="رسوم">رسوم</option>
-                                    <option value="أخرى">أخرى</option>
-                                </select>
-                            </div>
-                            <div>
-                                <label class="block text-sm font-bold text-gray-700 mb-2">المبلغ</label>
-                                <input type="number" id="expense-amount" class="input-field w-full px-4 py-3 border-2 border-gray-200 focus:outline-none" required>
-                            </div>
-                            <div>
-                                <label class="block text-sm font-bold text-gray-700 mb-2">تفاصيل المصروف</label>
-                                <textarea id="expense-details" class="input-field w-full px-4 py-3 border-2 border-gray-200 focus:outline-none" rows="2"></textarea>
-                            </div>
-                            <button type="submit" class="btn-primary w-full text-white py-3 rounded-xl flex items-center justify-center gap-2">
-                                <span id="expense-btn-text">إضافة مصروف</span>
-                                <span id="expense-spinner" class="loading-spinner hidden"></span>
-                            </button>
-                        </form>
-                    </div>
 
-                    <!-- Receipts & Deliveries -->
-                    <div class="glass-card p-6">
-                        <div class="flex items-center gap-3 mb-6">
-                            <div class="icon-circle" style="background: linear-gradient(135deg, #8b5cf6, #7c3aed);">
-                                🔄
+                        <!-- Receipts & Deliveries -->
+                        <div class="card-modern transfer-card">
+                            <div class="card-header">
+                                <i class="fas fa-exchange-alt ml-2"></i> الاستلامات والتسليم
                             </div>
-                            <h3 class="text-xl font-bold text-blue-900">الاستلامات والتسليم</h3>
+                            <div class="card-body">
+                                <form id="transfer-form" class="space-y-4">
+                                    <div class="form-group">
+                                        <label class="form-label">الاستلام من</label>
+                                        <input type="text" id="received-from" class="input-field w-full px-4 py-3 border-2 border-gray-200 focus:outline-none">
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label">التسليم لـ</label>
+                                        <input type="text" id="delivered-to" class="input-field w-full px-4 py-3 border-2 border-gray-200 focus:outline-none">
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label">المبلغ</label>
+                                        <input type="number" id="transfer-amount" class="input-field w-full px-4 py-3 border-2 border-gray-200 focus:outline-none" required>
+                                    </div>
+                                    <button type="submit" class="btn-primary w-full text-white py-3 rounded-xl flex items-center justify-center gap-2">
+                                        <span id="transfer-btn-text"><i class="fas fa-plus-circle ml-2"></i> إضافة عملية</span>
+                                        <span id="transfer-spinner" class="loading-spinner hidden"></span>
+                                    </button>
+                                </form>
+                            </div>
                         </div>
-                        <form id="transfer-form" class="space-y-4">
-                            <div>
-                                <label class="block text-sm font-bold text-gray-700 mb-2">الاستلام من</label>
-                                <input type="text" id="received-from" class="input-field w-full px-4 py-3 border-2 border-gray-200 focus:outline-none">
-                            </div>
-                            <div>
-                                <label class="block text-sm font-bold text-gray-700 mb-2">التسليم لـ</label>
-                                <input type="text" id="delivered-to" class="input-field w-full px-4 py-3 border-2 border-gray-200 focus:outline-none">
-                            </div>
-                            <div>
-                                <label class="block text-sm font-bold text-gray-700 mb-2">المبلغ</label>
-                                <input type="number" id="transfer-amount" class="input-field w-full px-4 py-3 border-2 border-gray-200 focus:outline-none" required>
-                            </div>
-                            <button type="submit" class="btn-primary w-full text-white py-3 rounded-xl flex items-center justify-center gap-2">
-                                <span id="transfer-btn-text">إضافة عملية</span>
-                                <span id="transfer-spinner" class="loading-spinner hidden"></span>
-                            </button>
-                        </form>
                     </div>
                 </div>
             </div>
 
             <!-- Daily Summary Tab -->
             <div id="daily-summary-tab" class="tab-content hidden">
-                <div class="glass-card mx-4 p-8">
-                    <div class="flex flex-col md:flex-row justify-between items-center mb-8 gap-4">
-                        <h3 class="text-3xl font-bold text-blue-900">📊 ملخص اليوم</h3>
+                <div class="glass-card mx-4 p-6 my-4">
+                    <div class="flex flex-col md:flex-row justify-between items-center mb-6 gap-4">
+                        <h3 class="text-2xl font-bold text-blue-900"><i class="fas fa-chart-bar ml-2"></i> ملخص اليوم</h3>
                         <div class="flex gap-3">
-                            <button id="share-summary-btn" class="btn-secondary text-white px-6 py-3 rounded-xl">📤 مشاركة الملخص</button>
-                            <button id="share-detailed-btn" class="btn-secondary text-white px-6 py-3 rounded-xl">📋 مشاركة تفصيلي</button>
+                            <button id="share-summary-btn" class="btn-secondary text-white px-6 py-3 rounded-xl flex items-center">
+                                <i class="fas fa-share ml-2"></i> مشاركة الملخص
+                            </button>
+                            <button id="share-detailed-btn" class="btn-secondary text-white px-6 py-3 rounded-xl flex items-center">
+                                <i class="fas fa-file-alt ml-2"></i> مشاركة تفصيلي
+                            </button>
                         </div>
                     </div>
+                    
+                    <!-- Date Filter -->
+                    <div class="filter-section">
+                        <div class="filter-row">
+                            <div class="filter-group">
+                                <label class="form-label">التاريخ</label>
+                                <input type="date" id="daily-summary-date" class="input-field w-full px-4 py-3 border-2 border-gray-200 focus:outline-none">
+                            </div>
+                            <button id="apply-daily-filter" class="btn-primary text-white px-6 py-3 rounded-xl flex items-center h-fit">
+                                <i class="fas fa-filter ml-2"></i> تطبيق الفلتر
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- Previous Day Balance -->
+                    <div class="mb-6">
+                        <div class="stat-card p-4">
+                            <div class="flex justify-between items-center">
+                                <p class="text-lg font-bold text-gray-700">الرصيد السابق (أمس)</p>
+                                <p class="text-2xl font-bold text-purple-600" id="previous-balance">0</p>
+                            </div>
+                        </div>
+                    </div>
+                    
                     <!-- Statistics -->
-                    <div class="grid grid-cols-2 md:grid-cols-4 gap-6 mb-8">
-                        <div class="stat-card p-6">
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+                        <div class="stat-card p-4">
                             <p class="text-sm font-bold text-gray-600 mb-2">إجمالي التحصيلات</p>
-                            <p class="text-3xl font-bold text-green-600" id="total-collections">0</p>
+                            <p class="text-2xl font-bold text-green-600" id="total-collections">0</p>
                         </div>
-                        <div class="stat-card p-6">
+                        <div class="stat-card p-4">
                             <p class="text-sm font-bold text-gray-600 mb-2">إجمالي الإيداعات</p>
-                            <p class="text-3xl font-bold text-blue-600" id="total-deposits">0</p>
+                            <p class="text-2xl font-bold text-blue-600" id="total-deposits">0</p>
                         </div>
-                        <div class="stat-card p-6">
+                        <div class="stat-card p-4">
                             <p class="text-sm font-bold text-gray-600 mb-2">إجمالي المصروفات</p>
-                            <p class="text-3xl font-bold text-red-600" id="total-expenses">0</p>
+                            <p class="text-2xl font-bold text-red-600" id="total-expenses">0</p>
                         </div>
-                        <div class="stat-card p-6">
+                        <div class="stat-card p-4">
                             <p class="text-sm font-bold text-gray-600 mb-2">المبلغ المتبقي</p>
-                            <p class="text-3xl font-bold text-purple-600" id="remaining-balance">0</p>
+                            <p class="text-2xl font-bold text-purple-600" id="remaining-balance">0</p>
                         </div>
                     </div>
+                    
                     <!-- Operations List -->
                     <div class="space-y-4" id="operations-list">
                         <p class="text-center text-gray-500 py-12 text-lg">لا توجد عمليات اليوم</p>
@@ -446,31 +767,38 @@
 
             <!-- All Operations Tab -->
             <div id="all-operations-tab" class="tab-content hidden">
-                <div class="glass-card mx-4 p-8">
-                    <h3 class="text-3xl font-bold text-blue-900 mb-6">📋 جميع العمليات</h3>
+                <div class="glass-card mx-4 p-6 my-4">
+                    <h3 class="text-2xl font-bold text-blue-900 mb-6"><i class="fas fa-list-alt ml-2"></i> جميع العمليات</h3>
+                    
                     <!-- Filters -->
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
-                        <div>
-                            <label class="block text-sm font-bold text-gray-700 mb-2">المندوب</label>
-                            <select id="filter-agent" class="input-field w-full px-4 py-3 border-2 border-gray-200 focus:outline-none">
-                                <option value="">الكل</option>
-                            </select>
-                        </div>
-                        <div>
-                            <label class="block text-sm font-bold text-gray-700 mb-2">نوع العملية</label>
-                            <select id="filter-type" class="input-field w-full px-4 py-3 border-2 border-gray-200 focus:outline-none">
-                                <option value="">الكل</option>
-                                <option value="collection">تحصيل</option>
-                                <option value="deposit">إيداع</option>
-                                <option value="expense">مصروف</option>
-                                <option value="transfer">تحويل</option>
-                            </select>
-                        </div>
-                        <div>
-                            <label class="block text-sm font-bold text-gray-700 mb-2">التاريخ</label>
-                            <input type="date" id="filter-date" class="input-field w-full px-4 py-3 border-2 border-gray-200 focus:outline-none">
+                    <div class="filter-section">
+                        <div class="filter-row">
+                            <div class="filter-group">
+                                <label class="form-label">المندوب</label>
+                                <select id="filter-agent" class="input-field w-full px-4 py-3 border-2 border-gray-200 focus:outline-none">
+                                    <option value="">الكل</option>
+                                </select>
+                            </div>
+                            <div class="filter-group">
+                                <label class="form-label">نوع العملية</label>
+                                <select id="filter-type" class="input-field w-full px-4 py-3 border-2 border-gray-200 focus:outline-none">
+                                    <option value="">الكل</option>
+                                    <option value="collection">تحصيل</option>
+                                    <option value="deposit">إيداع</option>
+                                    <option value="expense">مصروف</option>
+                                    <option value="transfer">تحويل</option>
+                                </select>
+                            </div>
+                            <div class="filter-group">
+                                <label class="form-label">التاريخ</label>
+                                <input type="date" id="filter-date" class="input-field w-full px-4 py-3 border-2 border-gray-200 focus:outline-none">
+                            </div>
+                            <button id="apply-all-operations-filter" class="btn-primary text-white px-6 py-3 rounded-xl flex items-center h-fit">
+                                <i class="fas fa-filter ml-2"></i> تطبيق الفلتر
+                            </button>
                         </div>
                     </div>
+                    
                     <!-- Operations List -->
                     <div class="space-y-4" id="all-operations-list">
                         <p class="text-center text-gray-500 py-12 text-lg">لا توجد عمليات</p>
@@ -480,11 +808,27 @@
 
             <!-- Bank Accounts Tab -->
             <div id="bank-accounts-tab" class="tab-content hidden">
-                <div class="glass-card mx-4 p-8">
-                    <div class="flex justify-between items-center mb-8">
-                        <h3 class="text-3xl font-bold text-blue-900">🏦 الحسابات البنكية</h3>
-                        <button id="add-bank-btn" class="btn-primary text-white px-6 py-3 rounded-xl admin-only">➕ إضافة حساب</button>
+                <div class="glass-card mx-4 p-6 my-4">
+                    <div class="flex justify-between items-center mb-6">
+                        <h3 class="text-2xl font-bold text-blue-900"><i class="fas fa-university ml-2"></i> الحسابات البنكية</h3>
+                        <button id="add-bank-btn" class="btn-primary text-white px-6 py-3 rounded-xl admin-only flex items-center">
+                            <i class="fas fa-plus ml-2"></i> إضافة حساب
+                        </button>
                     </div>
+                    
+                    <!-- Date Filter -->
+                    <div class="filter-section">
+                        <div class="filter-row">
+                            <div class="filter-group">
+                                <label class="form-label">التاريخ</label>
+                                <input type="date" id="bank-accounts-date" class="input-field w-full px-4 py-3 border-2 border-gray-200 focus:outline-none">
+                            </div>
+                            <button id="apply-bank-filter" class="btn-primary text-white px-6 py-3 rounded-xl flex items-center h-fit">
+                                <i class="fas fa-filter ml-2"></i> تطبيق الفلتر
+                            </button>
+                        </div>
+                    </div>
+                    
                     <div id="bank-accounts-list" class="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <p class="text-center text-gray-500 py-12 text-lg col-span-full">لا توجد حسابات بنكية</p>
                     </div>
@@ -493,23 +837,57 @@
 
             <!-- Debtor Customers Tab -->
             <div id="debtor-customers-tab" class="tab-content hidden">
-                <div class="glass-card mx-4 p-8">
-                    <div class="flex justify-between items-center mb-8">
-                        <h3 class="text-3xl font-bold text-blue-900">👥 العملاء المديونين</h3>
-                        <button id="add-debtor-btn" class="btn-primary text-white px-6 py-3 rounded-xl admin-only">➕ إضافة عميل</button>
+                <div class="glass-card mx-4 p-6 my-4">
+                    <div class="flex justify-between items-center mb-6">
+                        <h3 class="text-2xl font-bold text-blue-900"><i class="fas fa-users ml-2"></i> العملاء المديونين</h3>
+                        <button id="add-debtor-btn" class="btn-primary text-white px-6 py-3 rounded-xl admin-only flex items-center">
+                            <i class="fas fa-plus ml-2"></i> إضافة عميل
+                        </button>
                     </div>
-                    <div id="debtors-list" class="space-y-4">
-                        <p class="text-center text-gray-500 py-12 text-lg">لا توجد ديون مسجلة</p>
+                    
+                    <!-- Region Tabs -->
+                    <div class="region-tabs">
+                        <div class="region-tab active" data-region="all">الكل</div>
+                        <div class="region-tab" data-region="khamis">خميس مشيط</div>
+                        <div class="region-tab" data-region="dharan">ظهران الجنوب</div>
+                        <div class="region-tab" data-region="other">باقي المناطق</div>
+                    </div>
+                    
+                    <!-- Debtors by Region -->
+                    <div id="debtors-all" class="region-section active">
+                        <div id="debtors-list" class="space-y-4">
+                            <p class="text-center text-gray-500 py-12 text-lg">لا توجد ديون مسجلة</p>
+                        </div>
+                    </div>
+                    
+                    <div id="debtors-khamis" class="region-section">
+                        <div id="debtors-list-khamis" class="space-y-4">
+                            <p class="text-center text-gray-500 py-12 text-lg">لا توجد ديون لعملاء خميس مشيط</p>
+                        </div>
+                    </div>
+                    
+                    <div id="debtors-dharan" class="region-section">
+                        <div id="debtors-list-dharan" class="space-y-4">
+                            <p class="text-center text-gray-500 py-12 text-lg">لا توجد ديون لعملاء ظهران الجنوب</p>
+                        </div>
+                    </div>
+                    
+                    <div id="debtors-other" class="region-section">
+                        <div id="debtors-list-other" class="space-y-4">
+                            <p class="text-center text-gray-500 py-12 text-lg">لا توجد ديون لعملاء باقي المناطق</p>
+                        </div>
                     </div>
                 </div>
             </div>
 
             <!-- Failed Deposits Tab -->
             <div id="failed-deposits-tab" class="tab-content hidden">
-                <div class="glass-card mx-4 p-8">
-                    <div class="flex justify-between items-center mb-8">
-                        <h3 class="text-3xl font-bold text-blue-900">❌ الإيداعات الفاشلة</h3>
-                        <button id="add-failed-btn" class="btn-primary text-white px-6 py-3 rounded-xl">➕ إضافة عملية فاشلة</button>
+                <div class="glass-card mx-4 p-6 my-4">
+                    <div class="flex justify-between items-center mb-6">
+                        <h3 class="text-2xl font-bold text-blue-900"><i class="fas fa-times-circle ml-2"></i> الإيداعات الفاشلة</h3>
+                        <button id="add-failed-btn" class="btn-primary text-white px-6 py-3 rounded-xl flex items-center">
+                            <i class="fas fa-plus ml-2"></i> إضافة عملية فاشلة
+                        </button>
                     </div>
                     <div id="failed-deposits-list" class="space-y-4">
                         <p class="text-center text-gray-500 py-12 text-lg">لا توجد عمليات فاشلة</p>
@@ -519,31 +897,49 @@
 
             <!-- Dashboard Tab -->
             <div id="dashboard-tab" class="tab-content hidden">
-                <div class="glass-card mx-4 p-8">
-                    <h3 class="text-3xl font-bold text-blue-900 mb-8">📈 لوحة المعلومات</h3>
-                    <!-- Overall Statistics -->
-                    <div class="grid grid-cols-2 md:grid-cols-4 gap-6 mb-8">
-                        <div class="stat-card p-6">
-                            <p class="text-sm font-bold text-gray-600 mb-2">إجمالي التحصيلات</p>
-                            <p class="text-3xl font-bold text-green-600" id="dash-total-collections">0</p>
-                        </div>
-                        <div class="stat-card p-6">
-                            <p class="text-sm font-bold text-gray-600 mb-2">إجمالي الإيداعات</p>
-                            <p class="text-3xl font-bold text-blue-600" id="dash-total-deposits">0</p>
-                        </div>
-                        <div class="stat-card p-6">
-                            <p class="text-sm font-bold text-gray-600 mb-2">إجمالي المصروفات</p>
-                            <p class="text-3xl font-bold text-red-600" id="dash-total-expenses">0</p>
-                        </div>
-                        <div class="stat-card p-6">
-                            <p class="text-sm font-bold text-gray-600 mb-2">عدد المندوبين</p>
-                            <p class="text-3xl font-bold text-purple-600" id="dash-agents-count">0</p>
+                <div class="glass-card mx-4 p-6 my-4">
+                    <h3 class="text-2xl font-bold text-blue-900 mb-6"><i class="fas fa-tachometer-alt ml-2"></i> لوحة المعلومات</h3>
+                    
+                    <!-- Date Filter -->
+                    <div class="filter-section">
+                        <div class="filter-row">
+                            <div class="filter-group">
+                                <label class="form-label">التاريخ</label>
+                                <input type="date" id="dashboard-date" class="input-field w-full px-4 py-3 border-2 border-gray-200 focus:outline-none">
+                            </div>
+                            <button id="apply-dashboard-filter" class="btn-primary text-white px-6 py-3 rounded-xl flex items-center h-fit">
+                                <i class="fas fa-filter ml-2"></i> تطبيق الفلتر
+                            </button>
+                            <button id="reset-day-btn" class="btn-secondary text-white px-6 py-3 rounded-xl flex items-center h-fit">
+                                <i class="fas fa-sync-alt ml-2"></i> بدء يوم جديد
+                            </button>
                         </div>
                     </div>
+                    
+                    <!-- Overall Statistics -->
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+                        <div class="stat-card p-4">
+                            <p class="text-sm font-bold text-gray-600 mb-2">إجمالي التحصيلات</p>
+                            <p class="text-2xl font-bold text-green-600" id="dash-total-collections">0</p>
+                        </div>
+                        <div class="stat-card p-4">
+                            <p class="text-sm font-bold text-gray-600 mb-2">إجمالي الإيداعات</p>
+                            <p class="text-2xl font-bold text-blue-600" id="dash-total-deposits">0</p>
+                        </div>
+                        <div class="stat-card p-4">
+                            <p class="text-sm font-bold text-gray-600 mb-2">إجمالي المصروفات</p>
+                            <p class="text-2xl font-bold text-red-600" id="dash-total-expenses">0</p>
+                        </div>
+                        <div class="stat-card p-4">
+                            <p class="text-sm font-bold text-gray-600 mb-2">عدد المندوبين</p>
+                            <p class="text-2xl font-bold text-purple-600" id="dash-agents-count">0</p>
+                        </div>
+                    </div>
+                    
                     <!-- Agents Performance -->
-                    <div class="mt-8">
-                        <h4 class="text-2xl font-bold text-blue-900 mb-6">أداء المندوبين</h4>
-                        <div id="agents-performance" class="space-y-5">
+                    <div class="mt-6">
+                        <h4 class="text-xl font-bold text-blue-900 mb-4">أداء المندوبين</h4>
+                        <div id="agents-performance" class="space-y-4">
                             <p class="text-center text-gray-500 py-12 text-lg">لا توجد بيانات</p>
                         </div>
                     </div>
@@ -552,9 +948,23 @@
 
             <!-- Agents Management Tab -->
             <div id="agents-tab" class="tab-content hidden">
-                <div class="glass-card mx-4 p-8">
-                    <h3 class="text-3xl font-bold text-blue-900 mb-8">👨‍💼 إدارة المندوبين</h3>
-                    <div id="agents-list" class="space-y-5">
+                <div class="glass-card mx-4 p-6 my-4">
+                    <h3 class="text-2xl font-bold text-blue-900 mb-6"><i class="fas fa-user-tie ml-2"></i> إدارة المندوبين</h3>
+                    
+                    <!-- Date Filter -->
+                    <div class="filter-section">
+                        <div class="filter-row">
+                            <div class="filter-group">
+                                <label class="form-label">التاريخ</label>
+                                <input type="date" id="agents-date" class="input-field w-full px-4 py-3 border-2 border-gray-200 focus:outline-none">
+                            </div>
+                            <button id="apply-agents-filter" class="btn-primary text-white px-6 py-3 rounded-xl flex items-center h-fit">
+                                <i class="fas fa-filter ml-2"></i> تطبيق الفلتر
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div id="agents-list" class="space-y-4">
                         <p class="text-center text-gray-500 py-12 text-lg">لا توجد بيانات</p>
                     </div>
                 </div>
@@ -565,34 +975,36 @@
     <!-- Modals -->
     <!-- Add Bank Account Modal -->
     <div id="bank-modal" class="hidden fixed inset-0 modal-backdrop z-50 flex items-center justify-center p-4">
-        <div class="glass-card p-8 max-w-md w-full max-h-[90%] overflow-y-auto">
-            <h3 class="text-2xl font-bold text-blue-900 mb-6">إضافة حساب بنكي</h3>
+        <div class="glass-card p-6 max-w-md w-full max-h-[90%] overflow-y-auto">
+            <h3 class="text-xl font-bold text-blue-900 mb-4 flex items-center">
+                <i class="fas fa-university ml-2"></i> إضافة حساب بنكي
+            </h3>
             <form id="bank-form" class="space-y-4">
-                <div>
-                    <label class="block text-sm font-bold text-gray-700 mb-2">اسم الحساب</label>
+                <div class="form-group">
+                    <label class="form-label">اسم الحساب</label>
                     <input type="text" id="bank-name" class="input-field w-full px-4 py-3 border-2 border-gray-200 focus:outline-none" required>
                 </div>
-                <div>
-                    <label class="block text-sm font-bold text-gray-700 mb-2">رقم الحساب</label>
+                <div class="form-group">
+                    <label class="form-label">رقم الحساب</label>
                     <input type="text" id="bank-account-number" class="input-field w-full px-4 py-3 border-2 border-gray-200 focus:outline-none" required>
                 </div>
-                <div>
-                    <label class="block text-sm font-bold text-gray-700 mb-2">رقم البطاقة</label>
+                <div class="form-group">
+                    <label class="form-label">رقم البطاقة</label>
                     <input type="text" id="bank-card-number" class="input-field w-full px-4 py-3 border-2 border-gray-200 focus:outline-none">
                 </div>
-                <div>
-                    <label class="block text-sm font-bold text-gray-700 mb-2">اسم صاحب البطاقة</label>
+                <div class="form-group">
+                    <label class="form-label">اسم صاحب البطاقة</label>
                     <input type="text" id="bank-card-holder" class="input-field w-full px-4 py-3 border-2 border-gray-200 focus:outline-none">
                 </div>
-                <div>
-                    <label class="block text-sm font-bold text-gray-700 mb-2">السقف المالي</label>
+                <div class="form-group">
+                    <label class="form-label">السقف المالي</label>
                     <input type="number" id="bank-ceiling" class="input-field w-full px-4 py-3 border-2 border-gray-200 focus:outline-none" required>
                 </div>
-                <div>
-                    <label class="block text-sm font-bold text-gray-700 mb-2">الرقم السري للبطاقة</label>
+                <div class="form-group">
+                    <label class="form-label">الرقم السري للبطاقة</label>
                     <input type="password" id="bank-pin" class="input-field w-full px-4 py-3 border-2 border-gray-200 focus:outline-none">
                 </div>
-                <div class="flex gap-3 mt-6">
+                <div class="flex gap-3 mt-4">
                     <button type="submit" class="btn-primary flex-1 text-white py-3 rounded-xl flex items-center justify-center gap-2">
                         <span id="bank-btn-text">حفظ</span>
                         <span id="bank-spinner" class="loading-spinner hidden"></span>
@@ -605,18 +1017,29 @@
 
     <!-- Add Debtor Modal -->
     <div id="debtor-modal" class="hidden fixed inset-0 modal-backdrop z-50 flex items-center justify-center p-4">
-        <div class="glass-card p-8 max-w-md w-full">
-            <h3 class="text-2xl font-bold text-blue-900 mb-6">إضافة عميل مديون</h3>
+        <div class="glass-card p-6 max-w-md w-full">
+            <h3 class="text-xl font-bold text-blue-900 mb-4 flex items-center">
+                <i class="fas fa-user-plus ml-2"></i> إضافة عميل مديون
+            </h3>
             <form id="debtor-form" class="space-y-4">
-                <div>
-                    <label class="block text-sm font-bold text-gray-700 mb-2">اسم العميل</label>
+                <div class="form-group">
+                    <label class="form-label">اسم العميل</label>
                     <input type="text" id="debtor-name" class="input-field w-full px-4 py-3 border-2 border-gray-200 focus:outline-none" required>
                 </div>
-                <div>
-                    <label class="block text-sm font-bold text-gray-700 mb-2">المبلغ المستحق</label>
+                <div class="form-group">
+                    <label class="form-label">المبلغ المستحق</label>
                     <input type="number" id="debtor-amount" class="input-field w-full px-4 py-3 border-2 border-gray-200 focus:outline-none" required>
                 </div>
-                <div class="flex gap-3 mt-6">
+                <div class="form-group">
+                    <label class="form-label">المنطقة</label>
+                    <select id="debtor-region" class="input-field w-full px-4 py-3 border-2 border-gray-200 focus:outline-none" required>
+                        <option value="">اختر المنطقة</option>
+                        <option value="khamis">خميس مشيط</option>
+                        <option value="dharan">ظهران الجنوب</option>
+                        <option value="other">باقي المناطق</option>
+                    </select>
+                </div>
+                <div class="flex gap-3 mt-4">
                     <button type="submit" class="btn-primary flex-1 text-white py-3 rounded-xl flex items-center justify-center gap-2">
                         <span id="debtor-btn-text">حفظ</span>
                         <span id="debtor-spinner" class="loading-spinner hidden"></span>
@@ -629,46 +1052,50 @@
 
     <!-- Add Failed Deposit Modal -->
     <div id="failed-modal" class="hidden fixed inset-0 modal-backdrop z-50 flex items-center justify-center p-4">
-        <div class="glass-card p-8 max-w-md w-full max-h-[90%] overflow-y-auto">
-            <h3 class="text-2xl font-bold text-blue-900 mb-6">إضافة عملية إيداع فاشلة</h3>
+        <div class="glass-card p-6 max-w-md w-full max-h-[90%] overflow-y-auto">
+            <h3 class="text-xl font-bold text-blue-900 mb-4 flex items-center">
+                <i class="fas fa-times-circle ml-2"></i> إضافة عملية إيداع فاشلة
+            </h3>
             <form id="failed-form" class="space-y-4">
-                <div>
-                    <label class="block text-sm font-bold text-gray-700 mb-2">اسم الحساب</label>
-                    <input type="text" id="failed-bank-name" class="input-field w-full px-4 py-3 border-2 border-gray-200 focus:outline-none" required>
+                <div class="form-group">
+                    <label class="form-label">الحساب البنكي</label>
+                    <select id="failed-bank-name" class="input-field w-full px-4 py-3 border-2 border-gray-200 focus:outline-none" required>
+                        <option value="">اختر الحساب</option>
+                    </select>
                 </div>
-                <div>
-                    <label class="block text-sm font-bold text-gray-700 mb-2">رقم الحساب</label>
+                <div class="form-group">
+                    <label class="form-label">رقم الحساب</label>
                     <input type="text" id="failed-account-number" class="input-field w-full px-4 py-3 border-2 border-gray-200 focus:outline-none" required>
                 </div>
-                <div>
-                    <label class="block text-sm font-bold text-gray-700 mb-2">المبلغ</label>
+                <div class="form-group">
+                    <label class="form-label">المبلغ</label>
                     <input type="number" id="failed-amount" class="input-field w-full px-4 py-3 border-2 border-gray-200 focus:outline-none" required>
                 </div>
-                <div>
-                    <label class="block text-sm font-bold text-gray-700 mb-2">عنوان الفرع</label>
+                <div class="form-group">
+                    <label class="form-label">عنوان الفرع</label>
                     <input type="text" id="failed-branch-address" class="input-field w-full px-4 py-3 border-2 border-gray-200 focus:outline-none">
                 </div>
-                <div>
-                    <label class="block text-sm font-bold text-gray-700 mb-2">رقم الفرع</label>
+                <div class="form-group">
+                    <label class="form-label">رقم الفرع</label>
                     <input type="text" id="failed-branch-number" class="input-field w-full px-4 py-3 border-2 border-gray-200 focus:outline-none">
                 </div>
-                <div>
-                    <label class="block text-sm font-bold text-gray-700 mb-2">رقم الجهاز</label>
+                <div class="form-group">
+                    <label class="form-label">رقم الجهاز</label>
                     <input type="text" id="failed-device-number" class="input-field w-full px-4 py-3 border-2 border-gray-200 focus:outline-none">
                 </div>
-                <div>
-                    <label class="block text-sm font-bold text-gray-700 mb-2">رقم البطاقة</label>
+                <div class="form-group">
+                    <label class="form-label">رقم البطاقة</label>
                     <input type="text" id="failed-card-number" class="input-field w-full px-4 py-3 border-2 border-gray-200 focus:outline-none">
                 </div>
-                <div>
-                    <label class="block text-sm font-bold text-gray-700 mb-2">اسم صاحب البطاقة</label>
+                <div class="form-group">
+                    <label class="form-label">اسم صاحب البطاقة</label>
                     <input type="text" id="failed-card-holder" class="input-field w-full px-4 py-3 border-2 border-gray-200 focus:outline-none">
                 </div>
-                <div>
-                    <label class="block text-sm font-bold text-gray-700 mb-2">رمز البطاقة</label>
+                <div class="form-group">
+                    <label class="form-label">رمز البطاقة</label>
                     <input type="text" id="failed-card-code" class="input-field w-full px-4 py-3 border-2 border-gray-200 focus:outline-none">
                 </div>
-                <div class="flex gap-3 mt-6">
+                <div class="flex gap-3 mt-4">
                     <button type="submit" class="btn-primary flex-1 text-white py-3 rounded-xl flex items-center justify-center gap-2">
                         <span id="failed-btn-text">حفظ</span>
                         <span id="failed-spinner" class="loading-spinner hidden"></span>
@@ -681,11 +1108,17 @@
 
     <!-- Share Modal -->
     <div id="share-modal" class="hidden fixed inset-0 modal-backdrop z-50 flex items-center justify-center p-4">
-        <div class="glass-card p-8 max-w-lg w-full">
-            <h3 class="text-2xl font-bold text-blue-900 mb-6">مشاركة التقرير</h3>
-            <textarea id="share-text" class="w-full h-96 p-5 border-2 border-gray-200 rounded-xl mb-6 font-mono text-sm focus:border-blue-500 focus:outline-none" readonly></textarea>
+        <div class="glass-card p-6 max-w-lg w-full">
+            <h3 class="text-xl font-bold text-blue-900 mb-4 flex items-center">
+                <i class="fas fa-share-alt ml-2"></i> مشاركة التقرير
+            </h3>
+            <div class="share-template mb-4">
+                <div id="share-content"></div>
+            </div>
             <div class="flex gap-3">
-                <button id="copy-share-btn" class="btn-primary flex-1 text-white py-3 rounded-xl">📋 نسخ</button>
+                <button id="copy-share-btn" class="btn-primary flex-1 text-white py-3 rounded-xl flex items-center justify-center">
+                    <i class="fas fa-copy ml-2"></i> نسخ
+                </button>
                 <button id="close-share-modal" class="flex-1 bg-gray-300 text-gray-700 font-bold py-3 rounded-xl hover:bg-gray-400 transition">إغلاق</button>
             </div>
         </div>
@@ -713,6 +1146,53 @@
         let userType = '';
         const ADMIN_PASSWORD = 'mana1234';
 
+        // تهيئة السقوف عند بدء يوم جديد
+        function initializeDailyCeilings() {
+            const today = new Date().toISOString().split('T')[0];
+            const lastInitialization = localStorage.getItem('lastInitializationDate');
+            
+            if (lastInitialization !== today) {
+                // اليوم جديد، نقوم بتهيئة سقوف الحسابات
+                const banks = allRecords.filter(r => r.is_bank_account);
+                banks.forEach(bank => {
+                    // إعادة تعيين السقف اليومي (إذا كان هناك حقل منفصل)
+                    // في هذا النظام، نحن نستخدم السقف المالي الأساسي
+                });
+                
+                // حساب الرصيد السابق للمندوبين
+                if (userType === 'agent') {
+                    calculatePreviousBalance();
+                }
+                
+                localStorage.setItem('lastInitializationDate', today);
+                showToast('تم تهيئة النظام ليوم جديد');
+            }
+        }
+
+        // حساب رصيد الأمس للمندوب
+        function calculatePreviousBalance() {
+            const today = new Date();
+            const yesterday = new Date(today);
+            yesterday.setDate(yesterday.getDate() - 1);
+            const yesterdayStr = yesterday.toISOString().split('T')[0];
+
+            const yesterdayRecords = allRecords.filter(r => 
+                r.date === yesterdayStr && 
+                r.agent_name === currentAgent &&
+                !r.is_bank_account && 
+                !r.is_debtor_customer && 
+                !r.is_failed_deposit
+            );
+            
+            const totals = calculateTotals(yesterdayRecords);
+            const previousBalance = totals.collections + totals.receipts - totals.deposits - totals.expenses - totals.deliveries;
+            
+            localStorage.setItem(`previousBalance_${currentAgent}`, previousBalance);
+            document.getElementById('previous-balance').textContent = Math.round(previousBalance);
+            
+            return previousBalance;
+        }
+
         function updateDate() {
             const now = new Date();
             const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
@@ -732,21 +1212,47 @@
                 });
             }
             updateUI();
+            initializeDailyCeilings();
         });
 
+        // استبعاد اسم العميل عند السحب من البطاقة
         document.getElementById('collection-type').addEventListener('change', (e) => {
             const bankCardDiv = document.getElementById('bank-card-select-div');
-            const bankCardSelect = document.getElementById('collection-bank-card');
+            const customerNameField = document.getElementById('customer-name-field');
             
             if (e.target.value === 'سحب من بطاقة') {
                 bankCardDiv.classList.remove('hidden');
-                bankCardSelect.required = true;
-                updateBankCardsDropdown();
+                customerNameField.classList.add('hidden');
+                document.getElementById('customer-name').required = false;
             } else {
                 bankCardDiv.classList.add('hidden');
-                bankCardSelect.required = false;
+                customerNameField.classList.remove('hidden');
+                document.getElementById('customer-name').required = true;
             }
+            
+            // حفظ آخر اختيار
+            saveLastSelection('collection-type', e.target.value);
         });
+
+        // تحميل آخر اختيار عند تحميل الصفحة
+        function loadLastSelections() {
+            const lastCollectionType = getLastSelection('collection-type');
+            if (lastCollectionType) {
+                document.getElementById('collection-type').value = lastCollectionType;
+                // تشغيل الحدث لتحديث الواجهة
+                document.getElementById('collection-type').dispatchEvent(new Event('change'));
+            }
+            
+            const lastDepositBank = getLastSelection('deposit-bank');
+            if (lastDepositBank) {
+                document.getElementById('deposit-bank').value = lastDepositBank;
+            }
+            
+            const lastFailedBank = getLastSelection('failed-bank-name');
+            if (lastFailedBank) {
+                document.getElementById('failed-bank-name').value = lastFailedBank;
+            }
+        }
 
         document.getElementById('user-type').addEventListener('change', (e) => {
             const agentField = document.getElementById('agent-name-field');
@@ -787,7 +1293,7 @@
             if (userType === 'agent') {
                 document.getElementById('current-agent').textContent = `المندوب: ${currentAgent}`;
                 
-                const allTabs = document.querySelectorAll('.tab-button');
+                const allTabs = document.querySelectorAll('.nav-tab');
                 allTabs.forEach(tab => {
                     const tabName = tab.dataset.tab;
                     if (tabName === 'data-entry' || tabName === 'daily-summary' || tabName === 'bank-accounts' || tabName === 'debtor-customers' || tabName === 'failed-deposits') {
@@ -797,7 +1303,7 @@
                     }
                 });
                 
-                document.querySelectorAll('.tab-button').forEach(b => b.classList.remove('active'));
+                document.querySelectorAll('.nav-tab').forEach(b => b.classList.remove('active'));
                 document.querySelector('[data-tab="data-entry"]').classList.add('active');
                 
                 document.querySelectorAll('.tab-content').forEach(t => t.classList.add('hidden'));
@@ -806,7 +1312,7 @@
             } else if (userType === 'admin') {
                 document.getElementById('current-agent').textContent = `المستخدم: الإدارة`;
                 
-                const allTabs = document.querySelectorAll('.tab-button');
+                const allTabs = document.querySelectorAll('.nav-tab');
                 allTabs.forEach(tab => {
                     const tabName = tab.dataset.tab;
                     if (tabName === 'bank-accounts' || tabName === 'debtor-customers' || tabName === 'failed-deposits' || tabName === 'all-operations' || tabName === 'dashboard' || tabName === 'agents') {
@@ -816,7 +1322,7 @@
                     }
                 });
                 
-                document.querySelectorAll('.tab-button').forEach(b => b.classList.remove('active'));
+                document.querySelectorAll('.nav-tab').forEach(b => b.classList.remove('active'));
                 document.querySelector('[data-tab="all-operations"]').classList.add('active');
                 
                 document.querySelectorAll('.tab-content').forEach(t => t.classList.add('hidden'));
@@ -836,6 +1342,7 @@
             });
             
             updateUI();
+            loadLastSelections();
         }
 
         document.getElementById('login-form').addEventListener('submit', (e) => {
@@ -876,9 +1383,9 @@
             location.reload();
         });
 
-        document.querySelectorAll('.tab-button').forEach(btn => {
+        document.querySelectorAll('.nav-tab').forEach(btn => {
             btn.addEventListener('click', () => {
-                document.querySelectorAll('.tab-button').forEach(b => b.classList.remove('active'));
+                document.querySelectorAll('.nav-tab').forEach(b => b.classList.remove('active'));
                 btn.classList.add('active');
                 
                 document.querySelectorAll('.tab-content').forEach(t => t.classList.add('hidden'));
@@ -888,6 +1395,70 @@
                 updateUI();
             });
         });
+
+        // إضافة أحداث لتبويبات المناطق
+        document.querySelectorAll('.region-tab').forEach(tab => {
+            tab.addEventListener('click', () => {
+                document.querySelectorAll('.region-tab').forEach(t => t.classList.remove('active'));
+                tab.classList.add('active');
+                
+                document.querySelectorAll('.region-section').forEach(s => s.classList.remove('active'));
+                const regionId = 'debtors-' + tab.dataset.region;
+                document.getElementById(regionId).classList.add('active');
+            });
+        });
+
+        // إضافة أحداث للفلاتر الجديدة
+        document.getElementById('apply-daily-filter').addEventListener('click', updateDailySummary);
+        document.getElementById('apply-bank-filter').addEventListener('click', updateBankAccountsList);
+        document.getElementById('apply-dashboard-filter').addEventListener('click', updateDashboard);
+        document.getElementById('apply-agents-filter').addEventListener('click', updateAgentsList);
+        document.getElementById('apply-all-operations-filter').addEventListener('click', updateAllOperations);
+
+        // زر بدء يوم جديد
+        document.getElementById('reset-day-btn').addEventListener('click', () => {
+            const confirmDiv = document.createElement('div');
+            confirmDiv.className = 'fixed bottom-20 right-4 glass-card p-4 z-50 shadow-2xl max-w-xs';
+            confirmDiv.innerHTML = `
+                <p class="font-bold mb-3 text-blue-900">هل تريد بدء يوم جديد؟ سيتم إعادة تعيين جميع الإحصائيات.</p>
+                <div class="flex gap-2">
+                    <button id="confirm-reset" class="btn-primary text-white px-4 py-2 rounded-xl text-sm font-bold flex-1">نعم، ابدأ</button>
+                    <button id="cancel-reset" class="bg-gray-300 text-gray-700 px-4 py-2 rounded-xl text-sm font-bold flex-1 hover:bg-gray-400 transition">إلغاء</button>
+                </div>
+            `;
+            document.body.appendChild(confirmDiv);
+            
+            document.getElementById('confirm-reset').addEventListener('click', () => {
+                // إعادة تعيين تاريخ التهيئة الأخير
+                localStorage.removeItem('lastInitializationDate');
+                // إعادة تعيين أرصدة الأمس
+                const agents = [...new Set(allRecords.map(r => r.agent_name))];
+                agents.forEach(agent => {
+                    localStorage.removeItem(`previousBalance_${agent}`);
+                });
+                
+                // إعادة تعيين الفلاتر
+                document.getElementById('dashboard-date').value = '';
+                
+                showToast('تم بدء يوم جديد بنجاح');
+                confirmDiv.remove();
+                updateUI();
+            });
+            
+            document.getElementById('cancel-reset').addEventListener('click', () => {
+                confirmDiv.remove();
+            });
+        });
+
+        // حفظ آخر اختيار
+        function saveLastSelection(fieldId, value) {
+            localStorage.setItem(fieldId, value);
+        }
+
+        // استرجاع آخر اختيار
+        function getLastSelection(fieldId) {
+            return localStorage.getItem(fieldId);
+        }
 
         async function submitOperation(btn, spinner, record, successMsg, shareGenerator) {
             btn.textContent = 'جاري الإضافة...';
@@ -915,7 +1486,7 @@
             e.preventDefault();
             const btn = document.getElementById('collection-btn-text');
             const spinner = document.getElementById('collection-spinner');
-            btn.dataset.originalText = 'إضافة تحصيل';
+            btn.dataset.originalText = btn.textContent;
 
             const now = new Date();
             const collectionType = document.getElementById('collection-type').value;
@@ -923,7 +1494,7 @@
                 type: 'collection',
                 agent_name: currentAgent,
                 collection_type: collectionType,
-                customer_name: document.getElementById('customer-name').value,
+                customer_name: collectionType === 'سحب من بطاقة' ? '' : document.getElementById('customer-name').value,
                 amount: Math.round(parseFloat(document.getElementById('collection-amount').value)),
                 date: now.toISOString().split('T')[0],
                 time: now.getHours() + ':' + (now.getMinutes() < 10 ? '0' : '') + now.getMinutes(),
@@ -942,13 +1513,15 @@
                         const totalActivity = getTotalBankActivity(r.bank_account);
                         return generateWithdrawalShare(r, totalActivity);
                     }
-                    return generateOperationShare(r, 'تحصيل جديد');
+                    return generateOperationShare(r, '💰 عملية تحصيل جديدة');
                 }
             );
             
             if (success) {
                 e.target.reset();
                 document.getElementById('bank-card-select-div').classList.add('hidden');
+                document.getElementById('customer-name-field').classList.remove('hidden');
+                document.getElementById('customer-name').required = true;
             }
         });
 
@@ -956,11 +1529,14 @@
             e.preventDefault();
             const btn = document.getElementById('deposit-btn-text');
             const spinner = document.getElementById('deposit-spinner');
-            btn.dataset.originalText = 'إضافة إيداع';
+            btn.dataset.originalText = btn.textContent;
 
             const now = new Date();
             const bankAccount = document.getElementById('deposit-bank').value;
             const amount = Math.round(parseFloat(document.getElementById('deposit-amount').value));
+            
+            // حفظ آخر اختيار
+            saveLastSelection('deposit-bank', bankAccount);
             
             const record = {
                 type: 'deposit',
@@ -982,7 +1558,7 @@
                         const remaining = bank.financial_ceiling - totalDeposits;
                         return generateDepositShare(r, remaining);
                     }
-                    return generateOperationShare(r, 'إيداع جديد');
+                    return generateOperationShare(r, '🏦 إيداع بنكي جديد');
                 }
             );
             
@@ -993,7 +1569,7 @@
             e.preventDefault();
             const btn = document.getElementById('expense-btn-text');
             const spinner = document.getElementById('expense-spinner');
-            btn.dataset.originalText = 'إضافة مصروف';
+            btn.dataset.originalText = btn.textContent;
 
             const now = new Date();
             const record = {
@@ -1010,7 +1586,7 @@
             };
 
             const success = await submitOperation(btn, spinner, record, 'تم إضافة المصروف بنجاح ✅',
-                (r) => generateOperationShare(r, 'مصروف جديد')
+                (r) => generateOperationShare(r, '💸 مصروف جديد')
             );
             
             if (success) e.target.reset();
@@ -1020,7 +1596,7 @@
             e.preventDefault();
             const btn = document.getElementById('transfer-btn-text');
             const spinner = document.getElementById('transfer-spinner');
-            btn.dataset.originalText = 'إضافة عملية';
+            btn.dataset.originalText = btn.textContent;
 
             const now = new Date();
             const record = {
@@ -1037,7 +1613,7 @@
             };
 
             const success = await submitOperation(btn, spinner, record, 'تم إضافة العملية بنجاح ✅',
-                (r) => generateOperationShare(r, 'تحويل جديد')
+                (r) => generateOperationShare(r, '🔄 تحويل جديد')
             );
             
             if (success) e.target.reset();
@@ -1113,6 +1689,7 @@
                 agent_name: currentAgent,
                 customer_name: document.getElementById('debtor-name').value,
                 customer_debt: Math.round(parseFloat(document.getElementById('debtor-amount').value)),
+                customer_region: document.getElementById('debtor-region').value,
                 date: now.toISOString().split('T')[0],
                 time: now.getHours() + ':' + (now.getMinutes() < 10 ? '0' : '') + now.getMinutes(),
                 is_bank_account: false,
@@ -1152,10 +1729,15 @@
             spinner.classList.remove('hidden');
 
             const now = new Date();
+            const bankAccount = document.getElementById('failed-bank-name').value;
+            
+            // حفظ آخر اختيار
+            saveLastSelection('failed-bank-name', bankAccount);
+            
             const record = {
                 type: 'failed_deposit',
                 agent_name: currentAgent,
-                bank_account: document.getElementById('failed-bank-name').value,
+                bank_account: bankAccount,
                 account_number: document.getElementById('failed-account-number').value,
                 amount: Math.round(parseFloat(document.getElementById('failed-amount').value)),
                 branch_address: document.getElementById('failed-branch-address').value,
@@ -1191,8 +1773,17 @@
         });
 
         document.getElementById('copy-share-btn').addEventListener('click', () => {
-            const text = document.getElementById('share-text').value;
+            const text = document.getElementById('share-content').innerText;
             navigator.clipboard.writeText(text).then(() => {
+                showToast('تم نسخ التقرير ✅');
+            }).catch(err => {
+                // Fallback for browsers that don't support clipboard API
+                const textArea = document.createElement('textarea');
+                textArea.value = text;
+                document.body.appendChild(textArea);
+                textArea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textArea);
                 showToast('تم نسخ التقرير ✅');
             });
         });
@@ -1212,8 +1803,8 @@
         document.getElementById('filter-type').addEventListener('change', updateAllOperations);
         document.getElementById('filter-date').addEventListener('change', updateAllOperations);
 
-        function showShareModal(text) {
-            document.getElementById('share-text').value = text;
+        function showShareModal(htmlContent) {
+            document.getElementById('share-content').innerHTML = htmlContent;
             document.getElementById('share-modal').classList.remove('hidden');
         }
 
@@ -1224,6 +1815,14 @@
 
         function getTodayAgentRecords() {
             return getTodayRecords().filter(r => r.agent_name === currentAgent);
+        }
+
+        function getRecordsByDate(date) {
+            return allRecords.filter(r => r.date === date && !r.is_bank_account && !r.is_debtor_customer && !r.is_failed_deposit);
+        }
+
+        function getAgentRecordsByDate(date) {
+            return getRecordsByDate(date).filter(r => r.agent_name === currentAgent);
         }
 
         function calculateTotals(records) {
@@ -1242,26 +1841,24 @@
             return { collections, deposits, expenses, receipts, deliveries };
         }
 
-        function getTotalDepositsForBank(bankAccount) {
-            const today = new Date().toISOString().split('T')[0];
+        function getTotalDepositsForBank(bankAccount, date = null) {
+            const targetDate = date || new Date().toISOString().split('T')[0];
             return allRecords
-                .filter(r => r.type === 'deposit' && r.bank_account === bankAccount && r.date === today)
+                .filter(r => r.type === 'deposit' && r.bank_account === bankAccount && r.date === targetDate)
                 .reduce((sum, r) => sum + (r.amount || 0), 0);
         }
 
-        function getTotalWithdrawalsForBank(bankAccount) {
-            const today = new Date().toISOString().split('T')[0];
+        function getTotalWithdrawalsForBank(bankAccount, date = null) {
+            const targetDate = date || new Date().toISOString().split('T')[0];
             return allRecords
-                .filter(r => r.type === 'collection' && r.collection_type === 'سحب من بطاقة' && r.bank_account === bankAccount && r.date === today)
+                .filter(r => r.type === 'collection' && r.collection_type === 'سحب من بطاقة' && r.bank_account === bankAccount && r.date === targetDate)
                 .reduce((sum, r) => sum + (r.amount || 0), 0);
         }
         
-        function getTotalBankActivity(bankAccount) {
-            const today = new Date().toISOString().split('T')[0];
-            const deposits = allRecords
-                .filter(r => r.type === 'deposit' && r.bank_account === bankAccount && r.date === today)
-                .reduce((sum, r) => sum + (r.amount || 0), 0);
-            const withdrawals = getTotalWithdrawalsForBank(bankAccount);
+        function getTotalBankActivity(bankAccount, date = null) {
+            const targetDate = date || new Date().toISOString().split('T')[0];
+            const deposits = getTotalDepositsForBank(bankAccount, targetDate);
+            const withdrawals = getTotalWithdrawalsForBank(bankAccount, targetDate);
             return deposits + withdrawals;
         }
         
@@ -1294,15 +1891,23 @@
         }
 
         function updateBankAccountsDropdown() {
-            const select = document.getElementById('deposit-bank');
+            const depositSelect = document.getElementById('deposit-bank');
+            const failedSelect = document.getElementById('failed-bank-name');
             const banks = allRecords.filter(r => r.is_bank_account);
             
-            select.innerHTML = '<option value="">اختر الحساب</option>';
+            depositSelect.innerHTML = '<option value="">اختر الحساب</option>';
+            failedSelect.innerHTML = '<option value="">اختر الحساب</option>';
+            
             banks.forEach(bank => {
-                const option = document.createElement('option');
-                option.value = bank.bank_account;
-                option.textContent = bank.bank_account;
-                select.appendChild(option);
+                const option1 = document.createElement('option');
+                option1.value = bank.bank_account;
+                option1.textContent = bank.bank_account;
+                depositSelect.appendChild(option1);
+                
+                const option2 = document.createElement('option');
+                option2.value = bank.bank_account;
+                option2.textContent = bank.bank_account;
+                failedSelect.appendChild(option2);
             });
         }
 
@@ -1337,11 +1942,21 @@
         }
 
         function updateDailySummary() {
-            const records = getTodayAgentRecords();
+            const dateFilter = document.getElementById('daily-summary-date').value;
+            let records;
+            
+            if (dateFilter) {
+                records = getAgentRecordsByDate(dateFilter);
+            } else {
+                records = getTodayAgentRecords();
+            }
+            
             const totals = calculateTotals(records);
             
-            const remaining = totals.collections + totals.receipts - totals.deposits - totals.expenses - totals.deliveries;
+            const previousBalance = parseInt(localStorage.getItem(`previousBalance_${currentAgent}`) || 0);
+            const remaining = previousBalance + totals.collections + totals.receipts - totals.deposits - totals.expenses - totals.deliveries;
             
+            document.getElementById('previous-balance').textContent = Math.round(previousBalance);
             document.getElementById('total-collections').textContent = Math.round(totals.collections);
             document.getElementById('total-deposits').textContent = Math.round(totals.deposits);
             document.getElementById('total-expenses').textContent = Math.round(totals.expenses);
@@ -1349,7 +1964,7 @@
             
             const list = document.getElementById('operations-list');
             if (records.length === 0) {
-                list.innerHTML = '<p class="text-center text-gray-500 py-12 text-lg">لا توجد عمليات اليوم</p>';
+                list.innerHTML = '<p class="text-center text-gray-500 py-12 text-lg">لا توجد عمليات لهذا اليوم</p>';
                 return;
             }
             
@@ -1407,7 +2022,10 @@
             
             let details = '';
             if (record.type === 'collection') {
-                details = `${record.collection_type} - ${record.customer_name}`;
+                details = `${record.collection_type}`;
+                if (record.collection_type !== 'سحب من بطاقة' && record.customer_name) {
+                    details += ` - ${record.customer_name}`;
+                }
                 if (record.bank_account) {
                     details += ` - ${record.bank_account}`;
                 }
@@ -1420,23 +2038,27 @@
             }
             
             return `
-                <div class="operation-card glass-card p-6 flex justify-between items-center">
-                    <div class="flex items-center gap-4 flex-1">
+                <div class="operation-card glass-card p-4 flex justify-between items-center">
+                    <div class="flex items-center gap-3 flex-1">
                         <div class="icon-circle bg-gradient-to-br ${typeColors[record.type]}">
                             <span class="text-white">${typeLabels[record.type].charAt(0)}</span>
                         </div>
                         <div class="flex-1">
-                            <p class="font-bold text-lg text-blue-900">${typeLabels[record.type] || record.type}</p>
-                            <p class="text-sm text-gray-600 mt-1 font-medium">${details}</p>
-                            ${showAgent ? `<p class="text-xs text-blue-600 mt-1 font-semibold">المندوب: ${record.agent_name}</p>` : ''}
+                            <p class="font-bold text-blue-900">${typeLabels[record.type] || record.type}</p>
+                            <p class="text-sm text-gray-600 mt-1">${details}</p>
+                            ${showAgent ? `<p class="text-xs text-blue-600 mt-1">المندوب: ${record.agent_name}</p>` : ''}
                             <p class="text-xs text-gray-500 mt-1">${record.date} - ${formatTime(record.time)}</p>
                         </div>
                     </div>
                     <div class="text-left">
-                        <p class="text-2xl font-bold text-blue-700">${Math.round(record.amount)}</p>
-                        <div class="flex gap-3 mt-3">
-                            <button onclick="window.deleteRecord('${record.id}')" class="text-red-600 text-xl hover:scale-125 transition" title="حذف">🗑️</button>
-                            <button onclick="window.shareRecord('${record.id}')" class="text-green-600 text-xl hover:scale-125 transition" title="مشاركة">📤</button>
+                        <p class="text-xl font-bold text-blue-700">${Math.round(record.amount)}</p>
+                        <div class="flex gap-2 mt-2">
+                            <button onclick="window.deleteRecord('${record.id}')" class="text-red-600 hover:scale-125 transition" title="حذف">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                            <button onclick="window.shareRecord('${record.id}')" class="text-green-600 hover:scale-125 transition" title="مشاركة">
+                                <i class="fas fa-share"></i>
+                            </button>
                         </div>
                     </div>
                 </div>
@@ -1444,6 +2066,7 @@
         }
 
         function updateBankAccountsList() {
+            const dateFilter = document.getElementById('bank-accounts-date').value;
             const banks = allRecords.filter(r => r.is_bank_account);
             const list = document.getElementById('bank-accounts-list');
             
@@ -1453,19 +2076,21 @@
             }
             
             list.innerHTML = banks.map(bank => {
-                const totalDeposits = getTotalDepositsForBank(bank.bank_account);
-                const totalWithdrawals = getTotalWithdrawalsForBank(bank.bank_account);
+                const totalDeposits = getTotalDepositsForBank(bank.bank_account, dateFilter);
+                const totalWithdrawals = getTotalWithdrawalsForBank(bank.bank_account, dateFilter);
                 const totalActivity = totalDeposits + totalWithdrawals;
                 const percentage = (totalDeposits / bank.financial_ceiling) * 100;
                 const isAgent = userType === 'agent';
                 
                 return `
-                    <div class="glass-card p-8">
-                        <div class="flex items-center gap-3 mb-6">
-                            <div class="icon-circle" style="background: linear-gradient(135deg, #3b82f6, #2563eb);">🏦</div>
-                            <h4 class="text-xl font-bold text-blue-900">${bank.bank_account}</h4>
+                    <div class="glass-card p-5">
+                        <div class="flex items-center gap-3 mb-4">
+                            <div class="icon-circle" style="background: linear-gradient(135deg, var(--primary-light), #2563eb);">
+                                <i class="fas fa-university text-white"></i>
+                            </div>
+                            <h4 class="text-lg font-bold text-blue-900">${bank.bank_account}</h4>
                         </div>
-                        <div class="space-y-3 text-sm font-medium">
+                        <div class="space-y-2 text-sm">
                             <p><span class="text-gray-600">رقم الحساب:</span> <span class="text-blue-900 font-bold">${bank.account_number}</span></p>
                             ${!isAgent && bank.card_number ? `<p><span class="text-gray-600">رقم البطاقة:</span> <span class="text-blue-900 font-bold">${bank.card_number}</span></p>` : ''}
                             ${!isAgent && bank.card_holder ? `<p><span class="text-gray-600">صاحب البطاقة:</span> <span class="text-blue-900 font-bold">${bank.card_holder}</span></p>` : ''}
@@ -1475,15 +2100,21 @@
                             <p><span class="text-gray-600">إجمالي النشاط:</span> <span class="text-indigo-600 font-bold">${Math.round(totalActivity)}</span></p>
                             <p><span class="text-gray-600">المتبقي من السقف:</span> <span class="text-green-600 font-bold">${Math.round(bank.financial_ceiling - totalDeposits)}</span></p>
                         </div>
-                        <div class="mt-6">
-                            <div class="w-full bg-gray-200 rounded-full h-5">
-                                <div class="progress-bar h-5 rounded-full" style="width: ${Math.min(percentage, 100)}%"></div>
+                        <div class="mt-4">
+                            <div class="w-full bg-gray-200 rounded-full h-3">
+                                <div class="progress-bar h-3 rounded-full" style="width: ${Math.min(percentage, 100)}%"></div>
                             </div>
-                            <p class="text-sm text-center mt-2 font-bold text-gray-700">${Math.round(percentage)}%</p>
+                            <p class="text-sm text-center mt-1 font-bold text-gray-700">${Math.round(percentage)}%</p>
                         </div>
-                        <div class="flex gap-3 mt-6">
-                            ${!isAgent ? `<button onclick="window.deleteRecord('${bank.id}')" class="btn-secondary flex-1 text-white py-3 rounded-xl text-sm font-bold">🗑️ حذف</button>` : ''}
-                            <button onclick="window.shareBankReport('${bank.bank_account}')" class="btn-primary ${isAgent ? 'w-full' : 'flex-1'} text-white py-3 rounded-xl text-sm font-bold">📤 مشاركة</button>
+                        <div class="flex gap-2 mt-4">
+                            ${!isAgent ? `
+                                <button onclick="window.deleteRecord('${bank.id}')" class="btn-secondary flex-1 text-white py-2 rounded-xl text-sm flex items-center justify-center">
+                                    <i class="fas fa-trash ml-1"></i> حذف
+                                </button>
+                            ` : ''}
+                            <button onclick="window.shareBankReport('${bank.bank_account}')" class="btn-primary ${isAgent ? 'w-full' : 'flex-1'} text-white py-2 rounded-xl text-sm flex items-center justify-center">
+                                <i class="fas fa-share ml-1"></i> مشاركة
+                            </button>
                         </div>
                     </div>
                 `;
@@ -1493,25 +2124,57 @@
         function updateDebtorsList() {
             const debtors = allRecords.filter(r => r.is_debtor_customer);
             const list = document.getElementById('debtors-list');
+            const listKhamis = document.getElementById('debtors-list-khamis');
+            const listDharan = document.getElementById('debtors-list-dharan');
+            const listOther = document.getElementById('debtors-list-other');
             const isAgent = userType === 'agent';
+            
+            // تصنيف العملاء حسب المنطقة
+            const debtorsKhamis = debtors.filter(d => d.customer_region === 'khamis');
+            const debtorsDharan = debtors.filter(d => d.customer_region === 'dharan');
+            const debtorsOther = debtors.filter(d => d.customer_region === 'other');
             
             if (debtors.length === 0) {
                 list.innerHTML = '<p class="text-center text-gray-500 py-12 text-lg">لا توجد ديون مسجلة</p>';
+                listKhamis.innerHTML = '<p class="text-center text-gray-500 py-12 text-lg">لا توجد ديون لعملاء خميس مشيط</p>';
+                listDharan.innerHTML = '<p class="text-center text-gray-500 py-12 text-lg">لا توجد ديون لعملاء ظهران الجنوب</p>';
+                listOther.innerHTML = '<p class="text-center text-gray-500 py-12 text-lg">لا توجد ديون لعملاء باقي المناطق</p>';
                 return;
             }
             
-            list.innerHTML = debtors.map(debtor => `
-                <div class="operation-card glass-card p-6 flex justify-between items-center">
-                    <div class="flex items-center gap-4">
-                        <div class="icon-circle" style="background: linear-gradient(135deg, #f59e0b, #d97706);">👤</div>
+            // تحديث جميع القوائم
+            list.innerHTML = debtors.map(debtor => createDebtorCard(debtor, isAgent)).join('');
+            listKhamis.innerHTML = debtorsKhamis.map(debtor => createDebtorCard(debtor, isAgent)).join('');
+            listDharan.innerHTML = debtorsDharan.map(debtor => createDebtorCard(debtor, isAgent)).join('');
+            listOther.innerHTML = debtorsOther.map(debtor => createDebtorCard(debtor, isAgent)).join('');
+        }
+
+        function createDebtorCard(debtor, isAgent) {
+            const regionLabels = {
+                'khamis': 'خميس مشيط',
+                'dharan': 'ظهران الجنوب',
+                'other': 'باقي المناطق'
+            };
+            
+            return `
+                <div class="operation-card glass-card p-4 flex justify-between items-center">
+                    <div class="flex items-center gap-3">
+                        <div class="icon-circle" style="background: linear-gradient(135deg, var(--warning), #d97706);">
+                            <i class="fas fa-user text-white"></i>
+                        </div>
                         <div>
-                            <p class="font-bold text-lg text-blue-900">${debtor.customer_name}</p>
+                            <p class="font-bold text-blue-900">${debtor.customer_name}</p>
                             <p class="text-sm text-gray-600 mt-1">المبلغ المستحق: <span class="font-bold text-red-600">${Math.round(debtor.customer_debt)}</span></p>
+                            <p class="text-xs text-blue-600 mt-1">المنطقة: ${regionLabels[debtor.customer_region] || 'غير محدد'}</p>
                         </div>
                     </div>
-                    ${!isAgent ? `<button onclick="window.deleteRecord('${debtor.id}')" class="text-red-600 text-2xl hover:scale-125 transition">🗑️</button>` : ''}
+                    ${!isAgent ? `
+                        <button onclick="window.deleteRecord('${debtor.id}')" class="text-red-600 text-xl hover:scale-125 transition">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    ` : ''}
                 </div>
-            `).join('');
+            `;
         }
 
         function updateFailedDepositsList() {
@@ -1524,18 +2187,24 @@
             }
             
             list.innerHTML = failed.map(f => `
-                <div class="operation-card glass-card p-6">
-                    <div class="flex justify-between items-start mb-4">
-                        <div class="flex items-center gap-3">
-                            <div class="icon-circle" style="background: linear-gradient(135deg, #ef4444, #dc2626);">❌</div>
-                            <p class="font-bold text-lg text-red-600">عملية إيداع فاشلة</p>
+                <div class="operation-card glass-card p-4">
+                    <div class="flex justify-between items-start mb-3">
+                        <div class="flex items-center gap-2">
+                            <div class="icon-circle" style="background: linear-gradient(135deg, var(--danger), #dc2626);">
+                                <i class="fas fa-times text-white"></i>
+                            </div>
+                            <p class="font-bold text-red-600">عملية إيداع فاشلة</p>
                         </div>
-                        <div class="flex gap-3">
-                            <button onclick="window.shareRecord('${f.id}')" class="text-green-600 text-xl hover:scale-125 transition">📤</button>
-                            <button onclick="window.deleteRecord('${f.id}')" class="text-red-600 text-xl hover:scale-125 transition">🗑️</button>
+                        <div class="flex gap-2">
+                            <button onclick="window.shareRecord('${f.id}')" class="text-green-600 hover:scale-125 transition">
+                                <i class="fas fa-share"></i>
+                            </button>
+                            <button onclick="window.deleteRecord('${f.id}')" class="text-red-600 hover:scale-125 transition">
+                                <i class="fas fa-trash"></i>
+                            </button>
                         </div>
                     </div>
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm font-medium">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-2 text-sm">
                         <p><span class="text-gray-600">الحساب:</span> <span class="text-blue-900 font-bold">${f.bank_account}</span></p>
                         <p><span class="text-gray-600">المبلغ:</span> <span class="text-red-600 font-bold">${Math.round(f.amount)}</span></p>
                         <p><span class="text-gray-600">رقم الحساب:</span> <span class="text-blue-900 font-bold">${f.account_number}</span></p>
@@ -1548,8 +2217,15 @@
         }
 
         function updateDashboard() {
-            const today = new Date().toISOString().split('T')[0];
-            const todayRecords = allRecords.filter(r => r.date === today && !r.is_bank_account && !r.is_debtor_customer && !r.is_failed_deposit);
+            const dateFilter = document.getElementById('dashboard-date').value;
+            let todayRecords;
+            
+            if (dateFilter) {
+                todayRecords = getRecordsByDate(dateFilter);
+            } else {
+                todayRecords = getTodayRecords();
+            }
+            
             const totals = calculateTotals(todayRecords);
             
             document.getElementById('dash-total-collections').textContent = Math.round(totals.collections);
@@ -1570,22 +2246,24 @@
                 const agentTotals = calculateTotals(agentRecords);
                 
                 return `
-                    <div class="glass-card p-6">
-                        <div class="flex items-center gap-3 mb-4">
-                            <div class="icon-circle" style="background: linear-gradient(135deg, #8b5cf6, #7c3aed);">👨‍💼</div>
-                            <p class="font-bold text-xl text-blue-900">${agent}</p>
+                    <div class="glass-card p-4">
+                        <div class="flex items-center gap-2 mb-3">
+                            <div class="icon-circle" style="background: linear-gradient(135deg, var(--purple), #7c3aed);">
+                                <i class="fas fa-user-tie text-white"></i>
+                            </div>
+                            <p class="font-bold text-blue-900">${agent}</p>
                         </div>
-                        <div class="grid grid-cols-3 gap-4 text-sm">
+                        <div class="grid grid-cols-3 gap-3 text-sm">
                             <div>
-                                <p class="text-gray-600 font-medium">التحصيلات</p>
+                                <p class="text-gray-600">التحصيلات</p>
                                 <p class="font-bold text-xl text-green-600 mt-1">${Math.round(agentTotals.collections)}</p>
                             </div>
                             <div>
-                                <p class="text-gray-600 font-medium">الإيداعات</p>
+                                <p class="text-gray-600">الإيداعات</p>
                                 <p class="font-bold text-xl text-blue-600 mt-1">${Math.round(agentTotals.deposits)}</p>
                             </div>
                             <div>
-                                <p class="text-gray-600 font-medium">المصروفات</p>
+                                <p class="text-gray-600">المصروفات</p>
                                 <p class="font-bold text-xl text-red-600 mt-1">${Math.round(agentTotals.expenses)}</p>
                             </div>
                         </div>
@@ -1595,8 +2273,15 @@
         }
 
         function updateAgentsList() {
-            const today = new Date().toISOString().split('T')[0];
-            const todayRecords = allRecords.filter(r => r.date === today && !r.is_bank_account && !r.is_debtor_customer && !r.is_failed_deposit);
+            const dateFilter = document.getElementById('agents-date').value;
+            let todayRecords;
+            
+            if (dateFilter) {
+                todayRecords = getRecordsByDate(dateFilter);
+            } else {
+                todayRecords = getTodayRecords();
+            }
+            
             const agents = [...new Set(todayRecords.map(r => r.agent_name))];
             
             const list = document.getElementById('agents-list');
@@ -1608,54 +2293,61 @@
             list.innerHTML = agents.map(agent => {
                 const agentRecords = todayRecords.filter(r => r.agent_name === agent);
                 const totals = calculateTotals(agentRecords);
-                const remaining = totals.collections + totals.receipts - totals.deposits - totals.expenses - totals.deliveries;
+                const previousBalance = parseInt(localStorage.getItem(`previousBalance_${agent}`) || 0);
+                const remaining = previousBalance + totals.collections + totals.receipts - totals.deposits - totals.expenses - totals.deliveries;
                 
                 return `
-                    <div class="glass-card p-8">
-                        <div class="flex items-center gap-4 mb-6">
-                            <div class="icon-circle" style="background: linear-gradient(135deg, #8b5cf6, #7c3aed); width: 64px; height: 64px; font-size: 32px;">👨‍💼</div>
-                            <h4 class="text-2xl font-bold text-blue-900">${agent}</h4>
+                    <div class="glass-card p-5">
+                        <div class="flex items-center gap-3 mb-4">
+                            <div class="icon-circle" style="background: linear-gradient(135deg, var(--purple), #7c3aed); width: 50px; height: 50px;">
+                                <i class="fas fa-user-tie text-white"></i>
+                            </div>
+                            <h4 class="text-xl font-bold text-blue-900">${agent}</h4>
                         </div>
-                        <div class="grid grid-cols-2 md:grid-cols-3 gap-4 text-sm">
-                            <div class="stat-card p-4">
+                        <div class="grid grid-cols-2 md:grid-cols-3 gap-3 text-sm">
+                            <div class="stat-card p-3">
                                 <p class="text-gray-600 font-bold">التحصيلات</p>
-                                <p class="text-2xl font-bold text-green-600 mt-2">${Math.round(totals.collections)}</p>
+                                <p class="text-lg font-bold text-green-600 mt-1">${Math.round(totals.collections)}</p>
                             </div>
-                            <div class="stat-card p-4">
+                            <div class="stat-card p-3">
                                 <p class="text-gray-600 font-bold">الإيداعات</p>
-                                <p class="text-2xl font-bold text-blue-600 mt-2">${Math.round(totals.deposits)}</p>
+                                <p class="text-lg font-bold text-blue-600 mt-1">${Math.round(totals.deposits)}</p>
                             </div>
-                            <div class="stat-card p-4">
+                            <div class="stat-card p-3">
                                 <p class="text-gray-600 font-bold">المصروفات</p>
-                                <p class="text-2xl font-bold text-red-600 mt-2">${Math.round(totals.expenses)}</p>
+                                <p class="text-lg font-bold text-red-600 mt-1">${Math.round(totals.expenses)}</p>
                             </div>
-                            <div class="stat-card p-4">
+                            <div class="stat-card p-3">
                                 <p class="text-gray-600 font-bold">الاستلامات</p>
-                                <p class="text-2xl font-bold text-purple-600 mt-2">${Math.round(totals.receipts)}</p>
+                                <p class="text-lg font-bold text-purple-600 mt-1">${Math.round(totals.receipts)}</p>
                             </div>
-                            <div class="stat-card p-4">
+                            <div class="stat-card p-3">
                                 <p class="text-gray-600 font-bold">التسليمات</p>
-                                <p class="text-2xl font-bold text-orange-600 mt-2">${Math.round(totals.deliveries)}</p>
+                                <p class="text-lg font-bold text-orange-600 mt-1">${Math.round(totals.deliveries)}</p>
                             </div>
-                            <div class="stat-card p-4">
+                            <div class="stat-card p-3">
                                 <p class="text-gray-600 font-bold">المتبقي</p>
-                                <p class="text-2xl font-bold text-indigo-600 mt-2">${Math.round(remaining)}</p>
+                                <p class="text-lg font-bold text-indigo-600 mt-1">${Math.round(remaining)}</p>
                             </div>
                         </div>
-                        <button onclick="window.shareAgentReport('${agent}')" class="btn-primary w-full text-white py-3 rounded-xl mt-6 font-bold">📤 مشاركة التقرير</button>
+                        <button onclick="window.shareAgentReport('${agent}')" class="btn-primary w-full text-white py-2 rounded-xl mt-4 flex items-center justify-center">
+                            <i class="fas fa-share ml-2"></i> مشاركة التقرير
+                        </button>
                     </div>
                 `;
             }).join('');
         }
 
+        // تحسين قوالب المشاركة لتطابق النموذج المطلوب
         function generateOperationShare(record, title) {
             const todayRecords = getTodayAgentRecords();
             const totals = calculateTotals(todayRecords);
-            const remaining = totals.collections + totals.receipts - totals.deposits - totals.expenses - totals.deliveries;
+            const previousBalance = parseInt(localStorage.getItem(`previousBalance_${currentAgent}`) || 0);
+            const remaining = previousBalance + totals.collections + totals.receipts - totals.deposits - totals.expenses - totals.deliveries;
             
             let details = '';
             if (record.type === 'collection') {
-                details = `▫️ العميل: ${record.customer_name}\n▫️ النوع: ${record.collection_type}`;
+                details = `▫️ العميل: ${record.customer_name || 'غير محدد'}\n▫️ النوع: ${record.collection_type}`;
                 if (record.bank_account) {
                     details += `\n▫️ البطاقة: ${record.bank_account}`;
                 }
@@ -1680,7 +2372,7 @@ ${details}
 ▫️ التاريخ: ${formatDateForShare(record.date, record.time)}
 ▫️ المندوب: ${record.agent_name}
 
-💰 المبلغ المتبقي: ${Math.round(remaining)}`;
+*💰 المبلغ المتبقي: ${Math.round(remaining)}*`;
         }
 
         function generateWithdrawalShare(record, totalActivity) {
@@ -1690,7 +2382,7 @@ ${details}
 
 ▫️ البطاقة: ${record.bank_account}
 ▫️ المبلغ: ${Math.round(record.amount)}
-▫️ العميل: ${record.customer_name}
+▫️ العميل: ${record.customer_name || 'غير محدد'}
 ▫️ التاريخ: ${formatDateForShare(record.date, record.time)}
 ▫️ المندوب: ${record.agent_name}
 
@@ -1698,22 +2390,29 @@ ${details}
         }
 
         function generateDepositShare(record, remaining) {
+            const todayRecords = getTodayAgentRecords();
+            const totals = calculateTotals(todayRecords);
+            const previousBalance = parseInt(localStorage.getItem(`previousBalance_${currentAgent}`) || 0);
+            const totalRemaining = previousBalance + totals.collections + totals.receipts - totals.deposits - totals.expenses - totals.deliveries;
+            
             return `━━━━━━━━━━━━━━━━━
-🏦 إيداع بنكي جديد
+*🏦 إيداع بنكي جديد*
 ━━━━━━━━━━━━━━━━━
 
 ▫️ الحساب: ${record.bank_account}
 ▫️ المبلغ: ${Math.round(record.amount)}
 ▫️ التاريخ: ${formatDateForShare(record.date, record.time)}
 ▫️ المندوب: ${record.agent_name}
+💳 المتبقي من السقف: ${Math.round(remaining)}
 
-💳 المتبقي من السقف: ${Math.round(remaining)}`;
+*💰 المبلغ المتبقي :  ${Math.round(totalRemaining)}*`;
         }
 
         function generateSummaryReport() {
             const todayRecords = getTodayAgentRecords();
             const totals = calculateTotals(todayRecords);
-            const remaining = totals.collections + totals.receipts - totals.deposits - totals.expenses - totals.deliveries;
+            const previousBalance = parseInt(localStorage.getItem(`previousBalance_${currentAgent}`) || 0);
+            const remaining = previousBalance + totals.collections + totals.receipts - totals.deposits - totals.expenses - totals.deliveries;
             
             const now = new Date();
             const dateStr = `${now.getDate()}/${now.getMonth() + 1}/${now.getFullYear()}`;
@@ -1737,7 +2436,8 @@ ${details}
         function generateDetailedReport() {
             const todayRecords = getTodayAgentRecords();
             const totals = calculateTotals(todayRecords);
-            const remaining = totals.collections + totals.receipts - totals.deposits - totals.expenses - totals.deliveries;
+            const previousBalance = parseInt(localStorage.getItem(`previousBalance_${currentAgent}`) || 0);
+            const remaining = previousBalance + totals.collections + totals.receipts - totals.deposits - totals.expenses - totals.deliveries;
             
             const now = new Date();
             const dateStr = `${now.getDate()}/${now.getMonth() + 1}/${now.getFullYear()}`;
@@ -1755,7 +2455,7 @@ ${details}
             if (collections.length > 0) {
                 report += `💰 التحصيلات (${collections.length}):\n`;
                 collections.forEach((r, i) => {
-                    report += `${i + 1}. ${r.customer_name} - ${r.collection_type}: ${Math.round(r.amount)}`;
+                    report += `${i + 1}. ${r.customer_name || 'غير محدد'} - ${r.collection_type}: ${Math.round(r.amount)}`;
                     if (r.bank_account) report += ` - ${r.bank_account}`;
                     report += `\n`;
                 });
@@ -1814,28 +2514,30 @@ ${details}
                 showShareModal(generateWithdrawalShare(record, totalActivity));
             } else {
                 const titles = {
-                    collection: 'تحصيل جديد',
-                    deposit: 'إيداع جديد',
-                    expense: 'مصروف جديد',
-                    transfer: 'تحويل جديد'
+                    collection: '*💰 عملية تحصيل جديدة*',
+                    deposit: '*🏦 إيداع بنكي جديد*',
+                    expense: '💸 مصروف جديد',
+                    transfer: '🔄 تحويل جديد'
                 };
                 showShareModal(generateOperationShare(record, titles[record.type] || 'عملية جديدة'));
             }
         };
 
         window.shareBankReport = function(bankAccount) {
-            const today = new Date().toISOString().split('T')[0];
+            const dateFilter = document.getElementById('bank-accounts-date').value;
+            const targetDate = dateFilter || new Date().toISOString().split('T')[0];
+            
             const deposits = allRecords.filter(r => 
                 r.type === 'deposit' && 
                 r.bank_account === bankAccount && 
-                r.date === today
+                r.date === targetDate
             );
             
             const withdrawals = allRecords.filter(r => 
                 r.type === 'collection' && 
                 r.collection_type === 'سحب من بطاقة' && 
                 r.bank_account === bankAccount && 
-                r.date === today
+                r.date === targetDate
             );
             
             const bank = allRecords.find(r => r.is_bank_account && r.bank_account === bankAccount);
@@ -1882,17 +2584,20 @@ ${bank ? `▫️ رقم الحساب: ${bank.account_number}\n` : ''}${bank ? `�
         };
 
         window.shareAgentReport = function(agentName) {
-            const today = new Date().toISOString().split('T')[0];
+            const dateFilter = document.getElementById('agents-date').value;
+            const targetDate = dateFilter || new Date().toISOString().split('T')[0];
+            
             const records = allRecords.filter(r => 
                 r.agent_name === agentName && 
-                r.date === today &&
+                r.date === targetDate &&
                 !r.is_bank_account && 
                 !r.is_debtor_customer && 
                 !r.is_failed_deposit
             );
             
             const totals = calculateTotals(records);
-            const remaining = totals.collections + totals.receipts - totals.deposits - totals.expenses - totals.deliveries;
+            const previousBalance = parseInt(localStorage.getItem(`previousBalance_${agentName}`) || 0);
+            const remaining = previousBalance + totals.collections + totals.receipts - totals.deposits - totals.expenses - totals.deliveries;
             
             const now = new Date();
             const dateStr = `${now.getDate()}/${now.getMonth() + 1}/${now.getFullYear()}`;
@@ -1922,12 +2627,12 @@ ${bank ? `▫️ رقم الحساب: ${bank.account_number}\n` : ''}${bank ? `�
             if (!record) return;
             
             const confirmDiv = document.createElement('div');
-            confirmDiv.className = 'fixed bottom-20 right-4 glass-card p-6 z-50 shadow-2xl';
+            confirmDiv.className = 'fixed bottom-20 right-4 glass-card p-4 z-50 shadow-2xl max-w-xs';
             confirmDiv.innerHTML = `
-                <p class="font-bold mb-4 text-lg text-blue-900">هل تريد حذف هذا السجل؟</p>
-                <div class="flex gap-3">
-                    <button id="confirm-delete" class="btn-primary text-white px-6 py-3 rounded-xl text-sm font-bold flex-1">نعم، احذف</button>
-                    <button id="cancel-delete" class="bg-gray-300 text-gray-700 px-6 py-3 rounded-xl text-sm font-bold flex-1 hover:bg-gray-400 transition">إلغاء</button>
+                <p class="font-bold mb-3 text-blue-900">هل تريد حذف هذا السجل؟</p>
+                <div class="flex gap-2">
+                    <button id="confirm-delete" class="btn-primary text-white px-4 py-2 rounded-xl text-sm font-bold flex-1">نعم، احذف</button>
+                    <button id="cancel-delete" class="bg-gray-300 text-gray-700 px-4 py-2 rounded-xl text-sm font-bold flex-1 hover:bg-gray-400 transition">إلغاء</button>
                 </div>
             `;
             document.body.appendChild(confirmDiv);
@@ -1951,8 +2656,8 @@ ${bank ? `▫️ رقم الحساب: ${bank.account_number}\n` : ''}${bank ? `�
         function showToast(message, type = 'success') {
             const toast = document.createElement('div');
             toast.className = 'toast';
-            if (type === 'error') toast.style.background = 'linear-gradient(135deg, #ef4444, #dc2626)';
-            if (type === 'info') toast.style.background = 'linear-gradient(135deg, #3b82f6, #2563eb)';
+            if (type === 'error') toast.style.background = 'linear-gradient(135deg, var(--danger), #dc2626)';
+            if (type === 'info') toast.style.background = 'linear-gradient(135deg, var(--primary-light), #2563eb)';
             toast.textContent = message;
             document.body.appendChild(toast);
             
