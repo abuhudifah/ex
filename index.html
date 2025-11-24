@@ -634,10 +634,6 @@
                                         <label class="form-label">المبلغ</label>
                                         <input type="number" id="deposit-amount" class="input-field w-full px-4 py-3 border-2 border-gray-200 focus:outline-none" required>
                                     </div>
-                                    <div class="form-group">
-                                        <label class="form-label">دبوس الحساب</label>
-                                        <input type="password" id="deposit-pin" class="input-field w-full px-4 py-3 border-2 border-gray-200 focus:outline-none" placeholder="أدخل دبوس الحساب">
-                                    </div>
                                     <div class="flex gap-2">
                                         <button type="submit" class="btn-primary flex-1 text-white py-3 rounded-xl flex items-center justify-center gap-2">
                                             <span id="deposit-btn-text"><i class="fas fa-plus-circle ml-2"></i> إضافة إيداع</span>
@@ -1214,6 +1210,26 @@
             return previousBalance;
         }
 
+        // وظيفة التحقق من الوقت وبدء يوم جديد تلقائياً
+        function checkForNewDay() {
+            const now = new Date();
+            const currentHour = now.getHours();
+            
+            // التحقق إذا كانت الساعة 1 صباحاً
+            if (currentHour === 1) {
+                const today = now.toISOString().split('T')[0];
+                const lastInitialization = localStorage.getItem('lastInitializationDate');
+                
+                if (lastInitialization !== today) {
+                    // بدء يوم جديد
+                    initializeDailyCeilings();
+                }
+            }
+        }
+
+        // تشغيل التحقق كل دقيقة
+        setInterval(checkForNewDay, 60000);
+
         function updateDate() {
             const now = new Date();
             const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
@@ -1663,14 +1679,6 @@
             const now = new Date();
             const bankAccount = document.getElementById('deposit-bank').value;
             const amount = Math.round(parseFloat(document.getElementById('deposit-amount').value));
-            const pin = document.getElementById('deposit-pin').value;
-            
-            // التحقق من دبوس الحساب
-            const bank = allRecords.find(b => b.is_bank_account && b.bank_account === bankAccount);
-            if (bank && bank.card_pin && bank.card_pin !== pin) {
-                showToast('دبوس الحساب غير صحيح', 'error');
-                return;
-            }
             
             // حفظ آخر اختيار
             saveLastSelection('deposit-bank', bankAccount);
