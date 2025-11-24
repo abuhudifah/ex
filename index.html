@@ -574,6 +574,19 @@
             <!-- Data Entry Tab -->
             <div id="data-entry-tab" class="tab-content">
                 <div class="data-entry-bg mx-4 my-4">
+                    <!-- Date Filter for Data Entry -->
+                    <div class="filter-section mb-6">
+                        <div class="filter-row">
+                            <div class="filter-group">
+                                <label class="form-label">تاريخ الإدخال</label>
+                                <input type="date" id="data-entry-date" class="input-field w-full px-4 py-3 border-2 border-gray-200 focus:outline-none">
+                            </div>
+                            <button id="apply-data-entry-filter" class="btn-primary text-white px-6 py-3 rounded-xl flex items-center h-fit">
+                                <i class="fas fa-filter ml-2"></i> تطبيق الفلتر
+                            </button>
+                        </div>
+                    </div>
+                    
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <!-- Collections -->
                         <div class="card-modern collection-card">
@@ -1168,11 +1181,18 @@
             const today = new Date().toISOString().split('T')[0];
             
             // تعيين جميع حقول الفلتر بتاريخ اليوم
+            document.getElementById('data-entry-date').value = today;
             document.getElementById('daily-summary-date').value = today;
             document.getElementById('bank-accounts-date').value = today;
             document.getElementById('dashboard-date').value = today;
             document.getElementById('agents-date').value = today;
             document.getElementById('filter-date').value = today;
+        }
+
+        // الحصول على التاريخ المستهدف للإدخال
+        function getTargetDate() {
+            const dataEntryDate = document.getElementById('data-entry-date').value;
+            return dataEntryDate || new Date().toISOString().split('T')[0];
         }
 
         // تهيئة السقوف عند بدء يوم جديد
@@ -1199,7 +1219,7 @@
                             !r.is_failed_deposit
                         );
                         
-                        const totals = calculateTotals(yesterdayRecords);
+                        const totals = calculateTotals(yesterdayRecords, agent, yesterdayStr);
                         const previousBalance = parseInt(localStorage.getItem(`previousBalance_${agent}_${yesterdayStr}`) || 0);
                         const finalBalance = previousBalance + totals.collections + totals.receipts - totals.deposits - totals.expenses - totals.deliveries - totals.failed;
                         
@@ -1214,14 +1234,15 @@
         }
 
         // حساب رصيد الأمس للمندوب
-        function calculatePreviousBalance() {
-            const today = new Date().toISOString().split('T')[0];
-            const yesterday = new Date();
+        function calculatePreviousBalance(targetDate = null) {
+            const date = targetDate || getTargetDate();
+            const today = new Date(date);
+            const yesterday = new Date(today);
             yesterday.setDate(yesterday.getDate() - 1);
             const yesterdayStr = yesterday.toISOString().split('T')[0];
 
-            // استخدام الرصيد المخزن مسبقاً لليوم الحالي
-            const previousBalance = parseInt(localStorage.getItem(`previousBalance_${currentAgent}_${today}`) || 0);
+            // استخدام الرصيد المخزن مسبقاً لليوم السابق
+            const previousBalance = parseInt(localStorage.getItem(`previousBalance_${currentAgent}_${date}`) || 0);
             
             document.getElementById('previous-balance').textContent = Math.round(previousBalance);
             
@@ -1482,6 +1503,7 @@
         });
 
         // إضافة أحداث للفلاتر الجديدة
+        document.getElementById('apply-data-entry-filter').addEventListener('click', updateUI);
         document.getElementById('apply-daily-filter').addEventListener('click', updateDailySummary);
         document.getElementById('apply-bank-filter').addEventListener('click', updateBankAccountsList);
         document.getElementById('apply-dashboard-filter').addEventListener('click', updateDashboard);
@@ -1520,7 +1542,7 @@
                             !r.is_failed_deposit
                         );
                         
-                        const totals = calculateTotals(todayRecords);
+                        const totals = calculateTotals(todayRecords, agent, today);
                         const previousBalance = parseInt(localStorage.getItem(`previousBalance_${agent}_${today}`) || 0);
                         const finalBalance = previousBalance + totals.collections + totals.receipts - totals.deposits - totals.expenses - totals.deliveries - totals.failed;
                         
@@ -1668,6 +1690,7 @@
             btn.dataset.originalText = btn.textContent;
 
             const now = new Date();
+            const targetDate = getTargetDate();
             const collectionType = document.getElementById('collection-type').value;
             const record = {
                 type: 'collection',
@@ -1675,7 +1698,7 @@
                 collection_type: collectionType,
                 customer_name: collectionType === 'سحب من بطاقة' ? '' : document.getElementById('customer-name').value,
                 amount: Math.round(parseFloat(document.getElementById('collection-amount').value)),
-                date: now.toISOString().split('T')[0],
+                date: targetDate,
                 time: now.getHours() + ':' + (now.getMinutes() < 10 ? '0' : '') + now.getMinutes(),
                 is_bank_account: false,
                 is_debtor_customer: false,
@@ -1692,7 +1715,7 @@
             const success = await submitOperation(btn, spinner, record, 'تم إضافة التحصيل بنجاح ✅', 
                 (r) => {
                     if (r.collection_type === 'سحب من بطاقة') {
-                        const totalActivity = getTotalBankActivity(r.bank_account);
+                        const totalActivity = getTotalBankActivity(r.bank_account, targetDate);
                         return generateWithdrawalShare(r, totalActivity);
                     }
                     return generateOperationShare(r, '💰 عملية تحصيل جديدة');
@@ -1723,6 +1746,7 @@
             btn.dataset.originalText = btn.textContent;
 
             const now = new Date();
+            const targetDate = getTargetDate();
             const bankAccount = document.getElementById('deposit-bank').value;
             const amount = Math.round(parseFloat(document.getElementById('deposit-amount').value));
             
@@ -1734,7 +1758,7 @@
                 agent_name: currentAgent,
                 bank_account: bankAccount,
                 amount: amount,
-                date: now.toISOString().split('T')[0],
+                date: targetDate,
                 time: now.getHours() + ':' + (now.getMinutes() < 10 ? '0' : '') + now.getMinutes(),
                 is_bank_account: false,
                 is_debtor_customer: false,
@@ -1748,7 +1772,7 @@
                 (r) => {
                     const bank = allRecords.find(b => b.is_bank_account && b.bank_account === bankAccount);
                     if (bank) {
-                        const totalDeposits = getTotalDepositsForBank(bankAccount);
+                        const totalDeposits = getTotalDepositsForBank(bankAccount, targetDate);
                         const remaining = bank.financial_ceiling - totalDeposits;
                         return generateDepositShare(r, remaining);
                     }
@@ -1777,13 +1801,14 @@
             btn.dataset.originalText = btn.textContent;
 
             const now = new Date();
+            const targetDate = getTargetDate();
             const record = {
                 type: 'expense',
                 agent_name: currentAgent,
                 expense_type: document.getElementById('expense-type').value,
                 expense_details: document.getElementById('expense-details').value,
                 amount: Math.round(parseFloat(document.getElementById('expense-amount').value)),
-                date: now.toISOString().split('T')[0],
+                date: targetDate,
                 time: now.getHours() + ':' + (now.getMinutes() < 10 ? '0' : '') + now.getMinutes(),
                 is_bank_account: false,
                 is_debtor_customer: false,
@@ -1818,13 +1843,14 @@
             btn.dataset.originalText = btn.textContent;
 
             const now = new Date();
+            const targetDate = getTargetDate();
             const record = {
                 type: 'transfer',
                 agent_name: currentAgent,
                 received_from: document.getElementById('received-from').value,
                 delivered_to: document.getElementById('delivered-to').value,
                 amount: Math.round(parseFloat(document.getElementById('transfer-amount').value)),
-                date: now.toISOString().split('T')[0],
+                date: targetDate,
                 time: now.getHours() + ':' + (now.getMinutes() < 10 ? '0' : '') + now.getMinutes(),
                 is_bank_account: false,
                 is_debtor_customer: false,
@@ -1872,6 +1898,7 @@
             spinner.classList.remove('hidden');
 
             const now = new Date();
+            const targetDate = getTargetDate();
             const record = {
                 type: 'bank_account',
                 agent_name: currentAgent,
@@ -1881,7 +1908,7 @@
                 card_holder: document.getElementById('bank-card-holder').value,
                 financial_ceiling: Math.round(parseFloat(document.getElementById('bank-ceiling').value)),
                 card_pin: document.getElementById('bank-pin').value,
-                date: now.toISOString().split('T')[0],
+                date: targetDate,
                 time: now.getHours() + ':' + (now.getMinutes() < 10 ? '0' : '') + now.getMinutes(),
                 is_bank_account: true,
                 is_debtor_customer: false,
@@ -1947,13 +1974,14 @@
             spinner.classList.remove('hidden');
 
             const now = new Date();
+            const targetDate = getTargetDate();
             const record = {
                 type: 'debtor',
                 agent_name: currentAgent,
                 customer_name: document.getElementById('debtor-name').value,
                 customer_debt: Math.round(parseFloat(document.getElementById('debtor-amount').value)),
                 customer_region: document.getElementById('debtor-region').value,
-                date: now.toISOString().split('T')[0],
+                date: targetDate,
                 time: now.getHours() + ':' + (now.getMinutes() < 10 ? '0' : '') + now.getMinutes(),
                 is_bank_account: false,
                 is_debtor_customer: true,
@@ -1992,6 +2020,7 @@
             spinner.classList.remove('hidden');
 
             const now = new Date();
+            const targetDate = getTargetDate();
             const bankAccount = document.getElementById('failed-bank-name').value;
             
             // حفظ آخر اختيار
@@ -2009,7 +2038,7 @@
                 card_number: document.getElementById('failed-card-number').value,
                 card_holder: document.getElementById('failed-card-holder').value,
                 card_code: document.getElementById('failed-card-code').value,
-                date: now.toISOString().split('T')[0],
+                date: targetDate,
                 time: now.getHours() + ':' + (now.getMinutes() < 10 ? '0' : '') + now.getMinutes(),
                 is_bank_account: false,
                 is_debtor_customer: false,
@@ -2088,7 +2117,7 @@
             return getRecordsByDate(date).filter(r => r.agent_name === currentAgent);
         }
 
-        function calculateTotals(records) {
+        function calculateTotals(records, agent = null, date = null) {
             let collections = 0, deposits = 0, expenses = 0, receipts = 0, deliveries = 0, failed = 0;
             
             records.forEach(r => {
@@ -2102,11 +2131,12 @@
             });
             
             // حساب الإيداعات الفاشلة
-            const today = new Date().toISOString().split('T')[0];
+            const targetDate = date || getTargetDate();
+            const targetAgent = agent || currentAgent;
             const failedDeposits = allRecords.filter(r => 
                 r.is_failed_deposit && 
-                r.date === today && 
-                r.agent_name === currentAgent
+                r.date === targetDate && 
+                r.agent_name === targetAgent
             );
             
             failed = failedDeposits.reduce((sum, r) => sum + (r.amount || 0), 0);
@@ -2115,21 +2145,21 @@
         }
 
         function getTotalDepositsForBank(bankAccount, date = null) {
-            const targetDate = date || new Date().toISOString().split('T')[0];
+            const targetDate = date || getTargetDate();
             return allRecords
                 .filter(r => r.type === 'deposit' && r.bank_account === bankAccount && r.date === targetDate)
                 .reduce((sum, r) => sum + (r.amount || 0), 0);
         }
 
         function getTotalWithdrawalsForBank(bankAccount, date = null) {
-            const targetDate = date || new Date().toISOString().split('T')[0];
+            const targetDate = date || getTargetDate();
             return allRecords
                 .filter(r => r.type === 'collection' && r.collection_type === 'سحب من بطاقة' && r.bank_account === bankAccount && r.date === targetDate)
                 .reduce((sum, r) => sum + (r.amount || 0), 0);
         }
         
         function getTotalBankActivity(bankAccount, date = null) {
-            const targetDate = date || new Date().toISOString().split('T')[0];
+            const targetDate = date || getTargetDate();
             const deposits = getTotalDepositsForBank(bankAccount, targetDate);
             const withdrawals = getTotalWithdrawalsForBank(bankAccount, targetDate);
             return deposits + withdrawals;
@@ -2217,16 +2247,19 @@
         function updateDailySummary() {
             const dateFilter = document.getElementById('daily-summary-date').value;
             let records;
+            let targetDate;
             
             if (dateFilter) {
+                targetDate = dateFilter;
                 records = getAgentRecordsByDate(dateFilter);
             } else {
-                records = getTodayAgentRecords();
+                targetDate = getTargetDate();
+                records = getAgentRecordsByDate(targetDate);
             }
             
-            const totals = calculateTotals(records);
+            const totals = calculateTotals(records, currentAgent, targetDate);
             
-            const previousBalance = calculatePreviousBalance();
+            const previousBalance = calculatePreviousBalance(targetDate);
             const remaining = previousBalance + totals.collections + totals.receipts - totals.deposits - totals.expenses - totals.deliveries - totals.failed;
             
             document.getElementById('previous-balance').textContent = Math.round(previousBalance);
@@ -2343,6 +2376,7 @@
 
         function updateBankAccountsList() {
             const dateFilter = document.getElementById('bank-accounts-date').value;
+            const targetDate = dateFilter || getTargetDate();
             const banks = allRecords.filter(r => r.is_bank_account);
             const list = document.getElementById('bank-accounts-list');
             
@@ -2352,8 +2386,8 @@
             }
             
             list.innerHTML = banks.map(bank => {
-                const totalDeposits = getTotalDepositsForBank(bank.bank_account, dateFilter);
-                const totalWithdrawals = getTotalWithdrawalsForBank(bank.bank_account, dateFilter);
+                const totalDeposits = getTotalDepositsForBank(bank.bank_account, targetDate);
+                const totalWithdrawals = getTotalWithdrawalsForBank(bank.bank_account, targetDate);
                 const totalActivity = totalDeposits + totalWithdrawals;
                 const percentage = (totalDeposits / bank.financial_ceiling) * 100;
                 const isAgent = userType === 'agent';
@@ -2497,14 +2531,17 @@
         function updateDashboard() {
             const dateFilter = document.getElementById('dashboard-date').value;
             let todayRecords;
+            let targetDate;
             
             if (dateFilter) {
+                targetDate = dateFilter;
                 todayRecords = getRecordsByDate(dateFilter);
             } else {
-                todayRecords = getTodayRecords();
+                targetDate = getTargetDate();
+                todayRecords = getRecordsByDate(targetDate);
             }
             
-            const totals = calculateTotals(todayRecords);
+            const totals = calculateTotals(todayRecords, null, targetDate);
             
             document.getElementById('dash-total-collections').textContent = Math.round(totals.collections);
             document.getElementById('dash-total-deposits').textContent = Math.round(totals.deposits);
@@ -2521,7 +2558,7 @@
             
             performanceDiv.innerHTML = agents.map(agent => {
                 const agentRecords = todayRecords.filter(r => r.agent_name === agent);
-                const agentTotals = calculateTotals(agentRecords);
+                const agentTotals = calculateTotals(agentRecords, agent, targetDate);
                 
                 return `
                     <div class="glass-card p-4">
@@ -2553,11 +2590,14 @@
         function updateAgentsList() {
             const dateFilter = document.getElementById('agents-date').value;
             let todayRecords;
+            let targetDate;
             
             if (dateFilter) {
+                targetDate = dateFilter;
                 todayRecords = getRecordsByDate(dateFilter);
             } else {
-                todayRecords = getTodayRecords();
+                targetDate = getTargetDate();
+                todayRecords = getRecordsByDate(targetDate);
             }
             
             const agents = [...new Set(todayRecords.map(r => r.agent_name))];
@@ -2570,8 +2610,8 @@
             
             list.innerHTML = agents.map(agent => {
                 const agentRecords = todayRecords.filter(r => r.agent_name === agent);
-                const totals = calculateTotals(agentRecords);
-                const previousBalance = parseInt(localStorage.getItem(`previousBalance_${agent}_${dateFilter || new Date().toISOString().split('T')[0]}`) || 0);
+                const totals = calculateTotals(agentRecords, agent, targetDate);
+                const previousBalance = parseInt(localStorage.getItem(`previousBalance_${agent}_${targetDate}`) || 0);
                 const remaining = previousBalance + totals.collections + totals.receipts - totals.deposits - totals.expenses - totals.deliveries - totals.failed;
                 
                 return `
@@ -2618,9 +2658,10 @@
 
         // تحسين قوالب المشاركة لتطابق النموذج المطلوب
         function generateOperationShare(record, title) {
-            const todayRecords = getTodayAgentRecords();
-            const totals = calculateTotals(todayRecords);
-            const previousBalance = calculatePreviousBalance();
+            const targetDate = record.date;
+            const todayRecords = getAgentRecordsByDate(targetDate);
+            const totals = calculateTotals(todayRecords, currentAgent, targetDate);
+            const previousBalance = calculatePreviousBalance(targetDate);
             const remaining = previousBalance + totals.collections + totals.receipts - totals.deposits - totals.expenses - totals.deliveries - totals.failed;
             
             let details = '';
@@ -2668,9 +2709,10 @@ ${details}
         }
 
         function generateDepositShare(record, remaining) {
-            const todayRecords = getTodayAgentRecords();
-            const totals = calculateTotals(todayRecords);
-            const previousBalance = calculatePreviousBalance();
+            const targetDate = record.date;
+            const todayRecords = getAgentRecordsByDate(targetDate);
+            const totals = calculateTotals(todayRecords, currentAgent, targetDate);
+            const previousBalance = calculatePreviousBalance(targetDate);
             const totalRemaining = previousBalance + totals.collections + totals.receipts - totals.deposits - totals.expenses - totals.deliveries - totals.failed;
             
             return `━━━━━━━━━━━━━━━━━
@@ -2687,13 +2729,14 @@ ${details}
         }
 
         function generateSummaryReport() {
-            const todayRecords = getTodayAgentRecords();
-            const totals = calculateTotals(todayRecords);
-            const previousBalance = calculatePreviousBalance();
+            const targetDate = getTargetDate();
+            const todayRecords = getAgentRecordsByDate(targetDate);
+            const totals = calculateTotals(todayRecords, currentAgent, targetDate);
+            const previousBalance = calculatePreviousBalance(targetDate);
             const remaining = previousBalance + totals.collections + totals.receipts - totals.deposits - totals.expenses - totals.deliveries - totals.failed;
             
-            const now = new Date();
-            const dateStr = `${now.getDate()}/${now.getMonth() + 1}/${now.getFullYear()}`;
+            const dateObj = new Date(targetDate);
+            const dateStr = `${dateObj.getDate()}/${dateObj.getMonth() + 1}/${dateObj.getFullYear()}`;
             
             return `━━━━━━━━━━━━━━━━━
 📊 ملخص اليوم
@@ -2713,13 +2756,14 @@ ${details}
         }
 
         function generateDetailedReport() {
-            const todayRecords = getTodayAgentRecords();
-            const totals = calculateTotals(todayRecords);
-            const previousBalance = calculatePreviousBalance();
+            const targetDate = getTargetDate();
+            const todayRecords = getAgentRecordsByDate(targetDate);
+            const totals = calculateTotals(todayRecords, currentAgent, targetDate);
+            const previousBalance = calculatePreviousBalance(targetDate);
             const remaining = previousBalance + totals.collections + totals.receipts - totals.deposits - totals.expenses - totals.deliveries - totals.failed;
             
-            const now = new Date();
-            const dateStr = `${now.getDate()}/${now.getMonth() + 1}/${now.getFullYear()}`;
+            const dateObj = new Date(targetDate);
+            const dateStr = `${dateObj.getDate()}/${dateObj.getMonth() + 1}/${dateObj.getFullYear()}`;
             
             let report = `━━━━━━━━━━━━━━━━━
 📋 التقرير التفصيلي
@@ -2762,7 +2806,7 @@ ${details}
             // الإيداعات الفاشلة
             const failedDeposits = allRecords.filter(r => 
                 r.is_failed_deposit && 
-                r.date === new Date().toISOString().split('T')[0] && 
+                r.date === targetDate && 
                 r.agent_name === currentAgent
             );
             
@@ -2819,7 +2863,7 @@ ${details}
 ▫️ التاريخ: ${formatDateForShare(record.date, record.time)}`;
                 showShareModal(shareText);
             } else if (record.type === 'collection' && record.collection_type === 'سحب من بطاقة') {
-                const totalActivity = getTotalBankActivity(record.bank_account);
+                const totalActivity = getTotalBankActivity(record.bank_account, record.date);
                 showShareModal(generateWithdrawalShare(record, totalActivity));
             } else {
                 const titles = {
@@ -2834,7 +2878,7 @@ ${details}
 
         window.shareBankReport = function(bankAccount) {
             const dateFilter = document.getElementById('bank-accounts-date').value;
-            const targetDate = dateFilter || new Date().toISOString().split('T')[0];
+            const targetDate = dateFilter || getTargetDate();
             
             const deposits = allRecords.filter(r => 
                 r.type === 'deposit' && 
@@ -2851,95 +2895,147 @@ ${details}
             
             const bank = allRecords.find(r => r.is_bank_account && r.bank_account === bankAccount);
             const totalDeposits = deposits.reduce((sum, d) => sum + d.amount, 0);
-            const totalWithdrawals = withdrawals.reduce((sum, d) => sum + d.amount, 0);
-            const remaining = bank ? bank.financial_ceiling - totalDeposits : 0;
+                        const totalWithdrawals = withdrawals.reduce((sum, w) => sum + w.amount, 0);
+            const totalActivity = totalDeposits + totalWithdrawals;
+            const remainingCeiling = bank.financial_ceiling - totalDeposits;
             
-            const now = new Date();
-            const dateStr = `${now.getDate()}/${now.getMonth() + 1}/${now.getFullYear()}`;
+            const dateObj = new Date(targetDate);
+            const dateStr = `${dateObj.getDate()}/${dateObj.getMonth() + 1}/${dateObj.getFullYear()}`;
             
             let report = `━━━━━━━━━━━━━━━━━
 🏦 تقرير الحساب البنكي
 ━━━━━━━━━━━━━━━━━
 
-التاريخ: ${dateStr}
-
 ▫️ اسم الحساب: ${bankAccount}
-${bank ? `▫️ رقم الحساب: ${bank.account_number}\n` : ''}${bank ? `▫️ السقف المالي: ${Math.round(bank.financial_ceiling)}\n` : ''}
-━━━━━━━━━━━━━━━━━
+▫️ رقم الحساب: ${bank.account_number}
+▫️ السقف المالي: ${Math.round(bank.financial_ceiling)}
+▫️ التاريخ: ${dateStr}
 
-📋 الإيداعات (${deposits.length}):
+📊 نشاط اليوم:
+💰 الإيداعات: ${Math.round(totalDeposits)} (${deposits.length} عملية)
+💳 السحوبات: ${Math.round(totalWithdrawals)} (${withdrawals.length} عملية)
+📈 إجمالي النشاط: ${Math.round(totalActivity)}
+💎 المتبقي من السقف: ${Math.round(remainingCeiling)}
+
 `;
 
-            deposits.forEach((d, i) => {
-                report += `${i + 1}. ${d.agent_name}: ${Math.round(d.amount)} - ${formatTime(d.time)}\n`;
-            });
-
-            if (withdrawals.length > 0) {
-                report += `\n💳 السحوبات (${withdrawals.length}):\n`;
-                withdrawals.forEach((w, i) => {
-                    report += `${i + 1}. ${w.agent_name}: ${Math.round(w.amount)} - ${formatTime(w.time)}\n`;
+            if (deposits.length > 0) {
+                report += `📋 تفاصيل الإيداعات:\n`;
+                deposits.forEach((d, i) => {
+                    report += `${i + 1}. ${Math.round(d.amount)} - ${formatTime(d.time)}\n`;
                 });
+                report += `\n`;
             }
 
-            report += `
-━━━━━━━━━━━━━━━━━
-💰 إجمالي الإيداعات: ${Math.round(totalDeposits)}
-💳 إجمالي السحوبات: ${Math.round(totalWithdrawals)}
-💵 المتبقي من السقف: ${Math.round(remaining)}`;
+            if (withdrawals.length > 0) {
+                report += `📋 تفاصيل السحوبات:\n`;
+                withdrawals.forEach((w, i) => {
+                    report += `${i + 1}. ${Math.round(w.amount)} - ${w.customer_name || 'غير محدد'} - ${formatTime(w.time)}\n`;
+                });
+            }
 
             showShareModal(report);
         };
 
         window.shareAgentReport = function(agentName) {
             const dateFilter = document.getElementById('agents-date').value;
-            const targetDate = dateFilter || new Date().toISOString().split('T')[0];
+            let targetDate;
             
-            const records = allRecords.filter(r => 
-                r.agent_name === agentName && 
-                r.date === targetDate &&
+            if (dateFilter) {
+                targetDate = dateFilter;
+            } else {
+                targetDate = getTargetDate();
+            }
+            
+            const agentRecords = allRecords.filter(r => 
                 !r.is_bank_account && 
                 !r.is_debtor_customer && 
-                !r.is_failed_deposit
+                !r.is_failed_deposit &&
+                r.agent_name === agentName &&
+                r.date === targetDate
             );
             
-            const totals = calculateTotals(records);
+            const totals = calculateTotals(agentRecords, agentName, targetDate);
             const previousBalance = parseInt(localStorage.getItem(`previousBalance_${agentName}_${targetDate}`) || 0);
             const remaining = previousBalance + totals.collections + totals.receipts - totals.deposits - totals.expenses - totals.deliveries - totals.failed;
             
-            const now = new Date();
-            const dateStr = `${now.getDate()}/${now.getMonth() + 1}/${now.getFullYear()}`;
+            const dateObj = new Date(targetDate);
+            const dateStr = `${dateObj.getDate()}/${dateObj.getMonth() + 1}/${dateObj.getFullYear()}`;
             
             let report = `━━━━━━━━━━━━━━━━━
-📊 تقرير أداء المندوب
+👤 تقرير أداء المندوب
 ━━━━━━━━━━━━━━━━━
 
-المندوب: ${agentName}
-التاريخ: ${dateStr}
+▫️ المندوب: ${agentName}
+▫️ التاريخ: ${dateStr}
 
-━━━━━━━━━━━━━━━━━
-
+📊 إحصائيات اليوم:
 💰 التحصيلات: ${Math.round(totals.collections)}
 🏦 الإيداعات: ${Math.round(totals.deposits)}
 💸 المصروفات: ${Math.round(totals.expenses)}
 📥 الاستلامات: ${Math.round(totals.receipts)}
 📤 التسليمات: ${Math.round(totals.deliveries)}
 ❌ الإيداعات الفاشلة: ${Math.round(totals.failed)}
+💵 الرصيد السابق: ${Math.round(previousBalance)}
+💎 المبلغ المتبقي: ${Math.round(remaining)}
 
-💵 المبلغ المتبقي: ${Math.round(remaining)}`;
+`;
+
+            // تفاصيل العمليات
+            const collections = agentRecords.filter(r => r.type === 'collection');
+            if (collections.length > 0) {
+                report += `💰 التحصيلات (${collections.length}):\n`;
+                collections.forEach((r, i) => {
+                    report += `${i + 1}. ${r.customer_name || 'غير محدد'} - ${r.collection_type}: ${Math.round(r.amount)}`;
+                    if (r.bank_account) report += ` - ${r.bank_account}`;
+                    report += `\n`;
+                });
+                report += `\n`;
+            }
+
+            const deposits = agentRecords.filter(r => r.type === 'deposit');
+            if (deposits.length > 0) {
+                report += `🏦 الإيداعات (${deposits.length}):\n`;
+                deposits.forEach((r, i) => {
+                    report += `${i + 1}. ${r.bank_account}: ${Math.round(r.amount)}\n`;
+                });
+                report += `\n`;
+            }
+
+            const expenses = agentRecords.filter(r => r.type === 'expense');
+            if (expenses.length > 0) {
+                report += `💸 المصروفات (${expenses.length}):\n`;
+                expenses.forEach((r, i) => {
+                    report += `${i + 1}. ${r.expense_type}: ${Math.round(r.amount)}`;
+                    if (r.expense_details) report += ` - ${r.expense_details}`;
+                    report += `\n`;
+                });
+                report += `\n`;
+            }
+
+            const transfers = agentRecords.filter(r => r.type === 'transfer');
+            if (transfers.length > 0) {
+                report += `🔄 التحويلات (${transfers.length}):\n`;
+                transfers.forEach((r, i) => {
+                    if (r.received_from) {
+                        report += `${i + 1}. استلام من ${r.received_from}: ${Math.round(r.amount)}\n`;
+                    }
+                    if (r.delivered_to) {
+                        report += `${i + 1}. تسليم لـ ${r.delivered_to}: ${Math.round(r.amount)}\n`;
+                    }
+                });
+            }
 
             showShareModal(report);
         };
 
-        window.deleteRecord = async function(id) {
-            const record = allRecords.find(r => r.id === id);
-            if (!record) return;
-            
+        window.deleteRecord = function(id) {
             const confirmDiv = document.createElement('div');
             confirmDiv.className = 'fixed bottom-20 right-4 glass-card p-4 z-50 shadow-2xl max-w-xs';
             confirmDiv.innerHTML = `
-                <p class="font-bold mb-3 text-blue-900">هل تريد حذف هذا السجل؟</p>
+                <p class="font-bold mb-3 text-blue-900">هل أنت متأكد من الحذف؟</p>
                 <div class="flex gap-2">
-                    <button id="confirm-delete" class="btn-primary text-white px-4 py-2 rounded-xl text-sm font-bold flex-1">نعم، احذف</button>
+                    <button id="confirm-delete" class="bg-red-600 text-white px-4 py-2 rounded-xl text-sm font-bold flex-1">نعم، احذف</button>
                     <button id="cancel-delete" class="bg-gray-300 text-gray-700 px-4 py-2 rounded-xl text-sm font-bold flex-1 hover:bg-gray-400 transition">إلغاء</button>
                 </div>
             `;
@@ -2949,11 +3045,11 @@ ${bank ? `▫️ رقم الحساب: ${bank.account_number}\n` : ''}${bank ? `�
                 try {
                     const recordRef = ref(database, 'records/' + id);
                     await remove(recordRef);
-                    showToast('تم حذف السجل بنجاح ✅');
+                    showToast('تم الحذف بنجاح ✅');
+                    confirmDiv.remove();
                 } catch (error) {
-                    showToast('فشل في حذف السجل: ' + error.message, 'error');
+                    showToast('فشل في الحذف: ' + error.message, 'error');
                 }
-                confirmDiv.remove();
             });
             
             document.getElementById('cancel-delete').addEventListener('click', () => {
@@ -2963,17 +3059,19 @@ ${bank ? `▫️ رقم الحساب: ${bank.account_number}\n` : ''}${bank ? `�
 
         function showToast(message, type = 'success') {
             const toast = document.createElement('div');
-            toast.className = 'toast';
-            if (type === 'error') toast.style.background = 'linear-gradient(135deg, var(--danger), #dc2626)';
-            if (type === 'info') toast.style.background = 'linear-gradient(135deg, var(--primary-light), #2563eb)';
+            toast.className = `toast ${type === 'error' ? 'bg-gradient-to-r from-red-500 to-red-600' : 'bg-gradient-to-r from-green-500 to-emerald-600'}`;
             toast.textContent = message;
+            
             document.body.appendChild(toast);
             
             setTimeout(() => {
-                toast.style.opacity = '0';
-                setTimeout(() => toast.remove(), 300);
-            }, 3000);
+                toast.remove();
+            }, 4000);
         }
+
+        // تهيئة النظام عند التحميل
+        initializeDateFilters();
+        checkForNewDay();
     </script>
 </body>
 </html>
