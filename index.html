@@ -582,6 +582,7 @@
                             </div>
                             <div class="card-body">
                                 <form id="collection-form" class="space-y-4">
+                                    <input type="hidden" id="collection-edit-id" value="">
                                     <div class="form-group">
                                         <label class="form-label">نوع التحصيل</label>
                                         <select id="collection-type" class="input-field w-full px-4 py-3 border-2 border-gray-200 focus:outline-none" required>
@@ -604,10 +605,13 @@
                                         <label class="form-label">المبلغ</label>
                                         <input type="number" id="collection-amount" class="input-field w-full px-4 py-3 border-2 border-gray-200 focus:outline-none" required>
                                     </div>
-                                    <button type="submit" class="btn-primary w-full text-white py-3 rounded-xl flex items-center justify-center gap-2">
-                                        <span id="collection-btn-text"><i class="fas fa-plus-circle ml-2"></i> إضافة تحصيل</span>
-                                        <span id="collection-spinner" class="loading-spinner hidden"></span>
-                                    </button>
+                                    <div class="flex gap-2">
+                                        <button type="submit" class="btn-primary flex-1 text-white py-3 rounded-xl flex items-center justify-center gap-2">
+                                            <span id="collection-btn-text"><i class="fas fa-plus-circle ml-2"></i> إضافة تحصيل</span>
+                                            <span id="collection-spinner" class="loading-spinner hidden"></span>
+                                        </button>
+                                        <button type="button" id="collection-cancel-edit" class="hidden bg-gray-300 text-gray-700 font-bold py-3 rounded-xl hover:bg-gray-400 transition flex-1">إلغاء التعديل</button>
+                                    </div>
                                 </form>
                             </div>
                         </div>
@@ -619,6 +623,7 @@
                             </div>
                             <div class="card-body">
                                 <form id="deposit-form" class="space-y-4">
+                                    <input type="hidden" id="deposit-edit-id" value="">
                                     <div class="form-group">
                                         <label class="form-label">الحساب البنكي</label>
                                         <select id="deposit-bank" class="input-field w-full px-4 py-3 border-2 border-gray-200 focus:outline-none" required>
@@ -629,10 +634,17 @@
                                         <label class="form-label">المبلغ</label>
                                         <input type="number" id="deposit-amount" class="input-field w-full px-4 py-3 border-2 border-gray-200 focus:outline-none" required>
                                     </div>
-                                    <button type="submit" class="btn-primary w-full text-white py-3 rounded-xl flex items-center justify-center gap-2">
-                                        <span id="deposit-btn-text"><i class="fas fa-plus-circle ml-2"></i> إضافة إيداع</span>
-                                        <span id="deposit-spinner" class="loading-spinner hidden"></span>
-                                    </button>
+                                    <div class="form-group">
+                                        <label class="form-label">دبوس الحساب</label>
+                                        <input type="password" id="deposit-pin" class="input-field w-full px-4 py-3 border-2 border-gray-200 focus:outline-none" placeholder="أدخل دبوس الحساب">
+                                    </div>
+                                    <div class="flex gap-2">
+                                        <button type="submit" class="btn-primary flex-1 text-white py-3 rounded-xl flex items-center justify-center gap-2">
+                                            <span id="deposit-btn-text"><i class="fas fa-plus-circle ml-2"></i> إضافة إيداع</span>
+                                            <span id="deposit-spinner" class="loading-spinner hidden"></span>
+                                        </button>
+                                        <button type="button" id="deposit-cancel-edit" class="hidden bg-gray-300 text-gray-700 font-bold py-3 rounded-xl hover:bg-gray-400 transition flex-1">إلغاء التعديل</button>
+                                    </div>
                                 </form>
                             </div>
                         </div>
@@ -644,6 +656,7 @@
                             </div>
                             <div class="card-body">
                                 <form id="expense-form" class="space-y-4">
+                                    <input type="hidden" id="expense-edit-id" value="">
                                     <div class="form-group">
                                         <label class="form-label">نوع المصروف</label>
                                         <select id="expense-type" class="input-field w-full px-4 py-3 border-2 border-gray-200 focus:outline-none" required>
@@ -662,10 +675,13 @@
                                         <label class="form-label">تفاصيل المصروف</label>
                                         <textarea id="expense-details" class="input-field w-full px-4 py-3 border-2 border-gray-200 focus:outline-none" rows="2"></textarea>
                                     </div>
-                                    <button type="submit" class="btn-primary w-full text-white py-3 rounded-xl flex items-center justify-center gap-2">
-                                        <span id="expense-btn-text"><i class="fas fa-plus-circle ml-2"></i> إضافة مصروف</span>
-                                        <span id="expense-spinner" class="loading-spinner hidden"></span>
-                                    </button>
+                                    <div class="flex gap-2">
+                                        <button type="submit" class="btn-primary flex-1 text-white py-3 rounded-xl flex items-center justify-center gap-2">
+                                            <span id="expense-btn-text"><i class="fas fa-plus-circle ml-2"></i> إضافة مصروف</span>
+                                            <span id="expense-spinner" class="loading-spinner hidden"></span>
+                                        </button>
+                                        <button type="button" id="expense-cancel-edit" class="hidden bg-gray-300 text-gray-700 font-bold py-3 rounded-xl hover:bg-gray-400 transition flex-1">إلغاء التعديل</button>
+                                    </div>
                                 </form>
                             </div>
                         </div>
@@ -677,6 +693,7 @@
                             </div>
                             <div class="card-body">
                                 <form id="transfer-form" class="space-y-4">
+                                    <input type="hidden" id="transfer-edit-id" value="">
                                     <div class="form-group">
                                         <label class="form-label">الاستلام من</label>
                                         <input type="text" id="received-from" class="input-field w-full px-4 py-3 border-2 border-gray-200 focus:outline-none">
@@ -689,10 +706,13 @@
                                         <label class="form-label">المبلغ</label>
                                         <input type="number" id="transfer-amount" class="input-field w-full px-4 py-3 border-2 border-gray-200 focus:outline-none" required>
                                     </div>
-                                    <button type="submit" class="btn-primary w-full text-white py-3 rounded-xl flex items-center justify-center gap-2">
-                                        <span id="transfer-btn-text"><i class="fas fa-plus-circle ml-2"></i> إضافة عملية</span>
-                                        <span id="transfer-spinner" class="loading-spinner hidden"></span>
-                                    </button>
+                                    <div class="flex gap-2">
+                                        <button type="submit" class="btn-primary flex-1 text-white py-3 rounded-xl flex items-center justify-center gap-2">
+                                            <span id="transfer-btn-text"><i class="fas fa-plus-circle ml-2"></i> إضافة عملية</span>
+                                            <span id="transfer-spinner" class="loading-spinner hidden"></span>
+                                        </button>
+                                        <button type="button" id="transfer-cancel-edit" class="hidden bg-gray-300 text-gray-700 font-bold py-3 rounded-xl hover:bg-gray-400 transition flex-1">إلغاء التعديل</button>
+                                    </div>
                                 </form>
                             </div>
                         </div>
@@ -977,9 +997,10 @@
     <div id="bank-modal" class="hidden fixed inset-0 modal-backdrop z-50 flex items-center justify-center p-4">
         <div class="glass-card p-6 max-w-md w-full max-h-[90%] overflow-y-auto">
             <h3 class="text-xl font-bold text-blue-900 mb-4 flex items-center">
-                <i class="fas fa-university ml-2"></i> إضافة حساب بنكي
+                <i class="fas fa-university ml-2"></i> <span id="bank-modal-title">إضافة حساب بنكي</span>
             </h3>
             <form id="bank-form" class="space-y-4">
+                <input type="hidden" id="bank-edit-id" value="">
                 <div class="form-group">
                     <label class="form-label">اسم الحساب</label>
                     <input type="text" id="bank-name" class="input-field w-full px-4 py-3 border-2 border-gray-200 focus:outline-none" required>
@@ -1126,7 +1147,7 @@
 
     <script type="module">
         import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
-        import { getDatabase, ref, push, set, onValue, remove } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js';
+        import { getDatabase, ref, push, set, onValue, remove, update } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js';
 
         const firebaseConfig = {
             apiKey: "AIzaSyDn7tMB8muUc05JSmVexfdWfBtzYZBiLPU",
@@ -1185,7 +1206,7 @@
             );
             
             const totals = calculateTotals(yesterdayRecords);
-            const previousBalance = totals.collections + totals.receipts - totals.deposits - totals.expenses - totals.deliveries;
+            const previousBalance = totals.collections + totals.receipts - totals.deposits - totals.expenses - totals.deliveries - totals.failed;
             
             localStorage.setItem(`previousBalance_${currentAgent}`, previousBalance);
             document.getElementById('previous-balance').textContent = Math.round(previousBalance);
@@ -1253,6 +1274,18 @@
                 document.getElementById('failed-bank-name').value = lastFailedBank;
             }
         }
+
+        // تعبئة البيانات تلقائياً في نموذج الإيداعات الفاشلة
+        document.getElementById('failed-bank-name').addEventListener('change', (e) => {
+            const bankName = e.target.value;
+            const bank = allRecords.find(r => r.is_bank_account && r.bank_account === bankName);
+            
+            if (bank) {
+                document.getElementById('failed-account-number').value = bank.account_number || '';
+                document.getElementById('failed-card-number').value = bank.card_number || '';
+                document.getElementById('failed-card-holder').value = bank.card_holder || '';
+            }
+        });
 
         document.getElementById('user-type').addEventListener('change', (e) => {
             const agentField = document.getElementById('agent-name-field');
@@ -1460,21 +1493,105 @@
             return localStorage.getItem(fieldId);
         }
 
-        async function submitOperation(btn, spinner, record, successMsg, shareGenerator) {
-            btn.textContent = 'جاري الإضافة...';
+        // دالة لتعديل السجلات
+        function enableEditOperation(record) {
+            if (record.type === 'collection') {
+                document.getElementById('collection-edit-id').value = record.id;
+                document.getElementById('collection-type').value = record.collection_type;
+                document.getElementById('collection-type').dispatchEvent(new Event('change'));
+                
+                if (record.collection_type === 'سحب من بطاقة') {
+                    document.getElementById('collection-bank-card').value = record.bank_account || '';
+                } else {
+                    document.getElementById('customer-name').value = record.customer_name || '';
+                }
+                
+                document.getElementById('collection-amount').value = record.amount;
+                document.getElementById('collection-btn-text').innerHTML = '<i class="fas fa-edit ml-2"></i> تعديل التحصيل';
+                document.getElementById('collection-cancel-edit').classList.remove('hidden');
+                
+                // التمرير للنموذج
+                document.querySelector('[data-tab="data-entry"]').click();
+            } else if (record.type === 'deposit') {
+                document.getElementById('deposit-edit-id').value = record.id;
+                document.getElementById('deposit-bank').value = record.bank_account || '';
+                document.getElementById('deposit-amount').value = record.amount;
+                document.getElementById('deposit-btn-text').innerHTML = '<i class="fas fa-edit ml-2"></i> تعديل الإيداع';
+                document.getElementById('deposit-cancel-edit').classList.remove('hidden');
+                
+                document.querySelector('[data-tab="data-entry"]').click();
+            } else if (record.type === 'expense') {
+                document.getElementById('expense-edit-id').value = record.id;
+                document.getElementById('expense-type').value = record.expense_type || '';
+                document.getElementById('expense-amount').value = record.amount;
+                document.getElementById('expense-details').value = record.expense_details || '';
+                document.getElementById('expense-btn-text').innerHTML = '<i class="fas fa-edit ml-2"></i> تعديل المصروف';
+                document.getElementById('expense-cancel-edit').classList.remove('hidden');
+                
+                document.querySelector('[data-tab="data-entry"]').click();
+            } else if (record.type === 'transfer') {
+                document.getElementById('transfer-edit-id').value = record.id;
+                document.getElementById('received-from').value = record.received_from || '';
+                document.getElementById('delivered-to').value = record.delivered_to || '';
+                document.getElementById('transfer-amount').value = record.amount;
+                document.getElementById('transfer-btn-text').innerHTML = '<i class="fas fa-edit ml-2"></i> تعديل العملية';
+                document.getElementById('transfer-cancel-edit').classList.remove('hidden');
+                
+                document.querySelector('[data-tab="data-entry"]').click();
+            }
+        }
+
+        // إلغاء التعديل
+        document.getElementById('collection-cancel-edit').addEventListener('click', () => {
+            document.getElementById('collection-edit-id').value = '';
+            document.getElementById('collection-btn-text').innerHTML = '<i class="fas fa-plus-circle ml-2"></i> إضافة تحصيل';
+            document.getElementById('collection-cancel-edit').classList.add('hidden');
+            document.getElementById('collection-form').reset();
+        });
+
+        document.getElementById('deposit-cancel-edit').addEventListener('click', () => {
+            document.getElementById('deposit-edit-id').value = '';
+            document.getElementById('deposit-btn-text').innerHTML = '<i class="fas fa-plus-circle ml-2"></i> إضافة إيداع';
+            document.getElementById('deposit-cancel-edit').classList.add('hidden');
+            document.getElementById('deposit-form').reset();
+        });
+
+        document.getElementById('expense-cancel-edit').addEventListener('click', () => {
+            document.getElementById('expense-edit-id').value = '';
+            document.getElementById('expense-btn-text').innerHTML = '<i class="fas fa-plus-circle ml-2"></i> إضافة مصروف';
+            document.getElementById('expense-cancel-edit').classList.add('hidden');
+            document.getElementById('expense-form').reset();
+        });
+
+        document.getElementById('transfer-cancel-edit').addEventListener('click', () => {
+            document.getElementById('transfer-edit-id').value = '';
+            document.getElementById('transfer-btn-text').innerHTML = '<i class="fas fa-plus-circle ml-2"></i> إضافة عملية';
+            document.getElementById('transfer-cancel-edit').classList.add('hidden');
+            document.getElementById('transfer-form').reset();
+        });
+
+        async function submitOperation(btn, spinner, record, successMsg, shareGenerator, isEdit = false, editId = null) {
+            btn.textContent = isEdit ? 'جاري التعديل...' : 'جاري الإضافة...';
             spinner.classList.remove('hidden');
 
             try {
-                const newRecordRef = push(recordsRef);
-                await set(newRecordRef, record);
-                
-                showToast(successMsg);
-                if (shareGenerator) {
-                    showShareModal(shareGenerator(record));
+                if (isEdit && editId) {
+                    // تحديث السجل الموجود
+                    const recordRef = ref(database, 'records/' + editId);
+                    await update(recordRef, record);
+                    showToast(successMsg.replace('إضافة', 'تعديل'));
+                } else {
+                    // إضافة سجل جديد
+                    const newRecordRef = push(recordsRef);
+                    await set(newRecordRef, record);
+                    showToast(successMsg);
+                    if (shareGenerator) {
+                        showShareModal(shareGenerator(record));
+                    }
                 }
                 return true;
             } catch (error) {
-                showToast('فشل في إضافة العملية: ' + error.message, 'error');
+                showToast((isEdit ? 'فشل في تعديل العملية: ' : 'فشل في إضافة العملية: ') + error.message, 'error');
                 return false;
             } finally {
                 btn.textContent = btn.dataset.originalText;
@@ -1507,6 +1624,9 @@
                 record.bank_account = document.getElementById('collection-bank-card').value;
             }
 
+            const editId = document.getElementById('collection-edit-id').value;
+            const isEdit = !!editId;
+
             const success = await submitOperation(btn, spinner, record, 'تم إضافة التحصيل بنجاح ✅', 
                 (r) => {
                     if (r.collection_type === 'سحب من بطاقة') {
@@ -1514,7 +1634,9 @@
                         return generateWithdrawalShare(r, totalActivity);
                     }
                     return generateOperationShare(r, '💰 عملية تحصيل جديدة');
-                }
+                },
+                isEdit,
+                editId
             );
             
             if (success) {
@@ -1522,6 +1644,13 @@
                 document.getElementById('bank-card-select-div').classList.add('hidden');
                 document.getElementById('customer-name-field').classList.remove('hidden');
                 document.getElementById('customer-name').required = true;
+                
+                // إعادة تعيين وضع التعديل
+                if (isEdit) {
+                    document.getElementById('collection-edit-id').value = '';
+                    document.getElementById('collection-btn-text').innerHTML = '<i class="fas fa-plus-circle ml-2"></i> إضافة تحصيل';
+                    document.getElementById('collection-cancel-edit').classList.add('hidden');
+                }
             }
         });
 
@@ -1534,6 +1663,14 @@
             const now = new Date();
             const bankAccount = document.getElementById('deposit-bank').value;
             const amount = Math.round(parseFloat(document.getElementById('deposit-amount').value));
+            const pin = document.getElementById('deposit-pin').value;
+            
+            // التحقق من دبوس الحساب
+            const bank = allRecords.find(b => b.is_bank_account && b.bank_account === bankAccount);
+            if (bank && bank.card_pin && bank.card_pin !== pin) {
+                showToast('دبوس الحساب غير صحيح', 'error');
+                return;
+            }
             
             // حفظ آخر اختيار
             saveLastSelection('deposit-bank', bankAccount);
@@ -1550,6 +1687,9 @@
                 is_failed_deposit: false
             };
 
+            const editId = document.getElementById('deposit-edit-id').value;
+            const isEdit = !!editId;
+
             const success = await submitOperation(btn, spinner, record, 'تم إضافة الإيداع بنجاح ✅',
                 (r) => {
                     const bank = allRecords.find(b => b.is_bank_account && b.bank_account === bankAccount);
@@ -1559,10 +1699,21 @@
                         return generateDepositShare(r, remaining);
                     }
                     return generateOperationShare(r, '🏦 إيداع بنكي جديد');
-                }
+                },
+                isEdit,
+                editId
             );
             
-            if (success) e.target.reset();
+            if (success) {
+                e.target.reset();
+                
+                // إعادة تعيين وضع التعديل
+                if (isEdit) {
+                    document.getElementById('deposit-edit-id').value = '';
+                    document.getElementById('deposit-btn-text').innerHTML = '<i class="fas fa-plus-circle ml-2"></i> إضافة إيداع';
+                    document.getElementById('deposit-cancel-edit').classList.add('hidden');
+                }
+            }
         });
 
         document.getElementById('expense-form').addEventListener('submit', async (e) => {
@@ -1585,11 +1736,25 @@
                 is_failed_deposit: false
             };
 
+            const editId = document.getElementById('expense-edit-id').value;
+            const isEdit = !!editId;
+
             const success = await submitOperation(btn, spinner, record, 'تم إضافة المصروف بنجاح ✅',
-                (r) => generateOperationShare(r, '💸 مصروف جديد')
+                (r) => generateOperationShare(r, '💸 مصروف جديد'),
+                isEdit,
+                editId
             );
             
-            if (success) e.target.reset();
+            if (success) {
+                e.target.reset();
+                
+                // إعادة تعيين وضع التعديل
+                if (isEdit) {
+                    document.getElementById('expense-edit-id').value = '';
+                    document.getElementById('expense-btn-text').innerHTML = '<i class="fas fa-plus-circle ml-2"></i> إضافة مصروف';
+                    document.getElementById('expense-cancel-edit').classList.add('hidden');
+                }
+            }
         });
 
         document.getElementById('transfer-form').addEventListener('submit', async (e) => {
@@ -1612,20 +1777,37 @@
                 is_failed_deposit: false
             };
 
+            const editId = document.getElementById('transfer-edit-id').value;
+            const isEdit = !!editId;
+
             const success = await submitOperation(btn, spinner, record, 'تم إضافة العملية بنجاح ✅',
-                (r) => generateOperationShare(r, '🔄 تحويل جديد')
+                (r) => generateOperationShare(r, '🔄 تحويل جديد'),
+                isEdit,
+                editId
             );
             
-            if (success) e.target.reset();
+            if (success) {
+                e.target.reset();
+                
+                // إعادة تعيين وضع التعديل
+                if (isEdit) {
+                    document.getElementById('transfer-edit-id').value = '';
+                    document.getElementById('transfer-btn-text').innerHTML = '<i class="fas fa-plus-circle ml-2"></i> إضافة عملية';
+                    document.getElementById('transfer-cancel-edit').classList.add('hidden');
+                }
+            }
         });
 
         document.getElementById('add-bank-btn').addEventListener('click', () => {
             document.getElementById('bank-modal').classList.remove('hidden');
+            document.getElementById('bank-modal-title').textContent = 'إضافة حساب بنكي';
+            document.getElementById('bank-btn-text').textContent = 'حفظ';
         });
 
         document.getElementById('close-bank-modal').addEventListener('click', () => {
             document.getElementById('bank-modal').classList.add('hidden');
             document.getElementById('bank-form').reset();
+            document.getElementById('bank-edit-id').value = '';
         });
 
         document.getElementById('bank-form').addEventListener('submit', async (e) => {
@@ -1652,20 +1834,47 @@
                 is_failed_deposit: false
             };
 
+            const editId = document.getElementById('bank-edit-id').value;
+            const isEdit = !!editId;
+
             try {
-                const newRecordRef = push(recordsRef);
-                await set(newRecordRef, record);
+                if (isEdit) {
+                    // تحديث الحساب البنكي الموجود
+                    const recordRef = ref(database, 'records/' + editId);
+                    await update(recordRef, record);
+                    showToast('تم تعديل الحساب البنكي بنجاح ✅');
+                } else {
+                    // إضافة حساب بنكي جديد
+                    const newRecordRef = push(recordsRef);
+                    await set(newRecordRef, record);
+                    showToast('تم إضافة الحساب البنكي بنجاح ✅');
+                }
                 
                 document.getElementById('bank-modal').classList.add('hidden');
                 e.target.reset();
-                showToast('تم إضافة الحساب البنكي بنجاح ✅');
+                document.getElementById('bank-edit-id').value = '';
             } catch (error) {
-                showToast('فشل في إضافة الحساب البنكي: ' + error.message, 'error');
+                showToast((isEdit ? 'فشل في تعديل الحساب البنكي: ' : 'فشل في إضافة الحساب البنكي: ') + error.message, 'error');
             }
             
             btn.textContent = 'حفظ';
             spinner.classList.add('hidden');
         });
+
+        // دالة لتعديل الحسابات البنكية
+        function enableEditBankAccount(bank) {
+            document.getElementById('bank-edit-id').value = bank.id;
+            document.getElementById('bank-name').value = bank.bank_account || '';
+            document.getElementById('bank-account-number').value = bank.account_number || '';
+            document.getElementById('bank-card-number').value = bank.card_number || '';
+            document.getElementById('bank-card-holder').value = bank.card_holder || '';
+            document.getElementById('bank-ceiling').value = bank.financial_ceiling || '';
+            document.getElementById('bank-pin').value = bank.card_pin || '';
+            
+            document.getElementById('bank-modal-title').textContent = 'تعديل حساب بنكي';
+            document.getElementById('bank-btn-text').textContent = 'تحديث';
+            document.getElementById('bank-modal').classList.remove('hidden');
+        }
 
         document.getElementById('add-debtor-btn').addEventListener('click', () => {
             document.getElementById('debtor-modal').classList.remove('hidden');
@@ -1826,7 +2035,7 @@
         }
 
         function calculateTotals(records) {
-            let collections = 0, deposits = 0, expenses = 0, receipts = 0, deliveries = 0;
+            let collections = 0, deposits = 0, expenses = 0, receipts = 0, deliveries = 0, failed = 0;
             
             records.forEach(r => {
                 if (r.type === 'collection') collections += r.amount || 0;
@@ -1838,7 +2047,17 @@
                 }
             });
             
-            return { collections, deposits, expenses, receipts, deliveries };
+            // حساب الإيداعات الفاشلة
+            const today = new Date().toISOString().split('T')[0];
+            const failedDeposits = allRecords.filter(r => 
+                r.is_failed_deposit && 
+                r.date === today && 
+                r.agent_name === currentAgent
+            );
+            
+            failed = failedDeposits.reduce((sum, r) => sum + (r.amount || 0), 0);
+            
+            return { collections, deposits, expenses, receipts, deliveries, failed };
         }
 
         function getTotalDepositsForBank(bankAccount, date = null) {
@@ -1954,7 +2173,7 @@
             const totals = calculateTotals(records);
             
             const previousBalance = parseInt(localStorage.getItem(`previousBalance_${currentAgent}`) || 0);
-            const remaining = previousBalance + totals.collections + totals.receipts - totals.deposits - totals.expenses - totals.deliveries;
+            const remaining = previousBalance + totals.collections + totals.receipts - totals.deposits - totals.expenses - totals.deliveries - totals.failed;
             
             document.getElementById('previous-balance').textContent = Math.round(previousBalance);
             document.getElementById('total-collections').textContent = Math.round(totals.collections);
@@ -2053,6 +2272,9 @@
                     <div class="text-left">
                         <p class="text-xl font-bold text-blue-700">${Math.round(record.amount)}</p>
                         <div class="flex gap-2 mt-2">
+                            <button onclick="window.editOperation('${record.id}')" class="text-blue-600 hover:scale-125 transition" title="تعديل">
+                                <i class="fas fa-edit"></i>
+                            </button>
                             <button onclick="window.deleteRecord('${record.id}')" class="text-red-600 hover:scale-125 transition" title="حذف">
                                 <i class="fas fa-trash"></i>
                             </button>
@@ -2097,7 +2319,6 @@
                             <p><span class="text-gray-600">السقف المالي:</span> <span class="text-blue-700 font-bold">${Math.round(bank.financial_ceiling)}</span></p>
                             <p><span class="text-gray-600">إجمالي الإيداعات:</span> <span class="text-blue-600 font-bold">${Math.round(totalDeposits)}</span></p>
                             <p><span class="text-gray-600">إجمالي السحوبات:</span> <span class="text-purple-600 font-bold">${Math.round(totalWithdrawals)}</span></p>
-                            <p><span class="text-gray-600">إجمالي النشاط:</span> <span class="text-indigo-600 font-bold">${Math.round(totalActivity)}</span></p>
                             <p><span class="text-gray-600">المتبقي من السقف:</span> <span class="text-green-600 font-bold">${Math.round(bank.financial_ceiling - totalDeposits)}</span></p>
                         </div>
                         <div class="mt-4">
@@ -2108,6 +2329,9 @@
                         </div>
                         <div class="flex gap-2 mt-4">
                             ${!isAgent ? `
+                                <button onclick="window.editBankAccountRecord('${bank.id}')" class="btn-secondary flex-1 text-white py-2 rounded-xl text-sm flex items-center justify-center">
+                                    <i class="fas fa-edit ml-1"></i> تعديل
+                                </button>
                                 <button onclick="window.deleteRecord('${bank.id}')" class="btn-secondary flex-1 text-white py-2 rounded-xl text-sm flex items-center justify-center">
                                     <i class="fas fa-trash ml-1"></i> حذف
                                 </button>
@@ -2294,7 +2518,7 @@
                 const agentRecords = todayRecords.filter(r => r.agent_name === agent);
                 const totals = calculateTotals(agentRecords);
                 const previousBalance = parseInt(localStorage.getItem(`previousBalance_${agent}`) || 0);
-                const remaining = previousBalance + totals.collections + totals.receipts - totals.deposits - totals.expenses - totals.deliveries;
+                const remaining = previousBalance + totals.collections + totals.receipts - totals.deposits - totals.expenses - totals.deliveries - totals.failed;
                 
                 return `
                     <div class="glass-card p-5">
@@ -2343,7 +2567,7 @@
             const todayRecords = getTodayAgentRecords();
             const totals = calculateTotals(todayRecords);
             const previousBalance = parseInt(localStorage.getItem(`previousBalance_${currentAgent}`) || 0);
-            const remaining = previousBalance + totals.collections + totals.receipts - totals.deposits - totals.expenses - totals.deliveries;
+            const remaining = previousBalance + totals.collections + totals.receipts - totals.deposits - totals.expenses - totals.deliveries - totals.failed;
             
             let details = '';
             if (record.type === 'collection') {
@@ -2393,7 +2617,7 @@ ${details}
             const todayRecords = getTodayAgentRecords();
             const totals = calculateTotals(todayRecords);
             const previousBalance = parseInt(localStorage.getItem(`previousBalance_${currentAgent}`) || 0);
-            const totalRemaining = previousBalance + totals.collections + totals.receipts - totals.deposits - totals.expenses - totals.deliveries;
+            const totalRemaining = previousBalance + totals.collections + totals.receipts - totals.deposits - totals.expenses - totals.deliveries - totals.failed;
             
             return `━━━━━━━━━━━━━━━━━
 *🏦 إيداع بنكي جديد*
@@ -2412,7 +2636,7 @@ ${details}
             const todayRecords = getTodayAgentRecords();
             const totals = calculateTotals(todayRecords);
             const previousBalance = parseInt(localStorage.getItem(`previousBalance_${currentAgent}`) || 0);
-            const remaining = previousBalance + totals.collections + totals.receipts - totals.deposits - totals.expenses - totals.deliveries;
+            const remaining = previousBalance + totals.collections + totals.receipts - totals.deposits - totals.expenses - totals.deliveries - totals.failed;
             
             const now = new Date();
             const dateStr = `${now.getDate()}/${now.getMonth() + 1}/${now.getFullYear()}`;
@@ -2429,6 +2653,7 @@ ${details}
 💸 المصروفات: ${Math.round(totals.expenses)}
 📥 الاستلامات: ${Math.round(totals.receipts)}
 📤 التسليمات: ${Math.round(totals.deliveries)}
+❌ الإيداعات الفاشلة: ${Math.round(totals.failed)}
 
 💵 المبلغ المتبقي: ${Math.round(remaining)}`;
         }
@@ -2437,7 +2662,7 @@ ${details}
             const todayRecords = getTodayAgentRecords();
             const totals = calculateTotals(todayRecords);
             const previousBalance = parseInt(localStorage.getItem(`previousBalance_${currentAgent}`) || 0);
-            const remaining = previousBalance + totals.collections + totals.receipts - totals.deposits - totals.expenses - totals.deliveries;
+            const remaining = previousBalance + totals.collections + totals.receipts - totals.deposits - totals.expenses - totals.deliveries - totals.failed;
             
             const now = new Date();
             const dateStr = `${now.getDate()}/${now.getMonth() + 1}/${now.getFullYear()}`;
@@ -2480,6 +2705,21 @@ ${details}
                 report += `\n`;
             }
 
+            // الإيداعات الفاشلة
+            const failedDeposits = allRecords.filter(r => 
+                r.is_failed_deposit && 
+                r.date === new Date().toISOString().split('T')[0] && 
+                r.agent_name === currentAgent
+            );
+            
+            if (failedDeposits.length > 0) {
+                report += `❌ الإيداعات الفاشلة (${failedDeposits.length}):\n`;
+                failedDeposits.forEach((r, i) => {
+                    report += `${i + 1}. ${r.bank_account}: ${Math.round(r.amount)}\n`;
+                });
+                report += `\n`;
+            }
+
             report += `━━━━━━━━━━━━━━━━━
 📊 الإجماليات:
 💰 التحصيلات: ${Math.round(totals.collections)}
@@ -2487,11 +2727,26 @@ ${details}
 💸 المصروفات: ${Math.round(totals.expenses)}
 📥 الاستلامات: ${Math.round(totals.receipts)}
 📤 التسليمات: ${Math.round(totals.deliveries)}
+❌ الإيداعات الفاشلة: ${Math.round(totals.failed)}
 
 💵 المبلغ المتبقي: ${Math.round(remaining)}`;
 
             return report;
         }
+
+        window.editOperation = function(id) {
+            const record = allRecords.find(r => r.id === id);
+            if (record) {
+                enableEditOperation(record);
+            }
+        };
+
+        window.editBankAccountRecord = function(id) {
+            const bank = allRecords.find(r => r.id === id);
+            if (bank) {
+                enableEditBankAccount(bank);
+            }
+        };
 
         window.shareRecord = function(id) {
             const record = allRecords.find(r => r.id === id);
@@ -2543,7 +2798,6 @@ ${details}
             const bank = allRecords.find(r => r.is_bank_account && r.bank_account === bankAccount);
             const totalDeposits = deposits.reduce((sum, d) => sum + d.amount, 0);
             const totalWithdrawals = withdrawals.reduce((sum, d) => sum + d.amount, 0);
-            const totalActivity = totalDeposits + totalWithdrawals;
             const remaining = bank ? bank.financial_ceiling - totalDeposits : 0;
             
             const now = new Date();
@@ -2577,7 +2831,6 @@ ${bank ? `▫️ رقم الحساب: ${bank.account_number}\n` : ''}${bank ? `�
 ━━━━━━━━━━━━━━━━━
 💰 إجمالي الإيداعات: ${Math.round(totalDeposits)}
 💳 إجمالي السحوبات: ${Math.round(totalWithdrawals)}
-📊 إجمالي النشاط: ${Math.round(totalActivity)}
 💵 المتبقي من السقف: ${Math.round(remaining)}`;
 
             showShareModal(report);
@@ -2597,7 +2850,7 @@ ${bank ? `▫️ رقم الحساب: ${bank.account_number}\n` : ''}${bank ? `�
             
             const totals = calculateTotals(records);
             const previousBalance = parseInt(localStorage.getItem(`previousBalance_${agentName}`) || 0);
-            const remaining = previousBalance + totals.collections + totals.receipts - totals.deposits - totals.expenses - totals.deliveries;
+            const remaining = previousBalance + totals.collections + totals.receipts - totals.deposits - totals.expenses - totals.deliveries - totals.failed;
             
             const now = new Date();
             const dateStr = `${now.getDate()}/${now.getMonth() + 1}/${now.getFullYear()}`;
@@ -2616,6 +2869,7 @@ ${bank ? `▫️ رقم الحساب: ${bank.account_number}\n` : ''}${bank ? `�
 💸 المصروفات: ${Math.round(totals.expenses)}
 📥 الاستلامات: ${Math.round(totals.receipts)}
 📤 التسليمات: ${Math.round(totals.deliveries)}
+❌ الإيداعات الفاشلة: ${Math.round(totals.failed)}
 
 💵 المبلغ المتبقي: ${Math.round(remaining)}`;
 
