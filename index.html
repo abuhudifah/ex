@@ -477,7 +477,7 @@
             }
 
             .header-title {
-                font-size: 1.4rem;
+                fontSize: 1.4rem;
             }
 
             .logo {
@@ -1065,13 +1065,14 @@
         </div>
     </div>
 
-    <!-- Add Debtor Modal -->
+    <!-- Add/Edit Debtor Modal -->
     <div id="debtor-modal" class="hidden fixed inset-0 modal-backdrop z-50 flex items-center justify-center p-4">
         <div class="glass-card p-6 responsive-modal">
             <h3 class="text-xl font-bold text-blue-900 mb-4 flex items-center">
-                <i class="fas fa-user-plus ml-2"></i> إضافة عميل مديون
+                <i class="fas fa-user-plus ml-2"></i> <span id="debtor-modal-title">إضافة عميل مديون</span>
             </h3>
             <form id="debtor-form" class="space-y-4">
+                <input type="hidden" id="debtor-edit-id" value="">
                 <div class="form-group">
                     <label class="form-label">اسم العميل</label>
                     <input type="text" id="debtor-name" class="input-field w-full px-4 py-3 border-2 border-gray-200 focus:outline-none" required>
@@ -1979,11 +1980,15 @@
 
         document.getElementById('add-debtor-btn').addEventListener('click', () => {
             document.getElementById('debtor-modal').classList.remove('hidden');
+            document.getElementById('debtor-modal-title').textContent = 'إضافة عميل مديون';
+            document.getElementById('debtor-btn-text').textContent = 'حفظ';
+            document.getElementById('debtor-edit-id').value = '';
         });
 
         document.getElementById('close-debtor-modal').addEventListener('click', () => {
             document.getElementById('debtor-modal').classList.add('hidden');
             document.getElementById('debtor-form').reset();
+            document.getElementById('debtor-edit-id').value = '';
         });
 
         document.getElementById('debtor-form').addEventListener('submit', async (e) => {
@@ -2008,20 +2013,44 @@
                 is_failed_deposit: false
             };
 
+            const editId = document.getElementById('debtor-edit-id').value;
+            const isEdit = !!editId;
+
             try {
-                const newRecordRef = push(recordsRef);
-                await set(newRecordRef, record);
+                if (isEdit) {
+                    // تحديث العميل المديون الموجود
+                    const recordRef = ref(database, 'records/' + editId);
+                    await update(recordRef, record);
+                    showToast('تم تعديل العميل المديون بنجاح ✅');
+                } else {
+                    // إضافة عميل مديون جديد
+                    const newRecordRef = push(recordsRef);
+                    await set(newRecordRef, record);
+                    showToast('تم إضافة العميل المديون بنجاح ✅');
+                }
                 
                 document.getElementById('debtor-modal').classList.add('hidden');
                 e.target.reset();
-                showToast('تم إضافة العميل المديون بنجاح ✅');
+                document.getElementById('debtor-edit-id').value = '';
             } catch (error) {
-                showToast('فشل في إضافة العميل المديون: ' + error.message, 'error');
+                showToast((isEdit ? 'فشل في تعديل العميل المديون: ' : 'فشل في إضافة العميل المديون: ') + error.message, 'error');
             }
             
             btn.textContent = 'حفظ';
             spinner.classList.add('hidden');
         });
+
+        // دالة لتعديل العميل المديون
+        function enableEditDebtor(debtor) {
+            document.getElementById('debtor-edit-id').value = debtor.id;
+            document.getElementById('debtor-name').value = debtor.customer_name || '';
+            document.getElementById('debtor-amount').value = debtor.customer_debt || '';
+            document.getElementById('debtor-region').value = debtor.customer_region || '';
+            
+            document.getElementById('debtor-modal-title').textContent = 'تعديل عميل مديون';
+            document.getElementById('debtor-btn-text').textContent = 'تحديث';
+            document.getElementById('debtor-modal').classList.remove('hidden');
+        }
 
         document.getElementById('add-failed-btn').addEventListener('click', () => {
             document.getElementById('failed-modal').classList.remove('hidden');
@@ -2501,9 +2530,14 @@
                         </div>
                     </div>
                     ${!isAgent ? `
-                        <button onclick="window.deleteRecord('${debtor.id}')" class="text-red-600 text-xl hover:scale-125 transition">
-                            <i class="fas fa-trash"></i>
-                        </button>
+                        <div class="flex gap-2">
+                            <button onclick="window.editDebtorRecord('${debtor.id}')" class="text-blue-600 text-xl hover:scale-125 transition" title="تعديل">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button onclick="window.deleteRecord('${debtor.id}')" class="text-red-600 text-xl hover:scale-125 transition" title="حذف">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
                     ` : ''}
                 </div>
             `;
@@ -2866,6 +2900,13 @@ ${details}
             }
         };
 
+        window.editDebtorRecord = function(id) {
+            const debtor = allRecords.find(r => r.id === id);
+            if (debtor) {
+                enableEditDebtor(debtor);
+            }
+        };
+
         window.shareRecord = function(id) {
             const record = allRecords.find(r => r.id === id);
             if (!record) return;
@@ -2937,7 +2978,7 @@ ${details}
             if (deposits.length > 0) {
                 report += `📋 الإيداعات (${deposits.length}):\n`;
                 deposits.forEach((d, i) => {
-                    report += `${i + 1}. اسم المندوب: ${d.agent_name} - ${Math.round(d.amount)} - ${formatTime(d.time)}\n`;
+                    report += `${i + 1}. ${d.agent_name} : ${Math.round(d.amount)} - ${formatTime(d.time)}\n`;
                 });
                 report += `\n`;
             } else {
@@ -2947,7 +2988,7 @@ ${details}
             if (withdrawals.length > 0) {
                 report += `📋 السحوبات (${withdrawals.length}):\n`;
                 withdrawals.forEach((w, i) => {
-                    report += `${i + 1}. : ${w.agent_name} - ${Math.round(w.amount)} - ${formatTime(w.time)}\n`;
+                    report += `${i + 1}. ${w.agent_name} : ${Math.round(w.amount)} - ${formatTime(w.time)}\n`;
                 });
                 report += `\n`;
             } else {
