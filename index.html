@@ -445,6 +445,123 @@
             overflow-y: auto;
         }
 
+        /* تحسينات جديدة */
+        .last-deposits {
+            border-top: 1px solid #e5e7eb;
+            margin-top: 15px;
+            padding-top: 15px;
+        }
+
+        .deposit-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 0;
+            border-bottom: 1px solid #f3f4f6;
+        }
+
+        .deposit-item:last-child {
+            border-bottom: none;
+        }
+
+        .search-input {
+            width: 100%;
+            margin-bottom: 15px;
+        }
+
+        .debtor-select {
+            margin-bottom: 10px;
+        }
+
+        .remaining-debt {
+            background-color: #fef3c7;
+            border-radius: 8px;
+            padding: 8px 12px;
+            margin-top: 10px;
+            font-weight: 600;
+            color: #92400e;
+            text-align: center;
+        }
+
+        /* تحسينات القوائم المنسدلة للبحث */
+        .searchable-select {
+            position: relative;
+        }
+
+        .searchable-select input {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid #e2e8f0;
+            border-radius: 10px;
+            font-size: 16px;
+        }
+
+        .searchable-select .options {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            max-height: 200px;
+            overflow-y: auto;
+            z-index: 100;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .searchable-select .option {
+            padding: 10px 16px;
+            cursor: pointer;
+            border-bottom: 1px solid #f1f5f9;
+        }
+
+        .searchable-select .option:hover {
+            background-color: #f1f5f9;
+        }
+
+        .searchable-select .option:last-child {
+            border-bottom: none;
+        }
+
+        /* تحسينات لعرض بيانات العملاء المديونين */
+        .debtor-stats {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .debtor-stat-item {
+            background: #f8fafc;
+            border-radius: 8px;
+            padding: 10px;
+            text-align: center;
+        }
+
+        .debtor-stat-label {
+            font-size: 12px;
+            color: #64748b;
+            margin-bottom: 5px;
+        }
+
+        .debtor-stat-value {
+            font-size: 16px;
+            font-weight: bold;
+        }
+
+        .debt-due {
+            color: #ef4444;
+        }
+
+        .debt-collected {
+            color: #10b981;
+        }
+
+        .debt-remaining {
+            color: #f59e0b;
+        }
+
         @media (max-width: 768px) {
             .glass-card {
                 border-radius: 12px;
@@ -477,7 +594,7 @@
             }
 
             .header-title {
-                fontSize: 1.4rem;
+                font-size: 1.4rem;
             }
 
             .logo {
@@ -496,6 +613,10 @@
             .responsive-modal {
                 width: 95%;
                 margin: 10px;
+            }
+
+            .debtor-stats {
+                grid-template-columns: 1fr;
             }
         }
 
@@ -630,9 +751,25 @@
                                             <option value="">اختر البطاقة</option>
                                         </select>
                                     </div>
+                                    <!-- إضافة اختيار العميل من العملاء المديونين مع البحث -->
+                                    <div id="debtor-select-div" class="form-group">
+                                        <label class="form-label">اختر العميل من العملاء المديونين (اختياري)</label>
+                                        <div class="searchable-select">
+                                            <input type="text" id="debtor-search-input" class="input-field w-full px-4 py-3 border-2 border-gray-200 focus:outline-none" placeholder="اكتب اسم العميل للبحث...">
+                                            <div id="debtor-search-results" class="options hidden"></div>
+                                        </div>
+                                        <select id="debtor-select" class="input-field w-full px-4 py-3 border-2 border-gray-200 focus:outline-none hidden">
+                                            <option value="">اختر العميل</option>
+                                        </select>
+                                    </div>
                                     <div id="customer-name-field" class="form-group">
                                         <label class="form-label">اسم العميل</label>
                                         <input type="text" id="customer-name" class="input-field w-full px-4 py-3 border-2 border-gray-200 focus:outline-none" required>
+                                    </div>
+                                    <div id="remaining-debt-div" class="hidden">
+                                        <div class="remaining-debt">
+                                            المبلغ المتبقي: <span id="remaining-debt-amount">0</span>
+                                        </div>
                                     </div>
                                     <div class="form-group">
                                         <label class="form-label">المبلغ</label>
@@ -715,34 +852,77 @@
                             </div>
                         </div>
 
-                        <!-- Receipts & Deliveries -->
+                        <!-- Receipts & Deliveries - محسن -->
                         <div class="card-modern transfer-card">
                             <div class="card-header">
                                 <i class="fas fa-exchange-alt ml-2"></i> الاستلامات والتسليم
                             </div>
                             <div class="card-body">
-                                <form id="transfer-form" class="space-y-4">
-                                    <input type="hidden" id="transfer-edit-id" value="">
-                                    <div class="form-group">
-                                        <label class="form-label">الاستلام من</label>
-                                        <input type="text" id="received-from" class="input-field w-full px-4 py-3 border-2 border-gray-200 focus:outline-none">
-                                    </div>
-                                    <div class="form-group">
-                                        <label class="form-label">التسليم لـ</label>
-                                        <input type="text" id="delivered-to" class="input-field w-full px-4 py-3 border-2 border-gray-200 focus:outline-none">
-                                    </div>
-                                    <div class="form-group">
-                                        <label class="form-label">المبلغ</label>
-                                        <input type="number" id="transfer-amount" class="input-field w-full px-4 py-3 border-2 border-gray-200 focus:outline-none" required>
-                                    </div>
-                                    <div class="flex gap-2">
-                                        <button type="submit" class="btn-primary flex-1 text-white py-3 rounded-xl flex items-center justify-center gap-2">
-                                            <span id="transfer-btn-text"><i class="fas fa-plus-circle ml-2"></i> إضافة عملية</span>
-                                            <span id="transfer-spinner" class="loading-spinner hidden"></span>
-                                        </button>
-                                        <button type="button" id="transfer-cancel-edit" class="hidden bg-gray-300 text-gray-700 font-bold py-3 rounded-xl hover:bg-gray-400 transition flex-1">إلغاء التعديل</button>
-                                    </div>
-                                </form>
+                                <!-- قسم الاستلام -->
+                                <div class="mb-6 pb-4 border-b border-gray-200">
+                                    <h4 class="text-lg font-bold text-blue-900 mb-3">الاستلام</h4>
+                                    <form id="receipt-form" class="space-y-4">
+                                        <input type="hidden" id="receipt-edit-id" value="">
+                                        <div class="form-group">
+                                            <label class="form-label">نوع الاستلام</label>
+                                            <select id="receipt-type" class="input-field w-full px-4 py-3 border-2 border-gray-200 focus:outline-none" required>
+                                                <option value="">اختر النوع</option>
+                                                <option value="مندوب">مندوب</option>
+                                                <option value="استلام نقدي لصالح شركة">استلام نقدي لصالح شركة</option>
+                                            </select>
+                                        </div>
+                                        <div id="receipt-agent-field" class="form-group">
+                                            <label class="form-label">اسم المندوب</label>
+                                            <input type="text" id="receipt-agent-name" class="input-field w-full px-4 py-3 border-2 border-gray-200 focus:outline-none" placeholder="اسم المندوب">
+                                        </div>
+                                        <div id="receipt-company-field" class="hidden form-group">
+                                            <label class="form-label">اسم الشركة</label>
+                                            <input type="text" id="receipt-company-name" class="input-field w-full px-4 py-3 border-2 border-gray-200 focus:outline-none" placeholder="اسم الشركة">
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="form-label">المبلغ</label>
+                                            <input type="number" id="receipt-amount" class="input-field w-full px-4 py-3 border-2 border-gray-200 focus:outline-none" required>
+                                        </div>
+                                        <div class="flex gap-2">
+                                            <button type="submit" class="btn-primary flex-1 text-white py-3 rounded-xl flex items-center justify-center gap-2">
+                                                <span id="receipt-btn-text"><i class="fas fa-download ml-2"></i> استلام نقدي</span>
+                                                <span id="receipt-spinner" class="loading-spinner hidden"></span>
+                                            </button>
+                                            <button type="button" id="receipt-cancel-edit" class="hidden bg-gray-300 text-gray-700 font-bold py-3 rounded-xl hover:bg-gray-400 transition flex-1">إلغاء التعديل</button>
+                                        </div>
+                                    </form>
+                                </div>
+
+                                <!-- قسم التسليم -->
+                                <div>
+                                    <h4 class="text-lg font-bold text-blue-900 mb-3">التسليم</h4>
+                                    <form id="delivery-form" class="space-y-4">
+                                        <input type="hidden" id="delivery-edit-id" value="">
+                                        <div class="form-group">
+                                            <label class="form-label">نوع التسليم</label>
+                                            <select id="delivery-type" class="input-field w-full px-4 py-3 border-2 border-gray-200 focus:outline-none" required>
+                                                <option value="">اختر النوع</option>
+                                                <option value="مندوب">مندوب</option>
+                                                <option value="تسليم نقدي">تسليم نقدي</option>
+                                            </select>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="form-label">اسم المستلم</label>
+                                            <input type="text" id="delivery-recipient" class="input-field w-full px-4 py-3 border-2 border-gray-200 focus:outline-none" required>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="form-label">المبلغ</label>
+                                            <input type="number" id="delivery-amount" class="input-field w-full px-4 py-3 border-2 border-gray-200 focus:outline-none" required>
+                                        </div>
+                                        <div class="flex gap-2">
+                                            <button type="submit" class="btn-primary flex-1 text-white py-3 rounded-xl flex items-center justify-center gap-2">
+                                                <span id="delivery-btn-text"><i class="fas fa-upload ml-2"></i> تسليم نقدي</span>
+                                                <span id="delivery-spinner" class="loading-spinner hidden"></span>
+                                            </button>
+                                            <button type="button" id="delivery-cancel-edit" class="hidden bg-gray-300 text-gray-700 font-bold py-3 rounded-xl hover:bg-gray-400 transition flex-1">إلغاء التعديل</button>
+                                        </div>
+                                    </form>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -836,6 +1016,8 @@
                                     <option value="deposit">إيداع</option>
                                     <option value="expense">مصروف</option>
                                     <option value="transfer">تحويل</option>
+                                    <option value="receipt">استلام</option>
+                                    <option value="delivery">تسليم</option>
                                 </select>
                             </div>
                             <div class="filter-group">
@@ -884,7 +1066,7 @@
                 </div>
             </div>
 
-            <!-- Debtor Customers Tab -->
+            <!-- Debtor Customers Tab - محسن -->
             <div id="debtor-customers-tab" class="tab-content hidden">
                 <div class="glass-card mx-4 p-6 my-4">
                     <div class="flex justify-between items-center mb-6">
@@ -892,6 +1074,16 @@
                         <button id="add-debtor-btn" class="btn-primary text-white px-6 py-3 rounded-xl admin-only flex items-center">
                             <i class="fas fa-plus ml-2"></i> إضافة عميل
                         </button>
+                    </div>
+                    
+                    <!-- إضافة شريط البحث -->
+                    <div class="filter-section mb-4">
+                        <div class="filter-row">
+                            <div class="filter-group">
+                                <label class="form-label">بحث عن العميل</label>
+                                <input type="text" id="debtor-search" class="input-field w-full px-4 py-3 border-2 border-gray-200 focus:outline-none" placeholder="اكتب اسم العميل للبحث...">
+                            </div>
+                        </div>
                     </div>
                     
                     <!-- Region Tabs -->
@@ -1108,6 +1300,15 @@
                 <i class="fas fa-times-circle ml-2"></i> إضافة عملية إيداع فاشلة
             </h3>
             <form id="failed-form" class="space-y-4">
+                <!-- إضافة خانات التاريخ والوقت -->
+                <div class="form-group">
+                    <label class="form-label">التاريخ</label>
+                    <input type="date" id="failed-date" class="input-field w-full px-4 py-3 border-2 border-gray-200 focus:outline-none" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">الوقت</label>
+                    <input type="time" id="failed-time" class="input-field w-full px-4 py-3 border-2 border-gray-200 focus:outline-none" required>
+                </div>
                 <div class="form-group">
                     <label class="form-label">الحساب البنكي</label>
                     <select id="failed-bank-name" class="input-field w-full px-4 py-3 border-2 border-gray-200 focus:outline-none" required>
@@ -1200,6 +1401,8 @@
         // دالة لتهيئة الفلاتر بتاريخ اليوم
         function initializeDateFilters() {
             const today = new Date().toISOString().split('T')[0];
+            const now = new Date();
+            const timeStr = now.getHours() + ':' + (now.getMinutes() < 10 ? '0' : '') + now.getMinutes();
             
             // تعيين جميع حقول الفلتر بتاريخ اليوم
             document.getElementById('data-entry-date').value = today;
@@ -1208,6 +1411,10 @@
             document.getElementById('dashboard-date').value = today;
             document.getElementById('agents-date').value = today;
             document.getElementById('filter-date').value = today;
+            
+            // تعيين التاريخ والوقت في نموذج الإيداعات الفاشلة
+            document.getElementById('failed-date').value = today;
+            document.getElementById('failed-time').value = timeStr;
         }
 
         // الحصول على التاريخ المستهدف للإدخال
@@ -1315,23 +1522,118 @@
             initializeDailyCeilings();
         });
 
+        // البحث في العملاء المديونين
+        document.getElementById('debtor-search-input').addEventListener('input', (e) => {
+            const searchTerm = e.target.value.toLowerCase();
+            const resultsContainer = document.getElementById('debtor-search-results');
+            const debtors = allRecords.filter(r => r.is_debtor_customer);
+            
+            resultsContainer.innerHTML = '';
+            
+            if (searchTerm === '') {
+                resultsContainer.classList.add('hidden');
+                return;
+            }
+            
+            const filteredDebtors = debtors.filter(d => 
+                d.customer_name.toLowerCase().includes(searchTerm)
+            );
+            
+            if (filteredDebtors.length === 0) {
+                resultsContainer.innerHTML = '<div class="option p-2 text-gray-500 text-center">لا توجد نتائج</div>';
+                resultsContainer.classList.remove('hidden');
+                return;
+            }
+            
+            filteredDebtors.forEach(debtor => {
+                const div = document.createElement('div');
+                div.className = 'option p-2 hover:bg-blue-50 cursor-pointer border-b border-gray-100';
+                div.textContent = `${debtor.customer_name} - المبلغ المستحق: ${Math.round(debtor.customer_debt)}`;
+                div.addEventListener('click', () => {
+                    selectDebtor(debtor);
+                    resultsContainer.classList.add('hidden');
+                    document.getElementById('debtor-search-input').value = debtor.customer_name;
+                });
+                resultsContainer.appendChild(div);
+            });
+            
+            resultsContainer.classList.remove('hidden');
+        });
+
+        // إخفاء نتائج البحث عند النقر خارجها
+        document.addEventListener('click', (e) => {
+            if (!e.target.closest('#debtor-select-div')) {
+                document.getElementById('debtor-search-results').classList.add('hidden');
+            }
+        });
+
+        // اختيار عميل من نتائج البحث
+        function selectDebtor(debtor) {
+            const customerName = document.getElementById('customer-name');
+            const remainingDebtDiv = document.getElementById('remaining-debt-div');
+            const remainingDebtAmount = document.getElementById('remaining-debt-amount');
+            
+            customerName.value = debtor.customer_name;
+            customerName.disabled = true;
+            remainingDebtDiv.classList.remove('hidden');
+            remainingDebtAmount.textContent = Math.round(debtor.customer_debt);
+            
+            // تحديث القائمة المنسدلة
+            document.getElementById('debtor-select').value = debtor.customer_name;
+        }
+
         // استبعاد اسم العميل عند السحب من البطاقة
         document.getElementById('collection-type').addEventListener('change', (e) => {
             const bankCardDiv = document.getElementById('bank-card-select-div');
             const customerNameField = document.getElementById('customer-name-field');
+            const debtorSelectDiv = document.getElementById('debtor-select-div');
             
             if (e.target.value === 'سحب من بطاقة') {
                 bankCardDiv.classList.remove('hidden');
                 customerNameField.classList.add('hidden');
+                debtorSelectDiv.classList.add('hidden');
                 document.getElementById('customer-name').required = false;
             } else {
                 bankCardDiv.classList.add('hidden');
                 customerNameField.classList.remove('hidden');
+                debtorSelectDiv.classList.remove('hidden');
                 document.getElementById('customer-name').required = true;
             }
             
             // حفظ آخر اختيار
             saveLastSelection('collection-type', e.target.value);
+        });
+
+        // أحداث تغيير نوع الاستلام
+        document.getElementById('receipt-type').addEventListener('change', (e) => {
+            const agentField = document.getElementById('receipt-agent-field');
+            const companyField = document.getElementById('receipt-company-field');
+            const submitBtn = document.querySelector('#receipt-form button[type="submit"]');
+            
+            if (e.target.value === 'مندوب') {
+                agentField.classList.remove('hidden');
+                companyField.classList.add('hidden');
+                document.getElementById('receipt-agent-name').required = true;
+                document.getElementById('receipt-company-name').required = false;
+                submitBtn.querySelector('span').innerHTML = '<i class="fas fa-download ml-2"></i> استلام من مندوب';
+            } else if (e.target.value === 'استلام نقدي لصالح شركة') {
+                agentField.classList.add('hidden');
+                companyField.classList.remove('hidden');
+                document.getElementById('receipt-agent-name').required = false;
+                document.getElementById('receipt-company-name').required = true;
+                submitBtn.querySelector('span').innerHTML = '<i class="fas fa-download ml-2"></i> استلام نقدي';
+            }
+        });
+
+        // أحداث تغيير نوع التسليم
+        document.getElementById('delivery-type').addEventListener('change', (e) => {
+            const submitBtn = document.querySelector('#delivery-form button[type="submit"]');
+            
+            if (e.target.value === 'مندوب') {
+                submitBtn.querySelector('span').innerHTML = '<i class="fas fa-upload ml-2"></i> تسليم لمندوب';
+            } else if (e.target.value === 'تسليم نقدي') {
+                submitBtn.querySelector('span').innerHTML = '<i class="fas fa-upload ml-2"></i> تسليم نقدي';
+            }
         });
 
         // تحميل آخر اختيار عند تحميل الصفحة
@@ -1364,6 +1666,33 @@
                 document.getElementById('failed-card-number').value = bank.card_number || '';
                 document.getElementById('failed-card-holder').value = bank.card_holder || '';
             }
+        });
+
+        // إضافة شريط البحث في العملاء المديونين
+        document.getElementById('debtor-search').addEventListener('input', (e) => {
+            const searchTerm = e.target.value.toLowerCase();
+            const activeRegion = document.querySelector('.region-tab.active').dataset.region;
+            const regionId = activeRegion === 'all' ? 'debtors-list' : `debtors-list-${activeRegion}`;
+            const list = document.getElementById(regionId);
+            const debtors = allRecords.filter(r => r.is_debtor_customer);
+            
+            let filteredDebtors = debtors;
+            if (activeRegion !== 'all') {
+                filteredDebtors = debtors.filter(d => d.customer_region === activeRegion);
+            }
+            
+            if (searchTerm) {
+                filteredDebtors = filteredDebtors.filter(d => 
+                    d.customer_name.toLowerCase().includes(searchTerm)
+                );
+            }
+            
+            if (filteredDebtors.length === 0) {
+                list.innerHTML = `<p class="text-center text-gray-500 py-12 text-lg">${searchTerm ? 'لا توجد نتائج للبحث' : 'لا توجد ديون مسجلة'}</p>`;
+                return;
+            }
+            
+            list.innerHTML = filteredDebtors.map(debtor => createDebtorCard(debtor, userType === 'agent')).join('');
         });
 
         document.getElementById('user-type').addEventListener('change', (e) => {
@@ -1520,6 +1849,9 @@
                 document.querySelectorAll('.region-section').forEach(s => s.classList.remove('active'));
                 const regionId = 'debtors-' + tab.dataset.region;
                 document.getElementById(regionId).classList.add('active');
+                
+                // إعادة تطبيق البحث عند تغيير المنطقة
+                document.getElementById('debtor-search').dispatchEvent(new Event('input'));
             });
         });
 
@@ -1634,13 +1966,29 @@
                 document.getElementById('expense-cancel-edit').classList.remove('hidden');
                 
                 document.querySelector('[data-tab="data-entry"]').click();
-            } else if (record.type === 'transfer') {
-                document.getElementById('transfer-edit-id').value = record.id;
-                document.getElementById('received-from').value = record.received_from || '';
-                document.getElementById('delivered-to').value = record.delivered_to || '';
-                document.getElementById('transfer-amount').value = record.amount;
-                document.getElementById('transfer-btn-text').innerHTML = '<i class="fas fa-edit ml-2"></i> تعديل العملية';
-                document.getElementById('transfer-cancel-edit').classList.remove('hidden');
+            } else if (record.type === 'receipt') {
+                document.getElementById('receipt-edit-id').value = record.id;
+                document.getElementById('receipt-type').value = record.receipt_type || '';
+                document.getElementById('receipt-type').dispatchEvent(new Event('change'));
+                
+                if (record.receipt_type === 'مندوب') {
+                    document.getElementById('receipt-agent-name').value = record.received_from || '';
+                } else if (record.receipt_type === 'استلام نقدي لصالح شركة') {
+                    document.getElementById('receipt-company-name').value = record.received_from || '';
+                }
+                
+                document.getElementById('receipt-amount').value = record.amount;
+                document.getElementById('receipt-btn-text').innerHTML = '<i class="fas fa-edit ml-2"></i> تعديل الاستلام';
+                document.getElementById('receipt-cancel-edit').classList.remove('hidden');
+                
+                document.querySelector('[data-tab="data-entry"]').click();
+            } else if (record.type === 'delivery') {
+                document.getElementById('delivery-edit-id').value = record.id;
+                document.getElementById('delivery-type').value = record.delivery_type || '';
+                document.getElementById('delivery-recipient').value = record.delivered_to || '';
+                document.getElementById('delivery-amount').value = record.amount;
+                document.getElementById('delivery-btn-text').innerHTML = '<i class="fas fa-edit ml-2"></i> تعديل التسليم';
+                document.getElementById('delivery-cancel-edit').classList.remove('hidden');
                 
                 document.querySelector('[data-tab="data-entry"]').click();
             }
@@ -1652,6 +2000,8 @@
             document.getElementById('collection-btn-text').innerHTML = '<i class="fas fa-plus-circle ml-2"></i> إضافة تحصيل';
             document.getElementById('collection-cancel-edit').classList.add('hidden');
             document.getElementById('collection-form').reset();
+            document.getElementById('customer-name').disabled = false;
+            document.getElementById('remaining-debt-div').classList.add('hidden');
         });
 
         document.getElementById('deposit-cancel-edit').addEventListener('click', () => {
@@ -1668,11 +2018,18 @@
             document.getElementById('expense-form').reset();
         });
 
-        document.getElementById('transfer-cancel-edit').addEventListener('click', () => {
-            document.getElementById('transfer-edit-id').value = '';
-            document.getElementById('transfer-btn-text').innerHTML = '<i class="fas fa-plus-circle ml-2"></i> إضافة عملية';
-            document.getElementById('transfer-cancel-edit').classList.add('hidden');
-            document.getElementById('transfer-form').reset();
+        document.getElementById('receipt-cancel-edit').addEventListener('click', () => {
+            document.getElementById('receipt-edit-id').value = '';
+            document.getElementById('receipt-btn-text').innerHTML = '<i class="fas fa-download ml-2"></i> استلام نقدي';
+            document.getElementById('receipt-cancel-edit').classList.add('hidden');
+            document.getElementById('receipt-form').reset();
+        });
+
+        document.getElementById('delivery-cancel-edit').addEventListener('click', () => {
+            document.getElementById('delivery-edit-id').value = '';
+            document.getElementById('delivery-btn-text').innerHTML = '<i class="fas fa-upload ml-2"></i> تسليم نقدي';
+            document.getElementById('delivery-cancel-edit').classList.add('hidden');
+            document.getElementById('delivery-form').reset();
         });
 
         async function submitOperation(btn, spinner, record, successMsg, shareGenerator, isEdit = false, editId = null) {
@@ -1733,13 +2090,58 @@
             const editId = document.getElementById('collection-edit-id').value;
             const isEdit = !!editId;
 
+            // إذا كان العميل من العملاء المديونين، نقوم بتحديث المبلغ المتبقي
+            const debtorSelect = document.getElementById('debtor-select');
+            if (debtorSelect.value && collectionType === 'نقدي') {
+                const debtor = allRecords.find(d => 
+                    d.is_debtor_customer && 
+                    d.customer_name === debtorSelect.value
+                );
+                
+                if (debtor) {
+                    const remainingDebt = debtor.customer_debt - record.amount;
+                    
+                    // تحديث سجل العميل المديون
+                    if (remainingDebt > 0) {
+                        const debtorRef = ref(database, 'records/' + debtor.id);
+                        await update(debtorRef, {
+                            ...debtor,
+                            customer_debt: remainingDebt
+                        });
+                        showToast(`تم تحديث المبلغ المتبقي للعميل: ${Math.round(remainingDebt)}`);
+                    } else {
+                        // إذا تم سداد الدين بالكامل، يمكن حذف العميل من قائمة المديونين
+                        const debtorRef = ref(database, 'records/' + debtor.id);
+                        await remove(debtorRef);
+                        showToast('تم سداد الدين بالكامل وتم إزالة العميل من قائمة المديونين');
+                    }
+                }
+            }
+
             const success = await submitOperation(btn, spinner, record, 'تم إضافة التحصيل بنجاح ✅', 
                 (r) => {
                     if (r.collection_type === 'سحب من بطاقة') {
                         const totalActivity = getTotalBankActivity(r.bank_account, targetDate);
                         return generateWithdrawalShare(r, totalActivity);
                     }
-                    return generateOperationShare(r, '💰 عملية تحصيل جديدة');
+                    
+                    // إضافة المبلغ المتبقي في التقرير المشارك إذا كان العميل مديوناً
+                    let shareText = generateOperationShare(r, '💰 عملية تحصيل جديدة');
+                    if (debtorSelect.value && collectionType === 'نقدي') {
+                        const debtor = allRecords.find(d => 
+                            d.is_debtor_customer && 
+                            d.customer_name === debtorSelect.value
+                        );
+                        if (debtor) {
+                            const remainingDebt = debtor.customer_debt - record.amount;
+                            if (remainingDebt > 0) {
+                                shareText += `\n\n💳 المبلغ المتبقي على العميل: ${Math.round(remainingDebt)}`;
+                            } else {
+                                shareText += `\n\n✅ تم سداد الدين بالكامل`;
+                            }
+                        }
+                    }
+                    return shareText;
                 },
                 isEdit,
                 editId
@@ -1750,6 +2152,8 @@
                 document.getElementById('bank-card-select-div').classList.add('hidden');
                 document.getElementById('customer-name-field').classList.remove('hidden');
                 document.getElementById('customer-name').required = true;
+                document.getElementById('customer-name').disabled = false;
+                document.getElementById('remaining-debt-div').classList.add('hidden');
                 
                 // إعادة تعيين وضع التعديل
                 if (isEdit) {
@@ -1857,20 +2261,30 @@
             }
         });
 
-        document.getElementById('transfer-form').addEventListener('submit', async (e) => {
+        // نموذج الاستلام
+        document.getElementById('receipt-form').addEventListener('submit', async (e) => {
             e.preventDefault();
-            const btn = document.getElementById('transfer-btn-text');
-            const spinner = document.getElementById('transfer-spinner');
+            const btn = document.getElementById('receipt-btn-text');
+            const spinner = document.getElementById('receipt-spinner');
             btn.dataset.originalText = btn.textContent;
 
             const now = new Date();
             const targetDate = getTargetDate();
+            const receiptType = document.getElementById('receipt-type').value;
+            
+            let receivedFrom = '';
+            if (receiptType === 'مندوب') {
+                receivedFrom = document.getElementById('receipt-agent-name').value;
+            } else if (receiptType === 'استلام نقدي لصالح شركة') {
+                receivedFrom = document.getElementById('receipt-company-name').value;
+            }
+            
             const record = {
-                type: 'transfer',
+                type: 'receipt',
                 agent_name: currentAgent,
-                received_from: document.getElementById('received-from').value,
-                delivered_to: document.getElementById('delivered-to').value,
-                amount: Math.round(parseFloat(document.getElementById('transfer-amount').value)),
+                receipt_type: receiptType,
+                received_from: receivedFrom,
+                amount: Math.round(parseFloat(document.getElementById('receipt-amount').value)),
                 date: targetDate,
                 time: now.getHours() + ':' + (now.getMinutes() < 10 ? '0' : '') + now.getMinutes(),
                 is_bank_account: false,
@@ -1878,11 +2292,11 @@
                 is_failed_deposit: false
             };
 
-            const editId = document.getElementById('transfer-edit-id').value;
+            const editId = document.getElementById('receipt-edit-id').value;
             const isEdit = !!editId;
 
-            const success = await submitOperation(btn, spinner, record, 'تم إضافة العملية بنجاح ✅',
-                (r) => generateOperationShare(r, '🔄 تحويل جديد'),
+            const success = await submitOperation(btn, spinner, record, 'تم إضافة الاستلام بنجاح ✅',
+                (r) => generateReceiptShare(r),
                 isEdit,
                 editId
             );
@@ -1890,11 +2304,55 @@
             if (success) {
                 e.target.reset();
                 
-                // إعادة تعيين وضع التعديل
                 if (isEdit) {
-                    document.getElementById('transfer-edit-id').value = '';
-                    document.getElementById('transfer-btn-text').innerHTML = '<i class="fas fa-plus-circle ml-2"></i> إضافة عملية';
-                    document.getElementById('transfer-cancel-edit').classList.add('hidden');
+                    document.getElementById('receipt-edit-id').value = '';
+                    document.getElementById('receipt-btn-text').innerHTML = '<i class="fas fa-download ml-2"></i> استلام نقدي';
+                    document.getElementById('receipt-cancel-edit').classList.add('hidden');
+                }
+            }
+        });
+
+        // نموذج التسليم
+        document.getElementById('delivery-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const btn = document.getElementById('delivery-btn-text');
+            const spinner = document.getElementById('delivery-spinner');
+            btn.dataset.originalText = btn.textContent;
+
+            const now = new Date();
+            const targetDate = getTargetDate();
+            const deliveryType = document.getElementById('delivery-type').value;
+            const recipient = document.getElementById('delivery-recipient').value;
+            
+            const record = {
+                type: 'delivery',
+                agent_name: currentAgent,
+                delivery_type: deliveryType,
+                delivered_to: recipient,
+                amount: Math.round(parseFloat(document.getElementById('delivery-amount').value)),
+                date: targetDate,
+                time: now.getHours() + ':' + (now.getMinutes() < 10 ? '0' : '') + now.getMinutes(),
+                is_bank_account: false,
+                is_debtor_customer: false,
+                is_failed_deposit: false
+            };
+
+            const editId = document.getElementById('delivery-edit-id').value;
+            const isEdit = !!editId;
+
+            const success = await submitOperation(btn, spinner, record, 'تم إضافة التسليم بنجاح ✅',
+                (r) => generateDeliveryShare(r),
+                isEdit,
+                editId
+            );
+            
+            if (success) {
+                e.target.reset();
+                
+                if (isEdit) {
+                    document.getElementById('delivery-edit-id').value = '';
+                    document.getElementById('delivery-btn-text').innerHTML = '<i class="fas fa-upload ml-2"></i> تسليم نقدي';
+                    document.getElementById('delivery-cancel-edit').classList.add('hidden');
                 }
             }
         });
@@ -2068,8 +2526,8 @@
             btn.textContent = 'جاري الحفظ...';
             spinner.classList.remove('hidden');
 
-            const now = new Date();
-            const targetDate = getTargetDate();
+            const targetDate = document.getElementById('failed-date').value;
+            const targetTime = document.getElementById('failed-time').value;
             const bankAccount = document.getElementById('failed-bank-name').value;
             
             // حفظ آخر اختيار
@@ -2088,7 +2546,7 @@
                 card_holder: document.getElementById('failed-card-holder').value,
                 card_code: document.getElementById('failed-card-code').value,
                 date: targetDate,
-                time: now.getHours() + ':' + (now.getMinutes() < 10 ? '0' : '') + now.getMinutes(),
+                time: targetTime,
                 is_bank_account: false,
                 is_debtor_customer: false,
                 is_failed_deposit: true
@@ -2173,10 +2631,8 @@
                 if (r.type === 'collection') collections += r.amount || 0;
                 else if (r.type === 'deposit') deposits += r.amount || 0;
                 else if (r.type === 'expense') expenses += r.amount || 0;
-                else if (r.type === 'transfer') {
-                    if (r.received_from) receipts += r.amount || 0;
-                    if (r.delivered_to) deliveries += r.amount || 0;
-                }
+                else if (r.type === 'receipt') receipts += r.amount || 0;
+                else if (r.type === 'delivery') deliveries += r.amount || 0;
             });
             
             // حساب الإيداعات الفاشلة
@@ -2232,6 +2688,7 @@
         function updateUI() {
             updateBankAccountsDropdown();
             updateBankCardsDropdown();
+            updateDebtorSelect();
             updateDailySummary();
             updateBankAccountsList();
             updateDebtorsList();
@@ -2273,6 +2730,20 @@
                 option.value = bank.bank_account;
                 option.textContent = bank.bank_account;
                 select.appendChild(option);
+            });
+        }
+
+        function updateDebtorSelect() {
+            const debtorSelect = document.getElementById('debtor-select');
+            const debtors = allRecords.filter(r => r.is_debtor_customer);
+            
+            debtorSelect.innerHTML = '<option value="">اختر العميل</option>';
+            debtors.forEach(debtor => {
+                const option = document.createElement('option');
+                option.value = debtor.customer_name;
+                option.textContent = `${debtor.customer_name} - ${Math.round(debtor.customer_debt)}`;
+                option.dataset.debt = debtor.customer_debt;
+                debtorSelect.appendChild(option);
             });
         }
 
@@ -2365,14 +2836,16 @@
                 collection: '💰 تحصيل',
                 deposit: '🏦 إيداع',
                 expense: '💸 مصروف',
-                transfer: '🔄 تحويل'
+                receipt: '📥 استلام',
+                delivery: '📤 تسليم'
             };
             
             const typeColors = {
                 collection: 'from-green-500 to-emerald-600',
                 deposit: 'from-blue-500 to-blue-600',
                 expense: 'from-red-500 to-red-600',
-                transfer: 'from-purple-500 to-purple-600'
+                receipt: 'from-purple-500 to-purple-600',
+                delivery: 'from-orange-500 to-orange-600'
             };
             
             let details = '';
@@ -2388,8 +2861,10 @@
                 details = record.bank_account;
             } else if (record.type === 'expense') {
                 details = `${record.expense_type}${record.expense_details ? ' - ' + record.expense_details : ''}`;
-            } else if (record.type === 'transfer') {
-                details = `${record.received_from ? 'من: ' + record.received_from : ''} ${record.delivered_to ? 'إلى: ' + record.delivered_to : ''}`;
+            } else if (record.type === 'receipt') {
+                details = `${record.receipt_type} - ${record.received_from}`;
+            } else if (record.type === 'delivery') {
+                details = `${record.delivery_type} - ${record.delivered_to}`;
             }
             
             return `
@@ -2441,6 +2916,12 @@
                 const percentage = (totalDeposits / bank.financial_ceiling) * 100;
                 const isAgent = userType === 'agent';
                 
+                // الحصول على آخر 5 إيداعات لهذا الحساب البنكي
+                const lastDeposits = allRecords
+                    .filter(r => r.type === 'deposit' && r.bank_account === bank.bank_account && r.date === targetDate)
+                    .sort((a, b) => new Date(b.date + 'T' + b.time) - new Date(a.date + 'T' + a.time))
+                    .slice(0, 5);
+                
                 return `
                     <div class="glass-card p-5">
                         <div class="flex items-center gap-3 mb-4">
@@ -2464,6 +2945,23 @@
                             </div>
                             <p class="text-sm text-center mt-1 font-bold text-gray-700">${Math.round(percentage)}%</p>
                         </div>
+                        
+                        <!-- عرض آخر 5 إيداعات -->
+                        ${lastDeposits.length > 0 ? `
+                            <div class="last-deposits">
+                                <h5 class="font-bold text-blue-900 mb-2">آخر ${lastDeposits.length} إيداع:</h5>
+                                ${lastDeposits.map(deposit => `
+                                    <div class="deposit-item">
+                                        <div>
+                                            <span class="font-medium">${deposit.agent_name}</span>
+                                            <span class="text-xs text-gray-500"> - ${formatTime(deposit.time)}</span>
+                                        </div>
+                                        <span class="font-bold text-blue-700">${Math.round(deposit.amount)}</span>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        ` : ''}
+                        
                         <div class="flex gap-2 mt-4">
                             ${!isAgent ? `
                                 <button onclick="window.editBankAccountRecord('${bank.id}')" class="btn-secondary flex-1 text-white py-2 rounded-xl text-sm flex items-center justify-center">
@@ -2517,28 +3015,53 @@
                 'other': 'باقي المناطق'
             };
             
+            // حساب الرصيد المستخلص (مجموع التحصيلات لهذا العميل)
+            const collectionsForCustomer = allRecords.filter(r => 
+                r.type === 'collection' && 
+                r.customer_name === debtor.customer_name &&
+                !r.is_failed_deposit
+            );
+            const collectedAmount = collectionsForCustomer.reduce((sum, r) => sum + (r.amount || 0), 0);
+            
+            const remainingDebt = debtor.customer_debt - collectedAmount;
+            
             return `
-                <div class="operation-card glass-card p-4 flex justify-between items-center">
-                    <div class="flex items-center gap-3">
-                        <div class="icon-circle" style="background: linear-gradient(135deg, var(--warning), #d97706);">
-                            <i class="fas fa-user text-white"></i>
+                <div class="operation-card glass-card p-4">
+                    <div class="flex justify-between items-start mb-3">
+                        <div class="flex items-center gap-3">
+                            <div class="icon-circle" style="background: linear-gradient(135deg, var(--warning), #d97706);">
+                                <i class="fas fa-user text-white"></i>
+                            </div>
+                            <div>
+                                <p class="font-bold text-blue-900">${debtor.customer_name}</p>
+                                <p class="text-sm text-gray-600 mt-1">المنطقة: ${regionLabels[debtor.customer_region] || 'غير محدد'}</p>
+                            </div>
                         </div>
-                        <div>
-                            <p class="font-bold text-blue-900">${debtor.customer_name}</p>
-                            <p class="text-sm text-gray-600 mt-1">المبلغ المستحق: <span class="font-bold text-red-600">${Math.round(debtor.customer_debt)}</span></p>
-                            <p class="text-xs text-blue-600 mt-1">المنطقة: ${regionLabels[debtor.customer_region] || 'غير محدد'}</p>
+                        ${!isAgent ? `
+                            <div class="flex gap-2">
+                                <button onclick="window.editDebtorRecord('${debtor.id}')" class="text-blue-600 text-xl hover:scale-125 transition" title="تعديل">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                                <button onclick="window.deleteRecord('${debtor.id}')" class="text-red-600 text-xl hover:scale-125 transition" title="حذف">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+                        ` : ''}
+                    </div>
+                    <div class="debtor-stats">
+                        <div class="debtor-stat-item">
+                            <div class="debtor-stat-label">الرصيد المستحق</div>
+                            <div class="debtor-stat-value debt-due">${Math.round(debtor.customer_debt)}</div>
+                        </div>
+                        <div class="debtor-stat-item">
+                            <div class="debtor-stat-label">الرصيد المستخلص</div>
+                            <div class="debtor-stat-value debt-collected">${Math.round(collectedAmount)}</div>
+                        </div>
+                        <div class="debtor-stat-item">
+                            <div class="debtor-stat-label">المبلغ المتبقي</div>
+                            <div class="debtor-stat-value debt-remaining">${Math.round(remainingDebt)}</div>
                         </div>
                     </div>
-                    ${!isAgent ? `
-                        <div class="flex gap-2">
-                            <button onclick="window.editDebtorRecord('${debtor.id}')" class="text-blue-600 text-xl hover:scale-125 transition" title="تعديل">
-                                <i class="fas fa-edit"></i>
-                            </button>
-                            <button onclick="window.deleteRecord('${debtor.id}')" class="text-red-600 text-xl hover:scale-125 transition" title="حذف">
-                                <i class="fas fa-trash"></i>
-                            </button>
-                        </div>
-                    ` : ''}
                 </div>
             `;
         }
@@ -2731,9 +3254,10 @@
                 if (record.expense_details) {
                     details += `\n▫️ التفاصيل: ${record.expense_details}`;
                 }
-            } else if (record.type === 'transfer') {
-                if (record.received_from) details += `▫️ الاستلام من: ${record.received_from}\n`;
-                if (record.delivered_to) details += `▫️ التسليم لـ: ${record.delivered_to}`;
+            } else if (record.type === 'receipt') {
+                details = `▫️ النوع: ${record.receipt_type}\n▫️ ${record.receipt_type === 'مندوب' ? 'اسم المندوب:' : 'اسم الشركة:'} ${record.received_from}`;
+            } else if (record.type === 'delivery') {
+                details = `▫️ النوع: ${record.delivery_type}\n▫️ اسم المستلم: ${record.delivered_to}`;
             }
             
             return `━━━━━━━━━━━━━━━━━
@@ -2780,6 +3304,30 @@ ${details}
 💳 المتبقي من السقف: ${Math.round(remaining)}
 
 *💰 المبلغ المتبقي :  ${Math.round(totalRemaining)}*`;
+        }
+
+        function generateReceiptShare(record) {
+            return `━━━━━━━━━━━━━━━━━
+📥 استلام نقدي جديد
+━━━━━━━━━━━━━━━━━
+
+▫️ نوع الاستلام: ${record.receipt_type}
+▫️ ${record.receipt_type === 'مندوب' ? 'اسم المندوب:' : 'اسم الشركة:'} ${record.received_from}
+▫️ المبلغ: ${Math.round(record.amount)}
+▫️ التاريخ: ${formatDateForShare(record.date, record.time)}
+▫️ المندوب: ${record.agent_name}`;
+        }
+
+        function generateDeliveryShare(record) {
+            return `━━━━━━━━━━━━━━━━━
+📤 تسليم نقدي جديد
+━━━━━━━━━━━━━━━━━
+
+▫️ نوع التسليم: ${record.delivery_type}
+▫️ اسم المستلم: ${record.delivered_to}
+▫️ المبلغ: ${Math.round(record.amount)}
+▫️ التاريخ: ${formatDateForShare(record.date, record.time)}
+▫️ المندوب: ${record.agent_name}`;
         }
 
         function generateSummaryReport() {
@@ -2857,6 +3405,24 @@ ${details}
                 report += `\n`;
             }
 
+            const receipts = todayRecords.filter(r => r.type === 'receipt');
+            if (receipts.length > 0) {
+                report += `📥 الاستلامات (${receipts.length}):\n`;
+                receipts.forEach((r, i) => {
+                    report += `${i + 1}. ${r.receipt_type} - ${r.received_from}: ${Math.round(r.amount)}\n`;
+                });
+                report += `\n`;
+            }
+
+            const deliveries = todayRecords.filter(r => r.type === 'delivery');
+            if (deliveries.length > 0) {
+                report += `📤 التسليمات (${deliveries.length}):\n`;
+                deliveries.forEach((r, i) => {
+                    report += `${i + 1}. ${r.delivery_type} - ${r.delivered_to}: ${Math.round(r.amount)}\n`;
+                });
+                report += `\n`;
+            }
+
             // الإيداعات الفاشلة
             const failedDeposits = allRecords.filter(r => 
                 r.is_failed_deposit && 
@@ -2921,17 +3487,27 @@ ${details}
 ▫️ المبلغ: ${Math.round(record.amount)}
 ▫️ الفرع: ${record.branch_number || '-'}
 ▫️ رقم الجهاز: ${record.device_number || '-'}
-▫️ التاريخ: ${formatDateForShare(record.date, record.time)}`;
+▫️ العنوان: ${record.branch_address || '-'}
+▫️ رقم البطاقة: ${record.card_number || '-'}
+▫️ صاحب البطاقة: ${record.card_holder || '-'}
+▫️ رمز البطاقة: ${record.card_code || '-'}
+▫️ التاريخ: ${formatDateForShare(record.date, record.time)}
+▫️ المندوب: ${record.agent_name}`;
                 showShareModal(shareText);
             } else if (record.type === 'collection' && record.collection_type === 'سحب من بطاقة') {
                 const totalActivity = getTotalBankActivity(record.bank_account, record.date);
                 showShareModal(generateWithdrawalShare(record, totalActivity));
+            } else if (record.type === 'receipt') {
+                showShareModal(generateReceiptShare(record));
+            } else if (record.type === 'delivery') {
+                showShareModal(generateDeliveryShare(record));
             } else {
                 const titles = {
                     collection: '*💰 عملية تحصيل جديدة*',
                     deposit: '*🏦 إيداع بنكي جديد*',
                     expense: '💸 مصروف جديد',
-                    transfer: '🔄 تحويل جديد'
+                    receipt: '📥 استلام جديد',
+                    delivery: '📤 تسليم جديد'
                 };
                 showShareModal(generateOperationShare(record, titles[record.type] || 'عملية جديدة'));
             }
@@ -3079,16 +3655,20 @@ ${details}
                 report += `\n`;
             }
 
-            const transfers = agentRecords.filter(r => r.type === 'transfer');
-            if (transfers.length > 0) {
-                report += `🔄 التحويلات (${transfers.length}):\n`;
-                transfers.forEach((r, i) => {
-                    if (r.received_from) {
-                        report += `${i + 1}. استلام من ${r.received_from}: ${Math.round(r.amount)}\n`;
-                    }
-                    if (r.delivered_to) {
-                        report += `${i + 1}. تسليم لـ ${r.delivered_to}: ${Math.round(r.amount)}\n`;
-                    }
+            const receipts = agentRecords.filter(r => r.type === 'receipt');
+            if (receipts.length > 0) {
+                report += `📥 الاستلامات (${receipts.length}):\n`;
+                receipts.forEach((r, i) => {
+                    report += `${i + 1}. ${r.receipt_type} - ${r.received_from}: ${Math.round(r.amount)}\n`;
+                });
+                report += `\n`;
+            }
+
+            const deliveries = agentRecords.filter(r => r.type === 'delivery');
+            if (deliveries.length > 0) {
+                report += `📤 التسليمات (${deliveries.length}):\n`;
+                deliveries.forEach((r, i) => {
+                    report += `${i + 1}. ${r.delivery_type} - ${r.delivered_to}: ${Math.round(r.amount)}\n`;
                 });
             }
 
