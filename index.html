@@ -562,6 +562,48 @@
             color: #f59e0b;
         }
 
+        /* تحسينات لتبويب الملخص اليومي */
+        .operations-category {
+            margin-bottom: 30px;
+        }
+
+        .category-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #e5e7eb;
+        }
+
+        .category-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+        }
+
+        .category-title {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: var(--primary);
+        }
+
+        /* تحسينات للأحجام على الشاشات الصغيرة */
+        .responsive-stat-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 10px;
+        }
+
+        .responsive-operation-card {
+            flex-direction: column;
+            gap: 10px;
+        }
+
         @media (max-width: 768px) {
             .glass-card {
                 border-radius: 12px;
@@ -618,6 +660,25 @@
             .debtor-stats {
                 grid-template-columns: 1fr;
             }
+
+            /* تحسينات إضافية للملخص اليومي */
+            .responsive-stat-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+
+            .category-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 5px;
+            }
+
+            .responsive-operation-card {
+                padding: 15px;
+            }
+
+            .operations-category {
+                margin-bottom: 20px;
+            }
         }
 
         @media (max-width: 480px) {
@@ -637,6 +698,10 @@
             .responsive-modal {
                 width: 98%;
                 margin: 5px;
+            }
+
+            .responsive-stat-grid {
+                grid-template-columns: 1fr;
             }
         }
     </style>
@@ -929,30 +994,30 @@
                 </div>
             </div>
 
-            <!-- Daily Summary Tab -->
+            <!-- Daily Summary Tab - محسن -->
             <div id="daily-summary-tab" class="tab-content hidden">
-                <div class="glass-card mx-4 p-6 my-4">
+                <div class="glass-card mx-4 p-4 md:p-6 my-4">
                     <div class="flex flex-col md:flex-row justify-between items-center mb-6 gap-4">
                         <h3 class="text-2xl font-bold text-blue-900"><i class="fas fa-chart-bar ml-2"></i> ملخص اليوم</h3>
-                        <div class="flex gap-3">
-                            <button id="share-summary-btn" class="btn-secondary text-white px-6 py-3 rounded-xl flex items-center">
-                                <i class="fas fa-share ml-2"></i> مشاركة الملخص
+                        <div class="flex gap-3 flex-wrap">
+                            <button id="share-summary-btn" class="btn-secondary text-white px-4 md:px-6 py-3 rounded-xl flex items-center">
+                                <i class="fas fa-share ml-2"></i> <span class="hidden md:inline">مشاركة الملخص</span>
                             </button>
-                            <button id="share-detailed-btn" class="btn-secondary text-white px-6 py-3 rounded-xl flex items-center">
-                                <i class="fas fa-file-alt ml-2"></i> مشاركة تفصيلي
+                            <button id="share-detailed-btn" class="btn-secondary text-white px-4 md:px-6 py-3 rounded-xl flex items-center">
+                                <i class="fas fa-file-alt ml-2"></i> <span class="hidden md:inline">مشاركة تفصيلي</span>
                             </button>
                         </div>
                     </div>
                     
                     <!-- Date Filter -->
-                    <div class="filter-section">
+                    <div class="filter-section mb-4">
                         <div class="filter-row">
                             <div class="filter-group">
                                 <label class="form-label">التاريخ</label>
                                 <input type="date" id="daily-summary-date" class="input-field w-full px-4 py-3 border-2 border-gray-200 focus:outline-none">
                             </div>
-                            <button id="apply-daily-filter" class="btn-primary text-white px-6 py-3 rounded-xl flex items-center h-fit">
-                                <i class="fas fa-filter ml-2"></i> تطبيق الفلتر
+                            <button id="apply-daily-filter" class="btn-primary text-white px-4 md:px-6 py-3 rounded-xl flex items-center h-fit">
+                                <i class="fas fa-filter ml-2"></i> <span class="hidden md:inline">تطبيق الفلتر</span>
                             </button>
                         </div>
                     </div>
@@ -961,34 +1026,42 @@
                     <div class="mb-6">
                         <div class="stat-card p-4">
                             <div class="flex justify-between items-center">
-                                <p class="text-lg font-bold text-gray-700">الرصيد السابق (أمس)</p>
-                                <p class="text-2xl font-bold text-purple-600" id="previous-balance">0</p>
+                                <p class="text-base md:text-lg font-bold text-gray-700">الرصيد السابق (أمس)</p>
+                                <p class="text-xl md:text-2xl font-bold text-purple-600" id="previous-balance">0</p>
                             </div>
                         </div>
                     </div>
                     
-                    <!-- Statistics -->
-                    <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+                    <!-- Statistics - محسن -->
+                    <div class="responsive-stat-grid gap-3 md:gap-4 mb-6">
                         <div class="stat-card p-4">
                             <p class="text-sm font-bold text-gray-600 mb-2">إجمالي التحصيلات</p>
-                            <p class="text-2xl font-bold text-green-600" id="total-collections">0</p>
+                            <p class="text-xl md:text-2xl font-bold text-green-600" id="total-collections">0</p>
                         </div>
                         <div class="stat-card p-4">
                             <p class="text-sm font-bold text-gray-600 mb-2">إجمالي الإيداعات</p>
-                            <p class="text-2xl font-bold text-blue-600" id="total-deposits">0</p>
+                            <p class="text-xl md:text-2xl font-bold text-blue-600" id="total-deposits">0</p>
                         </div>
                         <div class="stat-card p-4">
                             <p class="text-sm font-bold text-gray-600 mb-2">إجمالي المصروفات</p>
-                            <p class="text-2xl font-bold text-red-600" id="total-expenses">0</p>
+                            <p class="text-xl md:text-2xl font-bold text-red-600" id="total-expenses">0</p>
+                        </div>
+                        <div class="stat-card p-4">
+                            <p class="text-sm font-bold text-gray-600 mb-2">الاستلامات</p>
+                            <p class="text-xl md:text-2xl font-bold text-purple-600" id="total-receipts">0</p>
+                        </div>
+                        <div class="stat-card p-4">
+                            <p class="text-sm font-bold text-gray-600 mb-2">التسليمات</p>
+                            <p class="text-xl md:text-2xl font-bold text-orange-600" id="total-deliveries">0</p>
                         </div>
                         <div class="stat-card p-4">
                             <p class="text-sm font-bold text-gray-600 mb-2">المبلغ المتبقي</p>
-                            <p class="text-2xl font-bold text-purple-600" id="remaining-balance">0</p>
+                            <p class="text-xl md:text-2xl font-bold text-indigo-600" id="remaining-balance">0</p>
                         </div>
                     </div>
                     
-                    <!-- Operations List -->
-                    <div class="space-y-4" id="operations-list">
+                    <!-- Operations List - محسن -->
+                    <div id="operations-list">
                         <p class="text-center text-gray-500 py-12 text-lg">لا توجد عمليات اليوم</p>
                     </div>
                 </div>
@@ -1015,7 +1088,6 @@
                                     <option value="collection">تحصيل</option>
                                     <option value="deposit">إيداع</option>
                                     <option value="expense">مصروف</option>
-                                    <option value="transfer">تحويل</option>
                                     <option value="receipt">استلام</option>
                                     <option value="delivery">تسليم</option>
                                 </select>
@@ -1037,7 +1109,7 @@
                 </div>
             </div>
 
-            <!-- Bank Accounts Tab -->
+            <!-- Bank Accounts Tab - محسن -->
             <div id="bank-accounts-tab" class="tab-content hidden">
                 <div class="glass-card mx-4 p-6 my-4">
                     <div class="flex justify-between items-center mb-6">
@@ -2307,7 +2379,7 @@
                 if (isEdit) {
                     document.getElementById('receipt-edit-id').value = '';
                     document.getElementById('receipt-btn-text').innerHTML = '<i class="fas fa-download ml-2"></i> استلام نقدي';
-                    document.getElementById('receipt-cancel-edit').classList.add('hidden');
+                    document.getElementById('receipt-cancel-edit').classList.remove('hidden');
                 }
             }
         });
@@ -2352,7 +2424,7 @@
                 if (isEdit) {
                     document.getElementById('delivery-edit-id').value = '';
                     document.getElementById('delivery-btn-text').innerHTML = '<i class="fas fa-upload ml-2"></i> تسليم نقدي';
-                    document.getElementById('delivery-cancel-edit').classList.add('hidden');
+                    document.getElementById('delivery-cancel-edit').classList.remove('hidden');
                 }
             }
         });
@@ -2786,6 +2858,8 @@
             document.getElementById('total-collections').textContent = Math.round(totals.collections);
             document.getElementById('total-deposits').textContent = Math.round(totals.deposits);
             document.getElementById('total-expenses').textContent = Math.round(totals.expenses);
+            document.getElementById('total-receipts').textContent = Math.round(totals.receipts);
+            document.getElementById('total-deliveries').textContent = Math.round(totals.deliveries);
             document.getElementById('remaining-balance').textContent = Math.round(remaining);
             
             const list = document.getElementById('operations-list');
@@ -2794,7 +2868,101 @@
                 return;
             }
             
-            list.innerHTML = records.map(r => createOperationCard(r)).join('');
+            // تصنيف العمليات حسب النوع
+            const collections = records.filter(r => r.type === 'collection');
+            const deposits = records.filter(r => r.type === 'deposit');
+            const expenses = records.filter(r => r.type === 'expense');
+            const receipts = records.filter(r => r.type === 'receipt');
+            const deliveries = records.filter(r => r.type === 'delivery');
+            
+            let html = '';
+            
+            // عرض التحصيلات
+            if (collections.length > 0) {
+                html += `
+                    <div class="operations-category">
+                        <div class="category-header">
+                            <div class="category-icon" style="background: linear-gradient(135deg, var(--success), #059669);">
+                                <i class="fas fa-money-bill-wave text-white"></i>
+                            </div>
+                            <h4 class="category-title">التحصيلات (${collections.length})</h4>
+                        </div>
+                        <div class="space-y-3">
+                            ${collections.map(r => createOperationCard(r)).join('')}
+                        </div>
+                    </div>
+                `;
+            }
+            
+            // عرض الإيداعات
+            if (deposits.length > 0) {
+                html += `
+                    <div class="operations-category">
+                        <div class="category-header">
+                            <div class="category-icon" style="background: linear-gradient(135deg, var(--primary-light), #2563eb);">
+                                <i class="fas fa-university text-white"></i>
+                            </div>
+                            <h4 class="category-title">الإيداعات (${deposits.length})</h4>
+                        </div>
+                        <div class="space-y-3">
+                            ${deposits.map(r => createOperationCard(r)).join('')}
+                        </div>
+                    </div>
+                `;
+            }
+            
+            // عرض المصروفات
+            if (expenses.length > 0) {
+                html += `
+                    <div class="operations-category">
+                        <div class="category-header">
+                            <div class="category-icon" style="background: linear-gradient(135deg, var(--danger), #dc2626);">
+                                <i class="fas fa-receipt text-white"></i>
+                            </div>
+                            <h4 class="category-title">المصروفات (${expenses.length})</h4>
+                        </div>
+                        <div class="space-y-3">
+                            ${expenses.map(r => createOperationCard(r)).join('')}
+                        </div>
+                    </div>
+                `;
+            }
+            
+            // عرض الاستلامات
+            if (receipts.length > 0) {
+                html += `
+                    <div class="operations-category">
+                        <div class="category-header">
+                            <div class="category-icon" style="background: linear-gradient(135deg, var(--purple), #7c3aed);">
+                                <i class="fas fa-download text-white"></i>
+                            </div>
+                            <h4 class="category-title">الاستلامات (${receipts.length})</h4>
+                        </div>
+                        <div class="space-y-3">
+                            ${receipts.map(r => createOperationCard(r)).join('')}
+                        </div>
+                    </div>
+                `;
+            }
+            
+            // عرض التسليمات
+            if (deliveries.length > 0) {
+                html += `
+                    <div class="operations-category">
+                        <div class="category-header">
+                            <div class="category-icon" style="background: linear-gradient(135deg, var(--warning), #d97706);">
+                                <i class="fas fa-upload text-white"></i>
+                            </div>
+                            <h4 class="category-title">التسليمات (${deliveries.length})</h4>
+                        </div>
+                        <div class="space-y-3">
+                            ${deliveries.map(r => createOperationCard(r)).join('')}
+                        </div>
+                    </div>
+                `;
+            }
+            
+            list.innerHTML = html;
         }
 
         function updateAllOperations() {
@@ -2868,8 +3036,8 @@
             }
             
             return `
-                <div class="operation-card glass-card p-4 flex justify-between items-center">
-                    <div class="flex items-center gap-3 flex-1">
+                <div class="operation-card glass-card p-4 responsive-operation-card">
+                    <div class="flex items-center gap-3 flex-1 w-full">
                         <div class="icon-circle bg-gradient-to-br ${typeColors[record.type]}">
                             <span class="text-white">${typeLabels[record.type].charAt(0)}</span>
                         </div>
@@ -2880,7 +3048,7 @@
                             <p class="text-xs text-gray-500 mt-1">${record.date} - ${formatTime(record.time)}</p>
                         </div>
                     </div>
-                    <div class="text-left">
+                    <div class="text-left w-full">
                         <p class="text-xl font-bold text-blue-700">${Math.round(record.amount)}</p>
                         <div class="flex gap-2 mt-2">
                             <button onclick="window.editOperation('${record.id}')" class="text-blue-600 hover:scale-125 transition" title="تعديل">
@@ -2932,8 +3100,8 @@
                         </div>
                         <div class="space-y-2 text-sm">
                             <p><span class="text-gray-600">رقم الحساب:</span> <span class="text-blue-900 font-bold">${bank.account_number}</span></p>
-                            ${!isAgent && bank.card_number ? `<p><span class="text-gray-600">رقم البطاقة:</span> <span class="text-blue-900 font-bold">${bank.card_number}</span></p>` : ''}
-                            ${!isAgent && bank.card_holder ? `<p><span class="text-gray-600">صاحب البطاقة:</span> <span class="text-blue-900 font-bold">${bank.card_holder}</span></p>` : ''}
+                            ${bank.card_number ? `<p><span class="text-gray-600">رقم البطاقة:</span> <span class="text-blue-900 font-bold">${bank.card_number}</span></p>` : ''}
+                            ${bank.card_holder ? `<p><span class="text-gray-600">صاحب البطاقة:</span> <span class="text-blue-900 font-bold">${bank.card_holder}</span></p>` : ''}
                             <p><span class="text-gray-600">السقف المالي:</span> <span class="text-blue-700 font-bold">${Math.round(bank.financial_ceiling)}</span></p>
                             <p><span class="text-gray-600">إجمالي الإيداعات:</span> <span class="text-blue-600 font-bold">${Math.round(totalDeposits)}</span></p>
                             <p><span class="text-gray-600">إجمالي السحوبات:</span> <span class="text-purple-600 font-bold">${Math.round(totalWithdrawals)}</span></p>
@@ -3545,6 +3713,8 @@ ${details}
 
 ▫️ اسم الحساب: ${bankAccount}
 ▫️ رقم الحساب: ${bank.account_number}
+▫️ رقم البطاقة: ${bank.card_number || 'غير محدد'}
+▫️ صاحب البطاقة: ${bank.card_holder || 'غير محدد'}
 ▫️ السقف المالي: ${Math.round(bank.financial_ceiling)}
 
 ━━━━━━━━━━━━━━━━━
